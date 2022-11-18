@@ -84,50 +84,50 @@ int main(void) {
 	return(0);
 }
 
-bool show_memory(void)
-{
-	// print whole memory
-	Serial.println("------ Whole memory------------------------");
-	for (uint16_t n = 0; n < BUFFERLEN; n += CHUNKSIZE) {
-		// read
-		if (Nunchuk.read(NUNCHUK_ADDRESS, (uint8_t)n,
-				(uint8_t)CHUNKSIZE) != CHUNKSIZE)
-			return (false);
+// bool show_memory(void)
+// {
+// 	// print whole memory
+// 	Serial.println("------ Whole memory------------------------");
+// 	for (uint16_t n = 0; n < BUFFERLEN; n += CHUNKSIZE) {
+// 		// read
+// 		if (Nunchuk.read(NUNCHUK_ADDRESS, (uint8_t)n,
+// 				(uint8_t)CHUNKSIZE) != CHUNKSIZE)
+// 			return (false);
 
-		// print
-		Serial.print("0x");
-		if (n == 0) Serial.print("0");
-		Serial.print(n, HEX);
-		Serial.print(": ");
-		for (uint8_t i = 0; i < CHUNKSIZE; i++) {
-			if (Nunchuk.buffer[i] == 0)
-				Serial.print('0');
-			Serial.print(Nunchuk.buffer[i], HEX);
-		}
-		Serial.println("");
-	}
+// 		// print
+// 		Serial.print("0x");
+// 		if (n == 0) Serial.print("0");
+// 		Serial.print(n, HEX);
+// 		Serial.print(": ");
+// 		for (uint8_t i = 0; i < CHUNKSIZE; i++) {
+// 			if (Nunchuk.buffer[i] == 0)
+// 				Serial.print('0');
+// 			Serial.print(Nunchuk.buffer[i], HEX);
+// 		}
+// 		Serial.println("");
+// 	}
 
-	return(true);
-}
+// 	return(true);
+// }
 
 bool show_state(void)
 {
 	if (!Nunchuk.getState(NUNCHUK_ADDRESS))
 		return (false);
-	Serial.println("------State data--------------------------");
+	// Serial.println("------State data--------------------------");
 	Serial.print("Joy X: ");
 	Serial.print(Nunchuk.state.joy_x_axis, HEX);
-	Serial.print("\t\tAccel X: ");
-	Serial.print(Nunchuk.state.accel_x_axis, HEX);
-	Serial.print("\t\tButton C: ");
-	Serial.println(Nunchuk.state.c_button, HEX);
+	// Serial.print("\t\tAccel X: ");
+	// Serial.print(Nunchuk.state.accel_x_axis, HEX);
+	// Serial.print("\t\tButton C: ");
+	// Serial.println(Nunchuk.state.c_button, HEX);
 
-	Serial.print("Joy Y: ");
-	Serial.print(Nunchuk.state.joy_y_axis, HEX);
-	Serial.print("\t\tAccel Y: ");
-	Serial.print(Nunchuk.state.accel_y_axis, HEX);
-	Serial.print("\t\tButton Z: ");
-	Serial.println(Nunchuk.state.z_button, HEX);
+	// Serial.print("Joy Y: ");
+	// Serial.print(Nunchuk.state.joy_y_axis, HEX);
+	// Serial.print("\t\tAccel Y: ");
+	// Serial.print(Nunchuk.state.accel_y_axis, HEX);
+	// Serial.print("\t\tButton Z: ");
+	// Serial.println(Nunchuk.state.z_button, HEX);
 
 	Serial.print("\t\t\tAccel Z: ");
 	Serial.println(Nunchuk.state.accel_z_axis, HEX);

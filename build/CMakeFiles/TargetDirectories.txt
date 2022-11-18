@@ -1,0 +1,10 @@
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/strip.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/hex.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/eeprom.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/disasm.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/upload.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/upload_eeprom.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/fuses.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/GIT.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/edit_cache.dir
+C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/rebuild_cache.dir

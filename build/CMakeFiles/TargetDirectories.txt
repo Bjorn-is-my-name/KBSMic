@@ -1,0 +1,10 @@
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/rebuild_cache.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/edit_cache.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/Bitches.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/fuses.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/upload_eeprom.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/upload.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/disasm.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/eeprom.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/hex.dir
+/home/bjorn/Projects/MIC/Bitches/build/CMakeFiles/strip.dir

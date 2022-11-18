@@ -1,0 +1,22 @@
+CMakeFiles/Bitches.dir/src/main.cpp.obj: \
+ /home/bjorn/Projects/MIC/Bitches/src/main.cpp \
+ /home/bjorn/Arduino/include/arduino/Wire.h \
+ /home/bjorn/Arduino/include/arduino/Stream.h \
+ /home/bjorn/Arduino/include/arduino/Print.h \
+ /home/bjorn/Arduino/include/arduino/WString.h \
+ /home/bjorn/Arduino/include/arduino/Printable.h \
+ /home/bjorn/Arduino/include/arduino/Nunchuk.h \
+ /home/bjorn/Arduino/include/arduino/Adafruit_ILI9341.h \
+ /home/bjorn/Arduino/include/arduino/Adafruit_GFX.h \
+ /home/bjorn/Arduino/include/arduino/Arduino.h \
+ /home/bjorn/Arduino/include/arduino/binary.h \
+ /home/bjorn/Arduino/include/arduino/WCharacter.h \
+ /home/bjorn/Arduino/include/arduino/HardwareSerial.h \
+ /home/bjorn/Arduino/include/arduino/USBAPI.h \
+ /home/bjorn/Arduino/include/arduino/pins_arduino.h \
+ /home/bjorn/Arduino/include/arduino/gfxfont.h \
+ /home/bjorn/Arduino/include/arduino/Adafruit_I2CDevice.h \
+ /home/bjorn/Arduino/include/arduino/Arduino.h \
+ /home/bjorn/Arduino/include/arduino/Adafruit_SPIDevice.h \
+ /home/bjorn/Arduino/include/arduino/SPI.h \
+ /home/bjorn/Arduino/include/arduino/Adafruit_SPITFT.h

@@ -1,0 +1,1 @@
+/usr/bin/avr-g++ -std=gnu++11 -fpermissive -fno-exceptions -fno-threadsafe-statics -Wno-error=narrowing -mmcu=atmega328p -flto -fuse-linker-plugin -Wl,--gc-sections CMakeFiles/Bitches.dir/src/main.cpp.obj -o Bitches.elf   -L/home/bjorn/Arduino/lib  -lWire -lNunchuk -lILI9341 -lGFX -lSTMPE610 -lBusIO -lSPI -lArduinoCore 

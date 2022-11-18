@@ -1,0 +1,5 @@
+C:/Users/Frank/Desktop/test_lcd/cmake-build-debug/CMakeFiles/Production.dir
+C:/Users/Frank/Desktop/test_lcd/cmake-build-debug/CMakeFiles/Debug.dir
+C:/Users/Frank/Desktop/test_lcd/cmake-build-debug/CMakeFiles/Z_DUMMY_TARGET.dir
+C:/Users/Frank/Desktop/test_lcd/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Frank/Desktop/test_lcd/cmake-build-debug/CMakeFiles/rebuild_cache.dir

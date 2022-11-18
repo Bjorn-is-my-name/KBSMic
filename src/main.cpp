@@ -9,20 +9,13 @@
 #include <Nunchuk.h>
 
 #define NUNCHUK_ADDRESS 0x52
-#define WAIT		100
+#define WAIT		10
 #define BAUDRATE	9600
-#define CHUNKSIZE	32
-#define BUFFERLEN	256
 
 // what to show
 #define STATE
-//#define MEM
-//#define CAL
 
-// prototypes
-bool show_memory(void);
 bool show_state(void);
-bool show_calibration(void);
 
 /*
  * main
@@ -36,6 +29,7 @@ int main(void) {
 
 	// join I2C bus as master
 	Wire.begin();
+	Serial.flush();
 
 	// handshake with nunchuk
 	Serial.print("-------- Connecting to nunchuk at address 0x");
@@ -62,53 +56,12 @@ int main(void) {
 			return(1);
 		}
 #endif
-#ifdef MEM
-		if (!show_memory()) {
-			Serial.println("******** No nunchuk found");
-			Serial.flush();
-			return(1);
-		}
-#endif
-#ifdef CAL
-		if (!show_calibration()) {
-			Serial.println("******** No nunchuk found");
-			Serial.flush();
-			return(1);
-		}
-#endif
-
 		// wait a while
 		_delay_ms(WAIT);
 	}
 
 	return(0);
 }
-
-// bool show_memory(void)
-// {
-// 	// print whole memory
-// 	Serial.println("------ Whole memory------------------------");
-// 	for (uint16_t n = 0; n < BUFFERLEN; n += CHUNKSIZE) {
-// 		// read
-// 		if (Nunchuk.read(NUNCHUK_ADDRESS, (uint8_t)n,
-// 				(uint8_t)CHUNKSIZE) != CHUNKSIZE)
-// 			return (false);
-
-// 		// print
-// 		Serial.print("0x");
-// 		if (n == 0) Serial.print("0");
-// 		Serial.print(n, HEX);
-// 		Serial.print(": ");
-// 		for (uint8_t i = 0; i < CHUNKSIZE; i++) {
-// 			if (Nunchuk.buffer[i] == 0)
-// 				Serial.print('0');
-// 			Serial.print(Nunchuk.buffer[i], HEX);
-// 		}
-// 		Serial.println("");
-// 	}
-
-// 	return(true);
-// }
 
 bool show_state(void)
 {

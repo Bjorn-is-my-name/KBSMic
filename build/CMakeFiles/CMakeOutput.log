@@ -29,10 +29,10 @@ The CXX compiler identification is GNU, found in "C:/Users/Jan/Projects/MIC/GIT/
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_38841/fast && /usr/bin/make  -f CMakeFiles/cmTC_38841.dir/build.make CMakeFiles/cmTC_38841.dir/build
+Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_b54ea/fast && /usr/bin/make  -f CMakeFiles/cmTC_b54ea.dir/build.make CMakeFiles/cmTC_b54ea.dir/build
 make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj
-C:/msys64/mingw64/bin/avr-gcc.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu11    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c
+Building C object CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj
+C:/msys64/mingw64/bin/avr-gcc.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu11    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c
 Using built-in specs.
 Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-atmega328p
 COLLECT_GCC=C:\msys64\mingw64\bin\avr-gcc.exe
@@ -40,8 +40,8 @@ Target: avr
 Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c,c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard
 Thread model: single
 gcc version 8.4.0 (GCC) 
-COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
- c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.d -MQ CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCCompilerABI.c -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj -g -Os -std=gnu11 -version -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o C:\Users\Jan\AppData\Local\Temp\ccTYbYHI.s
+COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
+ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.d -MQ CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCCompilerABI.c -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj -g -Os -std=gnu11 -version -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o C:\Users\Jan\AppData\Local\Temp\ccy8gRbY.s
 GNU C11 (GCC) version 8.4.0 (avr)
 	compiled by GNU C version 10.2.0, GMP version 6.2.0, MPFR version 4.1.0, MPC version 1.2.0, isl version isl-0.22.1-GMP
 
@@ -64,16 +64,16 @@ GNU C11 (GCC) version 8.4.0 (avr)
 warning: GMP header version 6.2.0 differs from library version 6.2.1.
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: 66fefac0013e8c54e2faf5de6048cf57
-COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
- c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj C:\Users\Jan\AppData\Local\Temp\ccTYbYHI.s
+COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
+ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj C:\Users\Jan\AppData\Local\Temp\ccy8gRbY.s
 COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../libexec/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/
 LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/avr5/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/avr5/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../lib/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/
-COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
-Linking C static library libcmTC_38841.a
-C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_38841.dir/cmake_clean_target.cmake
-C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_38841.dir/link.txt --verbose=1
-avr-gcc-ar qc libcmTC_38841.a CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj
-avr-gcc-ranlib libcmTC_38841.a
+COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
+Linking C static library libcmTC_b54ea.a
+C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_b54ea.dir/cmake_clean_target.cmake
+C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_b54ea.dir/link.txt --verbose=1
+avr-gcc-ar qc libcmTC_b54ea.a CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj
+avr-gcc-ranlib libcmTC_b54ea.a
 make[1]: Leaving directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
 
 
@@ -95,10 +95,10 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(avr-ld\.exe|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_38841/fast && /usr/bin/make  -f CMakeFiles/cmTC_38841.dir/build.make CMakeFiles/cmTC_38841.dir/build]
+  ignore line: [Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_b54ea/fast && /usr/bin/make  -f CMakeFiles/cmTC_b54ea.dir/build.make CMakeFiles/cmTC_b54ea.dir/build]
   ignore line: [make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj]
-  ignore line: [C:/msys64/mingw64/bin/avr-gcc.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu11    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c]
+  ignore line: [Building C object CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj]
+  ignore line: [C:/msys64/mingw64/bin/avr-gcc.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu11    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c]
   ignore line: [Using built-in specs.]
   ignore line: [Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-atmega328p]
   ignore line: [COLLECT_GCC=C:\msys64\mingw64\bin\avr-gcc.exe]
@@ -106,8 +106,8 @@ Parsed C implicit link information from above output:
   ignore line: [Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard]
   ignore line: [Thread model: single]
   ignore line: [gcc version 8.4.0 (GCC) ]
-  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
-  ignore line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.d -MQ CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCCompilerABI.c -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj -g -Os -std=gnu11 -version -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o C:\Users\Jan\AppData\Local\Temp\ccTYbYHI.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
+  ignore line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.d -MQ CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCCompilerABI.c -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj -g -Os -std=gnu11 -version -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o C:\Users\Jan\AppData\Local\Temp\ccy8gRbY.s]
   ignore line: [GNU C11 (GCC) version 8.4.0 (avr)]
   ignore line: [	compiled by GNU C version 10.2.0  GMP version 6.2.0  MPFR version 4.1.0  MPC version 1.2.0  isl version isl-0.22.1-GMP]
   ignore line: []
@@ -130,8 +130,8 @@ Parsed C implicit link information from above output:
   ignore line: [warning: GMP header version 6.2.0 differs from library version 6.2.1.]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: 66fefac0013e8c54e2faf5de6048cf57]
-  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
-  ignore line: [ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj C:\Users\Jan\AppData\Local\Temp\ccTYbYHI.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
+  ignore line: [ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj C:\Users\Jan\AppData\Local\Temp\ccy8gRbY.s]
   ignore line: [COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/]
   ignore line: [c:/msys64/mingw64/bin/../libexec/gcc/]
   ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/]
@@ -140,12 +140,12 @@ Parsed C implicit link information from above output:
   ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/]
   ignore line: [c:/msys64/mingw64/bin/../lib/gcc/]
   ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
-  ignore line: [Linking C static library libcmTC_38841.a]
-  ignore line: [C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_38841.dir/cmake_clean_target.cmake]
-  ignore line: [C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_38841.dir/link.txt --verbose=1]
-  ignore line: [avr-gcc-ar qc libcmTC_38841.a CMakeFiles/cmTC_38841.dir/CMakeCCompilerABI.c.obj]
-  ignore line: [avr-gcc-ranlib libcmTC_38841.a]
+  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
+  ignore line: [Linking C static library libcmTC_b54ea.a]
+  ignore line: [C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_b54ea.dir/cmake_clean_target.cmake]
+  ignore line: [C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_b54ea.dir/link.txt --verbose=1]
+  ignore line: [avr-gcc-ar qc libcmTC_b54ea.a CMakeFiles/cmTC_b54ea.dir/CMakeCCompilerABI.c.obj]
+  ignore line: [avr-gcc-ranlib libcmTC_b54ea.a]
   ignore line: [make[1]: Leaving directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp']
   ignore line: []
   ignore line: []
@@ -158,10 +158,10 @@ Parsed C implicit link information from above output:
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_c45cd/fast && /usr/bin/make  -f CMakeFiles/cmTC_c45cd.dir/build.make CMakeFiles/cmTC_c45cd.dir/build
+Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_78484/fast && /usr/bin/make  -f CMakeFiles/cmTC_78484.dir/build.make CMakeFiles/cmTC_78484.dir/build
 make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj
-C:/msys64/mingw64/bin/avr-g++.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu++11 -fpermissive -fno-exceptions -fno-threadsafe-statics -Wno-error=narrowing    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+Building CXX object CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj
+C:/msys64/mingw64/bin/avr-g++.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu++11 -fpermissive -fno-exceptions -fno-threadsafe-statics -Wno-error=narrowing    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp
 Using built-in specs.
 Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-atmega328p
 COLLECT_GCC=C:\msys64\mingw64\bin\avr-g++.exe
@@ -169,8 +169,8 @@ Target: avr
 Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c,c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard
 Thread model: single
 gcc version 8.4.0 (GCC) 
-COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
- c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1plus.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.d -MQ CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCXXCompilerABI.cpp -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj -g -Os -Wno-error=narrowing -std=gnu++11 -version -fpermissive -fno-exceptions -fno-threadsafe-statics -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -mn-flash=1 -mno-skip-bug -fno-rtti -fno-enforce-eh-specs -fno-exceptions -o C:\Users\Jan\AppData\Local\Temp\cc0FGRWh.s
+COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
+ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1plus.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.d -MQ CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCXXCompilerABI.cpp -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj -g -Os -Wno-error=narrowing -std=gnu++11 -version -fpermissive -fno-exceptions -fno-threadsafe-statics -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -mn-flash=1 -mno-skip-bug -fno-rtti -fno-enforce-eh-specs -fno-exceptions -o C:\Users\Jan\AppData\Local\Temp\cc9G63Ni.s
 GNU C++11 (GCC) version 8.4.0 (avr)
 	compiled by GNU C version 10.2.0, GMP version 6.2.0, MPFR version 4.1.0, MPC version 1.2.0, isl version isl-0.22.1-GMP
 
@@ -199,16 +199,16 @@ GNU C++11 (GCC) version 8.4.0 (avr)
 warning: GMP header version 6.2.0 differs from library version 6.2.1.
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: 420cd9c59657d9fe27ec680077c650d4
-COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
- c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\Jan\AppData\Local\Temp\cc0FGRWh.s
+COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
+ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\Jan\AppData\Local\Temp\cc9G63Ni.s
 COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../libexec/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/
 LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/avr5/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/avr5/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../lib/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/
-COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
-Linking CXX static library libcmTC_c45cd.a
-C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_c45cd.dir/cmake_clean_target.cmake
-C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_c45cd.dir/link.txt --verbose=1
-avr-gcc-ar qc libcmTC_c45cd.a CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj
-avr-gcc-ranlib libcmTC_c45cd.a
+COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
+Linking CXX static library libcmTC_78484.a
+C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_78484.dir/cmake_clean_target.cmake
+C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_78484.dir/link.txt --verbose=1
+avr-gcc-ar qc libcmTC_78484.a CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj
+avr-gcc-ranlib libcmTC_78484.a
 make[1]: Leaving directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
 
 
@@ -230,10 +230,10 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(avr-ld\.exe|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_c45cd/fast && /usr/bin/make  -f CMakeFiles/cmTC_c45cd.dir/build.make CMakeFiles/cmTC_c45cd.dir/build]
+  ignore line: [Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_78484/fast && /usr/bin/make  -f CMakeFiles/cmTC_78484.dir/build.make CMakeFiles/cmTC_78484.dir/build]
   ignore line: [make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building CXX object CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj]
-  ignore line: [C:/msys64/mingw64/bin/avr-g++.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu++11 -fpermissive -fno-exceptions -fno-threadsafe-statics -Wno-error=narrowing    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Building CXX object CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj]
+  ignore line: [C:/msys64/mingw64/bin/avr-g++.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu++11 -fpermissive -fno-exceptions -fno-threadsafe-statics -Wno-error=narrowing    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
   ignore line: [Using built-in specs.]
   ignore line: [Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-atmega328p]
   ignore line: [COLLECT_GCC=C:\msys64\mingw64\bin\avr-g++.exe]
@@ -241,8 +241,8 @@ Parsed CXX implicit link information from above output:
   ignore line: [Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard]
   ignore line: [Thread model: single]
   ignore line: [gcc version 8.4.0 (GCC) ]
-  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
-  ignore line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1plus.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.d -MQ CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCXXCompilerABI.cpp -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj -g -Os -Wno-error=narrowing -std=gnu++11 -version -fpermissive -fno-exceptions -fno-threadsafe-statics -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -mn-flash=1 -mno-skip-bug -fno-rtti -fno-enforce-eh-specs -fno-exceptions -o C:\Users\Jan\AppData\Local\Temp\cc0FGRWh.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
+  ignore line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1plus.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.d -MQ CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCXXCompilerABI.cpp -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj -g -Os -Wno-error=narrowing -std=gnu++11 -version -fpermissive -fno-exceptions -fno-threadsafe-statics -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -mn-flash=1 -mno-skip-bug -fno-rtti -fno-enforce-eh-specs -fno-exceptions -o C:\Users\Jan\AppData\Local\Temp\cc9G63Ni.s]
   ignore line: [GNU C++11 (GCC) version 8.4.0 (avr)]
   ignore line: [	compiled by GNU C version 10.2.0  GMP version 6.2.0  MPFR version 4.1.0  MPC version 1.2.0  isl version isl-0.22.1-GMP]
   ignore line: []
@@ -271,8 +271,8 @@ Parsed CXX implicit link information from above output:
   ignore line: [warning: GMP header version 6.2.0 differs from library version 6.2.1.]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: 420cd9c59657d9fe27ec680077c650d4]
-  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
-  ignore line: [ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\Jan\AppData\Local\Temp\cc0FGRWh.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
+  ignore line: [ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\Jan\AppData\Local\Temp\cc9G63Ni.s]
   ignore line: [COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/]
   ignore line: [c:/msys64/mingw64/bin/../libexec/gcc/]
   ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/]
@@ -281,12 +281,12 @@ Parsed CXX implicit link information from above output:
   ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/]
   ignore line: [c:/msys64/mingw64/bin/../lib/gcc/]
   ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
-  ignore line: [Linking CXX static library libcmTC_c45cd.a]
-  ignore line: [C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_c45cd.dir/cmake_clean_target.cmake]
-  ignore line: [C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_c45cd.dir/link.txt --verbose=1]
-  ignore line: [avr-gcc-ar qc libcmTC_c45cd.a CMakeFiles/cmTC_c45cd.dir/CMakeCXXCompilerABI.cpp.obj]
-  ignore line: [avr-gcc-ranlib libcmTC_c45cd.a]
+  ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
+  ignore line: [Linking CXX static library libcmTC_78484.a]
+  ignore line: [C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_78484.dir/cmake_clean_target.cmake]
+  ignore line: [C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_78484.dir/link.txt --verbose=1]
+  ignore line: [avr-gcc-ar qc libcmTC_78484.a CMakeFiles/cmTC_78484.dir/CMakeCXXCompilerABI.cpp.obj]
+  ignore line: [avr-gcc-ranlib libcmTC_78484.a]
   ignore line: [make[1]: Leaving directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp']
   ignore line: []
   ignore line: []

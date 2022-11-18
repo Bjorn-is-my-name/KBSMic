@@ -7,9 +7,7 @@
 #include <HardwareSerial.h>
 #include <Nunchuk.h>
 #include "Adafruit_ILI9341.h"
-#include "SPI.h"
 #include <Adafruit_STMPE610.h>
-#include <IRremote.h>
 
 
 #define NUNCHUK_ADDRESS 0x52

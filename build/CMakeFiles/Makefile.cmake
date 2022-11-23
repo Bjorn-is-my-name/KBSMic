@@ -7,9 +7,9 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "C:/Users/Jan/Arduino/etc/extratargets-avr.cmake"
   "C:/Users/Jan/Arduino/etc/toolchain-avr.cmake"
   "../CMakeLists.txt"
+  "../CMakeListsPrivate.txt"
   "CMakeFiles/3.23.2/CMakeCCompiler.cmake"
   "CMakeFiles/3.23.2/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.23.2/CMakeSystem.cmake"
@@ -41,12 +41,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/strip.dir/DependInfo.cmake"
-  "CMakeFiles/hex.dir/DependInfo.cmake"
-  "CMakeFiles/eeprom.dir/DependInfo.cmake"
-  "CMakeFiles/disasm.dir/DependInfo.cmake"
-  "CMakeFiles/upload.dir/DependInfo.cmake"
-  "CMakeFiles/upload_eeprom.dir/DependInfo.cmake"
-  "CMakeFiles/fuses.dir/DependInfo.cmake"
-  "CMakeFiles/Bitches.dir/DependInfo.cmake"
+  "CMakeFiles/Production.dir/DependInfo.cmake"
+  "CMakeFiles/Debug.dir/DependInfo.cmake"
+  "CMakeFiles/Z_DUMMY_TARGET.dir/DependInfo.cmake"
   )

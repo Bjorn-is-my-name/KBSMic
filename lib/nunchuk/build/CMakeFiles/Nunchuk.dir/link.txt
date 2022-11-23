@@ -1,0 +1,2 @@
+avr-gcc-ar qc libNunchuk.a CMakeFiles/Nunchuk.dir/src/Nunchuk.cpp.obj
+avr-gcc-ranlib libNunchuk.a

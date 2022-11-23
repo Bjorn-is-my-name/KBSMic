@@ -1,0 +1,7 @@
+C:/Users/Jan/Projects/MIC/Nunchukky/build/CMakeFiles/Nunchuk.dir
+C:/Users/Jan/Projects/MIC/Nunchukky/build/CMakeFiles/edit_cache.dir
+C:/Users/Jan/Projects/MIC/Nunchukky/build/CMakeFiles/rebuild_cache.dir
+C:/Users/Jan/Projects/MIC/Nunchukky/build/CMakeFiles/list_install_components.dir
+C:/Users/Jan/Projects/MIC/Nunchukky/build/CMakeFiles/install.dir
+C:/Users/Jan/Projects/MIC/Nunchukky/build/CMakeFiles/install/local.dir
+C:/Users/Jan/Projects/MIC/Nunchukky/build/CMakeFiles/install/strip.dir

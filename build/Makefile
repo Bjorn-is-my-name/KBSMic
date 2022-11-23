@@ -57,10 +57,10 @@ RM = C:/msys64/mingw64/bin/cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/LCD
+CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/GIT
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/LCD/build
+CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/GIT/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/LCD/build/CMakeFiles C:/Users/Jan/Projects/MIC/LCD/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles C:/Users/Jan/Projects/MIC/GIT/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/LCD/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,115 +117,50 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named strip
+# Target rules for targets named Production
 
 # Build rule for target.
-strip: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 strip
-.PHONY : strip
+Production: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Production
+.PHONY : Production
 
 # fast build rule for target.
-strip/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/strip.dir/build.make CMakeFiles/strip.dir/build
-.PHONY : strip/fast
+Production/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Production.dir/build.make CMakeFiles/Production.dir/build
+.PHONY : Production/fast
 
 #=============================================================================
-# Target rules for targets named hex
+# Target rules for targets named Debug
 
 # Build rule for target.
-hex: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 hex
-.PHONY : hex
+Debug: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Debug
+.PHONY : Debug
 
 # fast build rule for target.
-hex/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hex.dir/build.make CMakeFiles/hex.dir/build
-.PHONY : hex/fast
+Debug/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Debug.dir/build.make CMakeFiles/Debug.dir/build
+.PHONY : Debug/fast
 
 #=============================================================================
-# Target rules for targets named eeprom
+# Target rules for targets named Z_DUMMY_TARGET
 
 # Build rule for target.
-eeprom: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 eeprom
-.PHONY : eeprom
+Z_DUMMY_TARGET: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Z_DUMMY_TARGET
+.PHONY : Z_DUMMY_TARGET
 
 # fast build rule for target.
-eeprom/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/eeprom.dir/build.make CMakeFiles/eeprom.dir/build
-.PHONY : eeprom/fast
-
-#=============================================================================
-# Target rules for targets named disasm
-
-# Build rule for target.
-disasm: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 disasm
-.PHONY : disasm
-
-# fast build rule for target.
-disasm/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/disasm.dir/build.make CMakeFiles/disasm.dir/build
-.PHONY : disasm/fast
-
-#=============================================================================
-# Target rules for targets named upload
-
-# Build rule for target.
-upload: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 upload
-.PHONY : upload
-
-# fast build rule for target.
-upload/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/upload.dir/build.make CMakeFiles/upload.dir/build
-.PHONY : upload/fast
-
-#=============================================================================
-# Target rules for targets named upload_eeprom
-
-# Build rule for target.
-upload_eeprom: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 upload_eeprom
-.PHONY : upload_eeprom
-
-# fast build rule for target.
-upload_eeprom/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/upload_eeprom.dir/build.make CMakeFiles/upload_eeprom.dir/build
-.PHONY : upload_eeprom/fast
-
-#=============================================================================
-# Target rules for targets named fuses
-
-# Build rule for target.
-fuses: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 fuses
-.PHONY : fuses
-
-# fast build rule for target.
-fuses/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fuses.dir/build.make CMakeFiles/fuses.dir/build
-.PHONY : fuses/fast
-
-#=============================================================================
-# Target rules for targets named Bitches
-
-# Build rule for target.
-Bitches: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Bitches
-.PHONY : Bitches
-
-# fast build rule for target.
-Bitches/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Bitches.dir/build.make CMakeFiles/Bitches.dir/build
-.PHONY : Bitches/fast
+Z_DUMMY_TARGET/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/build
+.PHONY : Z_DUMMY_TARGET/fast
 
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
 # target to build an object file
 src/main.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Bitches.dir/build.make CMakeFiles/Bitches.dir/src/main.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/src/main.cpp.obj
 .PHONY : src/main.cpp.obj
 
 src/main.i: src/main.cpp.i
@@ -233,7 +168,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Bitches.dir/build.make CMakeFiles/Bitches.dir/src/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -241,7 +176,7 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Bitches.dir/build.make CMakeFiles/Bitches.dir/src/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
 # Help Target
@@ -252,14 +187,9 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... disasm"
-	@echo "... eeprom"
-	@echo "... fuses"
-	@echo "... hex"
-	@echo "... strip"
-	@echo "... upload"
-	@echo "... upload_eeprom"
-	@echo "... Bitches"
+	@echo "... Debug"
+	@echo "... Production"
+	@echo "... Z_DUMMY_TARGET"
 	@echo "... src/main.obj"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

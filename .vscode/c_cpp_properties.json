@@ -1,38 +1,66 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "PlatformIO",
             "includePath": [
-                "${workspaceFolder}/**"
+                "c:/Users/Jan/Projects/MIC/GIT/include",
+                "c:/Users/Jan/Projects/MIC/GIT/src",
+                "c:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/src",
+                "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit ILI9341",
+                "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit GFX Library",
+                "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit BusIO",
+                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/variants/standard",
+                "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit STMPE610",
+                "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit TouchScreen",
+                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                ""
             ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "c:/Users/Jan/Projects/MIC/GIT/include",
+                    "c:/Users/Jan/Projects/MIC/GIT/src",
+                    "c:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/src",
+                    "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit ILI9341",
+                    "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit GFX Library",
+                    "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit BusIO",
+                    "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "C:/Users/Jan/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "C:/Users/Jan/.platformio/packages/framework-arduino-avr/variants/standard",
+                    "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit STMPE610",
+                    "c:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit TouchScreen",
+                    "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    ""
+                ]
+            },
             "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
+                "PLATFORMIO=60105",
+                "ARDUINO_AVR_UNO",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega328P__",
+                ""
             ],
-            "compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe",
-            "cStandard": "gnu17",
-            "cppStandard": "gnu++17",
-            "intelliSenseMode": "windows-gcc-x64"
-        },
-        {
-            "name": "AVR",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "C:/msys64/mingw64/avr/include",
-                "C:/msys64/mingw64/lib/gcc/avr/**",
-                "C:/Users/Jan/Arduino/include/**"
-            ],
-            "defines": [
-                "__AVR_ATmega328P__"
-            ],
-            "compilerPath": "C:/msys64/mingw64/bin/avr-g++.exe",
-            "cStandard": "gnu11",
-            "cppStandard": "gnu++17",
-            "intelliSenseMode": "windows-gcc-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "C:/Users/Jan/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
             "compilerArgs": [
                 "-mmcu=atmega328p",
-                "-DF_CPU=16000000UL"
+                ""
             ]
         }
     ],

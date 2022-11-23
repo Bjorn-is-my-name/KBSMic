@@ -1,22 +1,23 @@
 CMakeFiles/Bitches.dir/src/main.cpp.obj: \
- C:/Users/Jan/Projects/MIC/LCD/src/main.cpp \
+ C:/Users/Jan/Projects/MIC/GIT/src/main.cpp \
  C:/Users/Jan/Arduino/include/arduino/Wire.h \
  C:/Users/Jan/Arduino/include/arduino/Stream.h \
  C:/Users/Jan/Arduino/include/arduino/Print.h \
  C:/Users/Jan/Arduino/include/arduino/WString.h \
  C:/Users/Jan/Arduino/include/arduino/Printable.h \
  C:/Users/Jan/Arduino/include/arduino/Adafruit_ILI9341.h \
+ C:/Users/Jan/Arduino/include/arduino/Adafruit_SPITFT.h \
  C:/Users/Jan/Arduino/include/arduino/Adafruit_GFX.h \
+ C:/Users/Jan/Arduino/include/arduino/gfxfont.h \
+ C:/Users/Jan/Arduino/include/arduino/Adafruit_I2CDevice.h \
+ C:/Users/Jan/Arduino/include/arduino/Adafruit_SPIDevice.h \
  C:/Users/Jan/Arduino/include/arduino/Arduino.h \
  C:/Users/Jan/Arduino/include/arduino/binary.h \
  C:/Users/Jan/Arduino/include/arduino/WCharacter.h \
  C:/Users/Jan/Arduino/include/arduino/HardwareSerial.h \
  C:/Users/Jan/Arduino/include/arduino/USBAPI.h \
- C:/Users/Jan/Arduino/include/arduino/pins_arduino.h \
- C:/Users/Jan/Arduino/include/arduino/gfxfont.h \
- C:/Users/Jan/Arduino/include/arduino/Adafruit_I2CDevice.h \
  C:/Users/Jan/Arduino/include/arduino/Arduino.h \
- C:/Users/Jan/Arduino/include/arduino/Adafruit_SPIDevice.h \
+ C:/Users/Jan/Arduino/include/arduino/pins_arduino.h \
  C:/Users/Jan/Arduino/include/arduino/SPI.h \
- C:/Users/Jan/Arduino/include/arduino/Adafruit_SPITFT.h \
- C:/Users/Jan/Arduino/include/arduino/Nunchuk.h
+ C:/Users/Jan/Arduino/include/arduino/Nunchuk.h \
+ C:/Users/Jan/Arduino/include/arduino/HardwareSerial.h

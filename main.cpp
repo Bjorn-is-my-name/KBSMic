@@ -114,7 +114,7 @@ void init_timer0()
     TCCR0B |= (1 << WGM02);
 
     // Prescale /8
-    TCCR0B |= (1 << CS00);
+    TCCR0B |= (1 << CS01);
 
     // Toggle OC0A (PD6) on compare match
     TCCR0A |= (1 << COM0A0);

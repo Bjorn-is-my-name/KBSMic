@@ -53,10 +53,10 @@ RM = C:/msys64/mingw64/bin/cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/GIT
+CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/LCD
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/GIT/build
+CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/LCD/build
 
 # Utility rule file for strip.
 
@@ -66,8 +66,8 @@ include CMakeFiles/strip.dir/compiler_depend.make
 # Include the progress variables for this target.
 include CMakeFiles/strip.dir/progress.make
 
-CMakeFiles/strip: GIT.elf
-	avr-strip GIT.elf
+CMakeFiles/strip: Bitches.elf
+	avr-strip Bitches.elf
 
 strip: CMakeFiles/strip
 strip: CMakeFiles/strip.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/strip.dir/clean:
 .PHONY : CMakeFiles/strip.dir/clean
 
 CMakeFiles/strip.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" C:/Users/Jan/Projects/MIC/GIT C:/Users/Jan/Projects/MIC/GIT C:/Users/Jan/Projects/MIC/GIT/build C:/Users/Jan/Projects/MIC/GIT/build C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/strip.dir/DependInfo.cmake --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" C:/Users/Jan/Projects/MIC/LCD C:/Users/Jan/Projects/MIC/LCD C:/Users/Jan/Projects/MIC/LCD/build C:/Users/Jan/Projects/MIC/LCD/build C:/Users/Jan/Projects/MIC/LCD/build/CMakeFiles/strip.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/strip.dir/depend
 

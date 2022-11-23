@@ -53,10 +53,10 @@ RM = C:/msys64/mingw64/bin/cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/GIT
+CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/LCD
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/GIT/build
+CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/LCD/build
 
 # Utility rule file for upload.
 
@@ -67,7 +67,7 @@ include CMakeFiles/upload.dir/compiler_depend.make
 include CMakeFiles/upload.dir/progress.make
 
 CMakeFiles/upload:
-	/mingw64/bin/avrdude -P COM6 -c arduino -p atmega328p -U flash:w:GIT.hex
+	/mingw64/bin/avrdude -P COM6 -c arduino -p atmega328p -U flash:w:Bitches.hex
 
 upload: CMakeFiles/upload
 upload: CMakeFiles/upload.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/upload.dir/clean:
 .PHONY : CMakeFiles/upload.dir/clean
 
 CMakeFiles/upload.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" C:/Users/Jan/Projects/MIC/GIT C:/Users/Jan/Projects/MIC/GIT C:/Users/Jan/Projects/MIC/GIT/build C:/Users/Jan/Projects/MIC/GIT/build C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/upload.dir/DependInfo.cmake --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" C:/Users/Jan/Projects/MIC/LCD C:/Users/Jan/Projects/MIC/LCD C:/Users/Jan/Projects/MIC/LCD/build C:/Users/Jan/Projects/MIC/LCD/build C:/Users/Jan/Projects/MIC/LCD/build/CMakeFiles/upload.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/upload.dir/depend
 

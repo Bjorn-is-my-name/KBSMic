@@ -53,10 +53,10 @@ RM = C:/msys64/mingw64/bin/cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/GIT
+CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/LCD
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/GIT/build
+CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/LCD/build
 
 # Utility rule file for eeprom.
 
@@ -67,7 +67,7 @@ include CMakeFiles/eeprom.dir/compiler_depend.make
 include CMakeFiles/eeprom.dir/progress.make
 
 CMakeFiles/eeprom:
-	avr-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma.eeprom=0 -O ihex GIT.elf GIT.eep
+	avr-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma.eeprom=0 -O ihex Bitches.elf Bitches.eep
 
 eeprom: CMakeFiles/eeprom
 eeprom: CMakeFiles/eeprom.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/eeprom.dir/clean:
 .PHONY : CMakeFiles/eeprom.dir/clean
 
 CMakeFiles/eeprom.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" C:/Users/Jan/Projects/MIC/GIT C:/Users/Jan/Projects/MIC/GIT C:/Users/Jan/Projects/MIC/GIT/build C:/Users/Jan/Projects/MIC/GIT/build C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/eeprom.dir/DependInfo.cmake --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" C:/Users/Jan/Projects/MIC/LCD C:/Users/Jan/Projects/MIC/LCD C:/Users/Jan/Projects/MIC/LCD/build C:/Users/Jan/Projects/MIC/LCD/build C:/Users/Jan/Projects/MIC/LCD/build/CMakeFiles/eeprom.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/eeprom.dir/depend
 

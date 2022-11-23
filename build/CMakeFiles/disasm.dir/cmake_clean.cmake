@@ -1,9 +1,9 @@
 file(REMOVE_RECURSE
   ".lst"
+  "Bitches.eeprom"
+  "Bitches.hex"
+  "Bitches.lss"
   "CMakeFiles/disasm"
-  "GIT.eeprom"
-  "GIT.hex"
-  "GIT.lss"
 )
 
 # Per-language clean rules from dependency scanning.

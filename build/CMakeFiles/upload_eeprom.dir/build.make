@@ -53,10 +53,10 @@ RM = C:/msys64/mingw64/bin/cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/GIT
+CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/LCD
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/GIT/build
+CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/LCD/build
 
 # Utility rule file for upload_eeprom.
 
@@ -67,7 +67,7 @@ include CMakeFiles/upload_eeprom.dir/compiler_depend.make
 include CMakeFiles/upload_eeprom.dir/progress.make
 
 CMakeFiles/upload_eeprom:
-	/mingw64/bin/avrdude -P COM6 -c arduino -p atmega328p -U eeprom:w:GIT.eep
+	/mingw64/bin/avrdude -P COM6 -c arduino -p atmega328p -U eeprom:w:Bitches.eep
 
 upload_eeprom: CMakeFiles/upload_eeprom
 upload_eeprom: CMakeFiles/upload_eeprom.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/upload_eeprom.dir/clean:
 .PHONY : CMakeFiles/upload_eeprom.dir/clean
 
 CMakeFiles/upload_eeprom.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" C:/Users/Jan/Projects/MIC/GIT C:/Users/Jan/Projects/MIC/GIT C:/Users/Jan/Projects/MIC/GIT/build C:/Users/Jan/Projects/MIC/GIT/build C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/upload_eeprom.dir/DependInfo.cmake --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" C:/Users/Jan/Projects/MIC/LCD C:/Users/Jan/Projects/MIC/LCD C:/Users/Jan/Projects/MIC/LCD/build C:/Users/Jan/Projects/MIC/LCD/build C:/Users/Jan/Projects/MIC/LCD/build/CMakeFiles/upload_eeprom.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/upload_eeprom.dir/depend
 

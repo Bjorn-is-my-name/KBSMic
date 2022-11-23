@@ -57,10 +57,10 @@ RM = C:/msys64/mingw64/bin/cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/GIT
+CMAKE_SOURCE_DIR = C:/Users/Jan/Projects/MIC/LCD
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/GIT/build
+CMAKE_BINARY_DIR = C:/Users/Jan/Projects/MIC/LCD/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles C:/Users/Jan/Projects/MIC/GIT/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/LCD/build/CMakeFiles C:/Users/Jan/Projects/MIC/LCD/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/LCD/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -208,24 +208,24 @@ fuses/fast:
 .PHONY : fuses/fast
 
 #=============================================================================
-# Target rules for targets named GIT
+# Target rules for targets named Bitches
 
 # Build rule for target.
-GIT: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 GIT
-.PHONY : GIT
+Bitches: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Bitches
+.PHONY : Bitches
 
 # fast build rule for target.
-GIT/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/GIT.dir/build.make CMakeFiles/GIT.dir/build
-.PHONY : GIT/fast
+Bitches/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Bitches.dir/build.make CMakeFiles/Bitches.dir/build
+.PHONY : Bitches/fast
 
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
 # target to build an object file
 src/main.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/GIT.dir/build.make CMakeFiles/GIT.dir/src/main.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Bitches.dir/build.make CMakeFiles/Bitches.dir/src/main.cpp.obj
 .PHONY : src/main.cpp.obj
 
 src/main.i: src/main.cpp.i
@@ -233,7 +233,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/GIT.dir/build.make CMakeFiles/GIT.dir/src/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Bitches.dir/build.make CMakeFiles/Bitches.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -241,7 +241,7 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/GIT.dir/build.make CMakeFiles/GIT.dir/src/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Bitches.dir/build.make CMakeFiles/Bitches.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
 # Help Target
@@ -259,7 +259,7 @@ help:
 	@echo "... strip"
 	@echo "... upload"
 	@echo "... upload_eeprom"
-	@echo "... GIT"
+	@echo "... Bitches"
 	@echo "... src/main.obj"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

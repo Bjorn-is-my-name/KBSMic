@@ -7,10 +7,9 @@
 
 void init_timer0();
 void init_timer2();
+void sendData();
 
 #define NUNCHUK_ADDRESS 0x52
-#define IR_38KHZ 52
-#define IR_52KHZ 37
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define PLAYER_WIDTH 20
@@ -23,21 +22,26 @@ void init_timer2();
 #define TFT_DC 9
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
-uint8_t dataSend;
-uint8_t ocr2aVal;
+bool dataIsSend = false;
 
 // Toggle IR light
 ISR(TIMER2_COMPB_vect)
 {
-    // Set compare value
-    OCR2A = dataSend ? OFF_TIME : ocr2aVal;
-    // Toggle between "Toggle OC0A on Compare Match" and "Set OC0A on Compare Match, clear OC0A at BOTTOM", effectively pulling OC2A low on waiting time
-    TCCR0A ^= (1 << COM0A1);
-    // Flip the action (data sending or waiting)
-    dataSend = !dataSend;
+    dataIsSend = !dataIsSend;
+
+    // If data is send, execute the waiting time and pull TC0 low
+    if (dataIsSend)
+    {
+        OCR2A = OFF_TIME;
+        TCCR0A |= (1 << COM0A1);
+    }
+    // If waiting time finished executing, turn TC2 off
+    else
+        TCCR2B &= ~((1 << CS22) | (1 << CS20));
 }
 
 int main(void) {
+    DDRD |= (1 << DDD0);
     // Player position (x and y flipped because they are flipped on the joystick)
     uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
 
@@ -73,22 +77,11 @@ int main(void) {
             if (Nunchuk.state.joy_x_axis > 140) {
                 if (pos[1] + PLAYER_WIDTH < SCREEN_WIDTH)
                     pos[1]++;
-
-                ocr2aVal = ONE_TIME;
             }
             // Left
             else if (Nunchuk.state.joy_x_axis < 100) {
                 if (pos[1] > 1)
                     pos[1]--;
-
-                ocr2aVal = ZERO_TIME;
-            }
-            // No horizontal movement
-            else {
-                if (pos[1] + PLAYER_WIDTH < SCREEN_WIDTH)
-                    pos[1]++;
-
-                ocr2aVal = ONE_TIME;
             }
 
             // Upwards acceleration
@@ -102,6 +95,9 @@ int main(void) {
 
         // Draw new position
         tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
+
+        // Send the data over IR
+        sendData();
     }
 
     return (0);
@@ -116,11 +112,11 @@ void init_timer0()
     // Prescale /8
     TCCR0B |= (1 << CS01);
 
-    // Toggle OC0A (PD6) on compare match
-    TCCR0A |= (1 << COM0A0);
+    // Set on compare match and clear on bottom (effectively pulling OC0A low)
+    TCCR0A |= (1 << COM0A0) | (1 << COM0A1);
 
     // Compare value
-    OCR0A = IR_38KHZ;
+    OCR0A = 52;
 }
 
 void init_timer2()
@@ -128,15 +124,18 @@ void init_timer2()
     // CTC mode
     TCCR2A |= (1 << WGM21);
 
-    // Prescale /128
-    TCCR2B |= (1 << CS22) | (1 << CS20);
-
-    dataSend = true;
-    ocr2aVal = ONE_TIME;
-
-    // Compare value
-    OCR2A = ocr2aVal;
-
     // Enable interupts on compare match
     TIMSK2 |= (1 << OCIE2B);
+}
+
+void sendData()
+{
+    // Enable TC0 by setting the prescaler (set to /128)
+    TCCR2B |= (1 << CS22) | (1 << CS20);
+    // Set the bit to send
+    OCR2A = ZERO_TIME;
+    // Clear the timer
+    //TCNT2 = 0;
+    // Set TC0 to toggle on compare match (stop pulling low)
+    TCCR0A &= ~(1 << COM0A1);
 }

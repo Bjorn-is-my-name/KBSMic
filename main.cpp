@@ -105,15 +105,13 @@ int main(void) {
 
 void init_timer0() 
 {
-    // Fast-PWM mode
-    TCCR0A |= (1 << WGM01) | (1 << WGM00);
-    TCCR0B |= (1 << WGM02);
-
-    // Prescale /8
-    TCCR0B |= (1 << CS01);
-
-    // Set on compare match and clear on bottom (effectively pulling OC0A low)
-    TCCR0A |= (1 << COM0A0) | (1 << COM0A1);
+    /*
+    Fast-PWM mode (TOP = OCRA) -> WGM0[2:0] = 0b111
+    Set on compare match and clear on bottom (effectively pulling OC0A low) -> COM0A[1:0] = 0b11
+    Prescale /8 -> CS0[2:0] = 0b010
+    */
+    TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
+    TCCR0B |= (1 << WGM02) | (1 << CS01);
 
     // Compare value
     OCR0A = 52;
@@ -130,12 +128,27 @@ void init_timer2()
 
 void sendData()
 {
-    // Enable TC0 by setting the prescaler (set to /128)
-    TCCR2B |= (1 << CS22) | (1 << CS20);
-    // Set the bit to send
-    OCR2A = ZERO_TIME;
-    // Clear the timer
-    //TCNT2 = 0;
-    // Set TC0 to toggle on compare match (stop pulling low)
-    TCCR0A &= ~(1 << COM0A1);
+    // If already sending data, wait for it to end
+    while((TCCR2B >> CS20) & 1);
+
+
+    PORTD |= (1 << PORTD0);
+    uint8_t data = 0b10101010;
+
+    for (int i = 0; i < 8; i++)
+    {
+        // Enable TC0 by setting the prescaler (set to /128)
+        TCCR2B |= (1 << CS22) | (1 << CS20);
+        // Set the bit to send
+        OCR2A = ((data >> i) & 1) ? ONE_TIME : ZERO_TIME;
+        // Set TC0 to toggle on compare match (stop pulling low)
+        TCCR0A &= ~(1 << COM0A1);
+    
+        // Wait for the sending to finish
+        while((TCCR2B >> CS20) & 1);
+    }
+
+
+
+    PORTD &= ~(1 << PORTD0);
 }

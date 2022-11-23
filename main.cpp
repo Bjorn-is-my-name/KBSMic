@@ -22,26 +22,48 @@ void sendData();
 #define TFT_DC 9
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
+// Check to see if the current bit is done sending
 bool dataIsSend = false;
+// Data to send over IR
+uint8_t sendingData = 0b10011001;
+// The data bit to send;
+uint8_t sendingBit = 0;
 
 // Toggle IR light
 ISR(TIMER2_COMPB_vect)
 {
-    dataIsSend = !dataIsSend;
-
-    // If data is send, execute the waiting time and pull TC0 low
+    // If the bit is done sending, wait before sending the next bit
     if (dataIsSend)
     {
+        // Time after which to continue to the next bit
         OCR2A = OFF_TIME;
+        // Disable TC0
         TCCR0A |= (1 << COM0A1);
     }
-    // If waiting time finished executing, turn TC2 off
+    // If the waiting time is passed, send the next bit
     else
-        TCCR2B &= ~((1 << CS22) | (1 << CS20));
+    {
+        if (sendingBit < 8)
+        {
+            // Set the time corresponding to the bit
+            OCR2A = ((sendingData >> sendingBit++) & 1) ? ONE_TIME : ZERO_TIME;
+            // Enable TC0
+            TCCR0A &= ~(1 << COM0A1);
+        }
+        else
+        {
+            // Once all bits are send, disable TC2 by removing the clock source
+            TCCR2B &= ~((1 << CS22) | (1 << CS20));
+            // Reset the sending bit for next run
+            sendingBit = 0;
+        }
+    }
+
+    // Flip between sending a bit and waiting
+    dataIsSend = !dataIsSend;
 }
 
 int main(void) {
-    DDRD |= (1 << DDD0);
     // Player position (x and y flipped because they are flipped on the joystick)
     uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
 
@@ -128,27 +150,13 @@ void init_timer2()
 
 void sendData()
 {
-    // If already sending data, wait for it to end
-    while((TCCR2B >> CS20) & 1);
+    // Return if already sending data
+    if((TCCR2B >> CS20) & 1)
+        return;
 
+    // Force an interupt to start the sending
+    OCR2A = 1;
 
-    PORTD |= (1 << PORTD0);
-    uint8_t data = 0b10101010;
-
-    for (int i = 0; i < 8; i++)
-    {
-        // Enable TC0 by setting the prescaler (set to /128)
-        TCCR2B |= (1 << CS22) | (1 << CS20);
-        // Set the bit to send
-        OCR2A = ((data >> i) & 1) ? ONE_TIME : ZERO_TIME;
-        // Set TC0 to toggle on compare match (stop pulling low)
-        TCCR0A &= ~(1 << COM0A1);
-    
-        // Wait for the sending to finish
-        while((TCCR2B >> CS20) & 1);
-    }
-
-
-
-    PORTD &= ~(1 << PORTD0);
+    // Enable TC2 by setting the prescaler (set to /128)
+    TCCR2B |= (1 << CS22) | (1 << CS20); 
 }

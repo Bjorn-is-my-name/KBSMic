@@ -1,5 +1,4 @@
 #include <avr/io.h>
-#include <util/delay.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
 #include <Adafruit_ILI9341.h>
@@ -17,6 +16,7 @@ void sendData();
 #define PLAYER_WIDTH 20
 #define PLAYER_HEIGHT 20
 #define OFF_TIME 70
+#define START_TIME 255
 #define ZERO_TIME 70
 #define ONE_TIME 210
 
@@ -29,7 +29,7 @@ bool dataIsSend = false;
 // Data to send over IR
 uint8_t sendingData = 0b10011001;
 // The data bit to send;
-uint8_t sendingBit = 0;
+int8_t sendingBit = -2;
 
 // Toggle IR light
 ISR(TIMER2_COMPB_vect)
@@ -45,11 +45,17 @@ ISR(TIMER2_COMPB_vect)
     // If the waiting time is passed, send the next bit
     else
     {
-        if (sendingBit < 8)
+        if (++sendingBit < 8)
         {
-            // Set the time corresponding to the bit
-            OCR2A = ((sendingData >> sendingBit++) & 1) ? ONE_TIME : ZERO_TIME;
-            // Enable TC0
+            // Send start bit
+            if (sendingBit == -1)
+                OCR2A = START_TIME;
+            // Send data
+            else
+                // Set the time corresponding to the bit
+                OCR2A = ((sendingData >> sendingBit) & 1) ? ONE_TIME : ZERO_TIME;
+
+            // Enabe TC0
             TCCR0A &= ~(1 << COM0A1);
         }
         else
@@ -57,7 +63,7 @@ ISR(TIMER2_COMPB_vect)
             // Once all bits are send, disable TC2 by removing the clock source
             TCCR2B &= ~((1 << CS22) | (1 << CS20));
             // Reset the sending bit for next run
-            sendingBit = 0;
+            sendingBit = -2;
         }
     }
 

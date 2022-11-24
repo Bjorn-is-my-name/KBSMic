@@ -78,11 +78,12 @@ int main(void) {
     sei();
     Wire.begin();
     tft.begin();
-    tft.fillScreen(ILI9341_BLACK);
 
     // Check nunckuk connection
-    if (!Nunchuk.begin(NUNCHUK_ADDRESS))
-        return -1;
+    while(!Nunchuk.begin(NUNCHUK_ADDRESS))
+        tft.fillScreen(ILI9341_RED);
+
+    tft.fillScreen(ILI9341_BLACK);
 
     while (1) {
         // Clear old position

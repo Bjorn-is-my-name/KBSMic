@@ -1,21 +1,27 @@
 #include <avr/io.h>
-#include <util/delay.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
 #include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
+#include <qrcode.c>
+#include <spriteTest.c>
 
 void init_timer0();
 void init_timer2();
 void sendData();
 
+void drawSprite(uint8_t, uint8_t, uint8_t, uint8_t, const short unsigned int []);
+
 #define NUNCHUK_ADDRESS 0x52
-#define IR_38KHZ 52
-#define IR_52KHZ 37
+#define IR_38KHZ 52 //with prescaler 8
+#define IR_52KHZ 37 //with prescaler 8
+
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
+
 #define PLAYER_WIDTH 20
 #define PLAYER_HEIGHT 20
+
 #define OFF_TIME 70
 #define ZERO_TIME 70
 #define ONE_TIME 210
@@ -78,15 +84,18 @@ int main(void) {
     sei();
     Wire.begin();
     tft.begin();
-    tft.fillScreen(ILI9341_BLACK);
+    tft.setRotation(1);
 
     // Check nunckuk connection
-    if (!Nunchuk.begin(NUNCHUK_ADDRESS))
+    while(!Nunchuk.begin(NUNCHUK_ADDRESS))
         tft.fillScreen(ILI9341_RED);
+
+    tft.fillScreen(ILI9341_BLACK);
+    drawSprite(40, 40, 8, 8, spriteTest);
 
     while (1) {
         // Clear old position
-        tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_BLACK);
+        // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_BLACK);
 
         // Position change lambda function
         [&pos]()
@@ -118,8 +127,7 @@ int main(void) {
         }();
 
         // Draw new position
-        tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
-
+        // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
         // Send the data over IR
         sendData();
     }
@@ -161,4 +169,17 @@ void sendData()
 
     // Enable TC2 by setting the prescaler (set to /128)
     TCCR2B |= (1 << CS22) | (1 << CS20); 
+}
+
+void drawSprite(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const short unsigned int Array[]){
+    uint8_t X = 0;
+    uint8_t Y = 0;
+    for(uint16_t i = 0; i <64; i++){
+        if(i%w==0){
+            Y++;
+            X=0;
+        }
+        tft.drawPixel(x+X,y+Y,Array[i]);
+        X++;
+    }
 }

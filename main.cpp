@@ -10,6 +10,8 @@ void init_timer2();
 void sendData();
 
 #define NUNCHUK_ADDRESS 0x52
+#define IR_38KHZ 52
+#define IR_52KHZ 37
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define PLAYER_WIDTH 20
@@ -136,7 +138,7 @@ void init_timer0()
     TCCR0B |= (1 << WGM02) | (1 << CS01);
 
     // Compare value
-    OCR0A = 52;
+    OCR0A = IR_38KHZ;
 }
 
 void init_timer2()

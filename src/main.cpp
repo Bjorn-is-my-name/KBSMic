@@ -73,7 +73,7 @@ ISR(TIMER2_COMPB_vect)
 
 int main(void) {
     // Player position (x and y flipped because they are flipped on the joystick)
-    uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
+    uint16_t pos[] = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
 
     // Setup IR
     DDRD |= (1 << DDD6);
@@ -108,21 +108,21 @@ int main(void) {
 
             // Right
             if (Nunchuk.state.joy_x_axis > 140) {
-                if (pos[1] + PLAYER_WIDTH < SCREEN_WIDTH)
-                    pos[1]++;
+                if (pos[0] + PLAYER_WIDTH < SCREEN_WIDTH)
+                    pos[0]++;
             }
             // Left
             else if (Nunchuk.state.joy_x_axis < 100) {
-                if (pos[1] > 1)
-                    pos[1]--;
+                if (pos[0] > 1)
+                    pos[0]--;
             }
 
             // Upwards acceleration
-            if (Nunchuk.state.accel_z_axis <= 10 && pos[0] <= SCREEN_HEIGHT - PLAYER_HEIGHT) {
-                pos[0]+= 5;
+            if (Nunchuk.state.accel_z_axis <= 10 && pos[1] <= SCREEN_HEIGHT - PLAYER_HEIGHT) {
+                pos[1]+= 5;
             }
-            else if(pos[0] >= 1){
-                pos[0]--;
+            else if(pos[1] >= 1){
+                pos[1]--;
             }
         }();
 

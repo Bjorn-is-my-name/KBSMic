@@ -81,7 +81,7 @@ int main(void) {
 
 void init_IR()
 {
-    DDRD |= (1 << PD6);
+    DDRD |= (1 << PD6);                         //Pin D6 as output (IR-LED)
 }
 
 void init_timer0()
@@ -89,7 +89,7 @@ void init_timer0()
     TCCR0A |= (1 << WGM00) | (1 << WGM01);      //fast-PWM + CTC
     TCCR0B |= (1 << WGM02);                     //^^^^^^^^^^^^^^
     TCCR0B |= (1 << CS01);                      //prescaler 8
-    OCR0A = 52;                                 //compare value = 52
+    OCR0A = 52;                                 //compare value = 52 = 38kHZ  35 = 56kHZ
     TIMSK0 |= (1 << OCIE0A);                    //enable interrupts
     TCCR0A |= (1 << COM0A0);                    //enables toggle on OC0A
 }

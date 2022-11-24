@@ -155,6 +155,102 @@ Z_DUMMY_TARGET/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/build
 .PHONY : Z_DUMMY_TARGET/fast
 
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.obj: lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.obj
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.obj
+
+# target to build an object file
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.obj
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.obj
+
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.i: lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.i
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.i
+
+# target to preprocess a source file
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.i
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.i
+
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.s: lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.s
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.s
+
+# target to generate assembly for a file
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.s
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.s
+
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.obj: lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.obj
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.obj
+
+# target to build an object file
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.obj
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.obj
+
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.i: lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.i
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.i
+
+# target to preprocess a source file
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.i
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.i
+
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.s: lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.s
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.s
+
+# target to generate assembly for a file
+lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.s
+.PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.s
+
+lib/nunchuk/examples/src/nunchuk.obj: lib/nunchuk/examples/src/nunchuk.cpp.obj
+.PHONY : lib/nunchuk/examples/src/nunchuk.obj
+
+# target to build an object file
+lib/nunchuk/examples/src/nunchuk.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/examples/src/nunchuk.cpp.obj
+.PHONY : lib/nunchuk/examples/src/nunchuk.cpp.obj
+
+lib/nunchuk/examples/src/nunchuk.i: lib/nunchuk/examples/src/nunchuk.cpp.i
+.PHONY : lib/nunchuk/examples/src/nunchuk.i
+
+# target to preprocess a source file
+lib/nunchuk/examples/src/nunchuk.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/examples/src/nunchuk.cpp.i
+.PHONY : lib/nunchuk/examples/src/nunchuk.cpp.i
+
+lib/nunchuk/examples/src/nunchuk.s: lib/nunchuk/examples/src/nunchuk.cpp.s
+.PHONY : lib/nunchuk/examples/src/nunchuk.s
+
+# target to generate assembly for a file
+lib/nunchuk/examples/src/nunchuk.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/examples/src/nunchuk.cpp.s
+.PHONY : lib/nunchuk/examples/src/nunchuk.cpp.s
+
+lib/nunchuk/src/Nunchuk.obj: lib/nunchuk/src/Nunchuk.cpp.obj
+.PHONY : lib/nunchuk/src/Nunchuk.obj
+
+# target to build an object file
+lib/nunchuk/src/Nunchuk.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/src/Nunchuk.cpp.obj
+.PHONY : lib/nunchuk/src/Nunchuk.cpp.obj
+
+lib/nunchuk/src/Nunchuk.i: lib/nunchuk/src/Nunchuk.cpp.i
+.PHONY : lib/nunchuk/src/Nunchuk.i
+
+# target to preprocess a source file
+lib/nunchuk/src/Nunchuk.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/src/Nunchuk.cpp.i
+.PHONY : lib/nunchuk/src/Nunchuk.cpp.i
+
+lib/nunchuk/src/Nunchuk.s: lib/nunchuk/src/Nunchuk.cpp.s
+.PHONY : lib/nunchuk/src/Nunchuk.s
+
+# target to generate assembly for a file
+lib/nunchuk/src/Nunchuk.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/src/Nunchuk.cpp.s
+.PHONY : lib/nunchuk/src/Nunchuk.cpp.s
+
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
@@ -190,6 +286,18 @@ help:
 	@echo "... Debug"
 	@echo "... Production"
 	@echo "... Z_DUMMY_TARGET"
+	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.obj"
+	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.i"
+	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.s"
+	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.obj"
+	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.i"
+	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.s"
+	@echo "... lib/nunchuk/examples/src/nunchuk.obj"
+	@echo "... lib/nunchuk/examples/src/nunchuk.i"
+	@echo "... lib/nunchuk/examples/src/nunchuk.s"
+	@echo "... lib/nunchuk/src/Nunchuk.obj"
+	@echo "... lib/nunchuk/src/Nunchuk.i"
+	@echo "... lib/nunchuk/src/Nunchuk.s"
 	@echo "... src/main.obj"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

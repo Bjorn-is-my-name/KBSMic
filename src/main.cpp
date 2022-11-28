@@ -5,8 +5,6 @@
 #include <Nunchuk.h>
 
 void init_timer0();
-void init_timer2();
-void sendData();
 
 #define NUNCHUK_ADDRESS 0x52
 #define IR_38KHZ 52
@@ -15,10 +13,11 @@ void sendData();
 #define SCREEN_HEIGHT 240
 #define PLAYER_WIDTH 20
 #define PLAYER_HEIGHT 20
-#define OFF_TIME 70
-#define START_TIME 255
-#define ZERO_TIME 70
-#define ONE_TIME 210
+#define OFF_TIME 19
+#define START_TIME 190
+#define ZERO_TIME 19
+#define ONE_TIME 57
+#define SENDINGDATA_LEN 8
 
 #define TFT_CS 10
 #define TFT_DC 9
@@ -27,48 +26,53 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
 // Data to send over IR
-uint8_t sendingData = 0b10011001;
+uint8_t sendingData = 0;
 // The data bit to send;
 int8_t sendingBit = -2;
+uint8_t onTime = 0;
 
 // Toggle IR light
-ISR(TIMER2_COMPB_vect)
+ISR(TIMER0_COMPA_vect)
 {
-    // If the bit is done sending, wait before sending the next bit
-    if (dataIsSend)
-    {
-        // Time after which to continue to the next bit
-        OCR2A = OFF_TIME;
-        // Disable TC0
-        TCCR0A |= (1 << COM0A1);
-    }
-    // If the waiting time is passed, send the next bit
-    else
-    {
-        if (++sendingBit < 8)
-        {
-            // Send start bit
-            if (sendingBit == -1)
-                OCR2A = START_TIME;
-            // Send data
-            else
-                // Set the time corresponding to the bit
-                OCR2A = ((sendingData >> sendingBit) & 1) ? ONE_TIME : ZERO_TIME;
+    static uint8_t counter = 0;
 
-            // Enabe TC0
-            TCCR0A &= ~(1 << COM0A1);
+    if (++counter > onTime)
+    {
+        // If the bit is done sending, wait before sending the next bit
+        if (dataIsSend)
+        {
+            // Time after which to continue to the next bit
+            onTime = OFF_TIME;
+            // Disable TC0
+            TCCR0A |= (1 << COM0A1);
         }
+        // If the waiting time is passed, send the next bit
         else
         {
-            // Once all bits are send, disable TC2 by removing the clock source
-            TCCR2B &= ~((1 << CS22) | (1 << CS20));
-            // Reset the sending bit for next run
-            sendingBit = -2;
-        }
-    }
+            if (++sendingBit < SENDINGDATA_LEN)
+            {
+                // Send start bit
+                if (sendingBit == -1)
+                    onTime = START_TIME;
+                // Send data
+                else
+                    // Set the time corresponding to the bit
+                    onTime = ((sendingData >> sendingBit) & 1) ? ONE_TIME : ZERO_TIME;
 
-    // Flip between sending a bit and waiting
-    dataIsSend = !dataIsSend;
+                // Enabe TC0
+                TCCR0A &= ~(1 << COM0A1);
+            }
+            else
+            {
+                // Once all bits are send, reset for next run
+                sendingBit = -2;
+            }
+        }
+
+        // Flip between sending a bit and waiting
+        dataIsSend = !dataIsSend;
+        counter = 0;
+    }
 }
 
 int main(void) {
@@ -78,7 +82,6 @@ int main(void) {
     // Setup IR
     DDRD |= (1 << DDD6);
     init_timer0();
-    init_timer2();
 
     // Setup screen
     sei();
@@ -128,7 +131,6 @@ int main(void) {
         tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
 
         // Send the data over IR
-        sendData();
     }
 
     return (0);
@@ -146,26 +148,7 @@ void init_timer0()
 
     // Compare value
     OCR0A = IR_38KHZ;
-}
-
-void init_timer2()
-{
-    // CTC mode
-    TCCR2A |= (1 << WGM21);
 
     // Enable interupts on compare match
-    TIMSK2 |= (1 << OCIE2B);
-}
-
-void sendData()
-{
-    // Return if already sending data
-    if((TCCR2B >> CS20) & 1)
-        return;
-
-    // Force an interupt to start the sending
-    OCR2A = 1;
-
-    // Enable TC2 by setting the prescaler (set to /128)
-    TCCR2B |= (1 << CS22) | (1 << CS20); 
+    TIMSK0 |= (1 << OCIE0A);
 }

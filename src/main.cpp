@@ -1,143 +1,205 @@
-/*
- * read data from nunchuk and write to Serial
- */
-#include <util/delay.h>
+#include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
-#include <HardwareSerial.h>
+#include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
-#include "Adafruit_ILI9341.h"
-#include <Adafruit_STMPE610.h>
+#include <spriteTest.c>
 
+void init_timer0();
+void setFreq(uint8_t);
+void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t*);
 
+#define TFT_CS 10
+#define TFT_DC 9
 #define NUNCHUK_ADDRESS 0x52
-#define WAIT        0
-#define BAUDRATE    9600
-#define CHUNKSIZE    32
-#define BUFFERLEN    256
-int rect_pos_x = 0;
-int rect_pos_y = 0;
+#define IR_38KHZ 52
+#define IR_56KHZ 35
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define PLAYER_WIDTH 16
+#define PLAYER_HEIGHT 16
+#define SENDINGDATA_LEN 8
 
-
-//SCHERM ZOOI
-#define TS_MINX 150
-#define TS_MINY 130
-#define TS_MAXX 3800
-#define TS_MAXY 4000
-
-// The STMPE610 uses hardware SPI on the shield, and #8
-#define STMPE_CS 8
-Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
-
-// The display also uses hardware SPI, plus #9 & #10
 #define TFT_CS 10
 #define TFT_DC 9
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
-// Size of the color selection boxes and the paintbrush size
-#define BOXSIZE 40
-#define PENRADIUS 3
-int oldcolor, currentcolor;
+// Check to see if the current bit is done sending
+bool dataIsSend = false;
+// Data to send over IR
+uint8_t sendingData = 0b01010101;
+// The data bit to send;
+int8_t sendingBit = -2;
+uint8_t onTime = 0;
+unsigned long currentMs = 0;
 
-// what to show
-#define STATE
-//#define MEM
-//#define CAL
+uint8_t halfMsTime;
+uint8_t startTime;
+uint8_t zeroTime;
+uint8_t oneTime;
+uint8_t offTime;
 
-// prototypes
-bool show_memory(void);
+ISR(PCINT2_vect)
+{
+    PORTD ^= 1;
+}
 
-bool move_rect(void);
+// Toggle IR light
+ISR(TIMER0_COMPA_vect)
+{
+    static uint8_t counter = 0;
+    static uint8_t msCounter = 0;
 
-bool show_calibration(void);
+    if(++msCounter >= halfMsTime){
+        currentMs++;
+        msCounter = 0;
+    }
 
-/*
- * main
- */
+    if (++counter > onTime)
+    {
+        // If the bit is done sending, wait before sending the next bit
+        if (dataIsSend)
+        {
+            // Time after which to continue to the next bit
+            onTime = offTime;
+            // Disable TC0
+            TCCR0A |= (1 << COM0A1);
+        }
+        // If the waiting time is passed, send the next bit
+        else
+        {
+            if (++sendingBit < SENDINGDATA_LEN)
+            {
+                // Send start bit
+                if (sendingBit == -1)
+                    onTime = startTime;
+                // Send data
+                else
+                    // Set the time corresponding to the bit
+                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime : zeroTime;
+
+                // Enabe TC0
+                TCCR0A &= ~(1 << COM0A1);
+            }
+            else
+            {
+                // Once all bits are send, reset for next run
+                sendingBit = -2;
+            }
+        }
+
+        // Flip between sending a bit and waiting
+        dataIsSend = !dataIsSend;
+        counter = 0;
+    }
+}
+
 int main(void) {
-    // enable global interrupts
+    // Player position (x and y flipped because they are flipped on the joystick)
+    uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
+
+    // Setup IR sending
+    DDRD |= (1 << DDD6) | 1;
+    init_timer0();
+
+    // Setup IR recieving
+    //PORTD |= (1 << PORTD2); //pull up
+    //PCICR |= (1 << PCIE2);
+    //PCMSK2 |= (1 << PCINT18);
+
+    setFreq(IR_56KHZ);
+
+    // Setup screen
     sei();
-    // use Serial for printing nunchuk data
-    Serial.begin(BAUDRATE);
-
-    // join I2C bus as master
     Wire.begin();
-
     tft.begin();
+    tft.setRotation(1);
 
-    if (!ts.begin()) {
-        Serial.println("Couldn't start touchscreen controller");
-        while (1);
-    }
-    Serial.println("Touchscreen started");
+    // Check nunckuk connection
+    while(!Nunchuk.begin(NUNCHUK_ADDRESS))
+        tft.fillScreen(ILI9341_RED);
 
-    tft.fillScreen(ILI9341_BLUE);
-
-
-    // handshake with nunchuk
-    if (!Nunchuk.begin(NUNCHUK_ADDRESS)) {
-        Serial.println("******** No nunchuk found");
-        Serial.flush();
-        return (1);
-    }
-
-    /*
-     * get identificaton (nunchuk should be 0xA4200000)
-     */
-    Serial.print("-------- Nunchuk with Id: ");
-    Serial.println(Nunchuk.id);
+    tft.fillScreen(ILI9341_BLACK);
 
     while (1) {
-        if (!move_rect()) {
-            Serial.println("******** No nunchuk found");
-        }
+        // Position change lambda function
+        [&pos]()
+        {
+            // Check nunchuk connection
+            if(!Nunchuk.getState(NUNCHUK_ADDRESS))
+                return 0;
+
+            // Check for joystick usage
+
+            // Right
+            if (Nunchuk.state.joy_x_axis > 140) {
+                if (pos[0] + PLAYER_WIDTH < SCREEN_WIDTH)
+                    pos[0]++;
+            }
+            // Left
+            else if (Nunchuk.state.joy_x_axis < 100) {
+                if (pos[0] > 1)
+                    pos[0]--;
+            }
+
+            // Upwards acceleration
+            if (Nunchuk.state.accel_z_axis <= 10 && pos[1] > 5) {
+                pos[1]-= 5;
+            }
+            else if(pos[1] < SCREEN_HEIGHT - PLAYER_HEIGHT){
+                pos[1]++;
+            }
+        }();
+
+        // Draw new position
+        // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
+        drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest);
+
+        // Send the data over IR
     }
+
     return (0);
 }
 
-bool move_rect(void) {
-    if (!Nunchuk.getState(NUNCHUK_ADDRESS))
-        return (false);
-//    uint8_t		joy_x_axis;
-//    uint8_t		joy_y_axis;
-//    uint16_t	accel_x_axis;
-//    uint16_t	accel_y_axis;
-//    uint16_t	accel_z_axis;
-//    uint8_t		z_button;
-//    uint8_t		c_button;
-    if (Nunchuk.state.joy_x_axis > 140) {
-        rect_pos_x += 1;
-        tft.fillRect(rect_pos_y, rect_pos_x - 20, 20, 20, ILI9341_BLUE);
-    } else if (Nunchuk.state.joy_x_axis < 100) {
-        rect_pos_x -= 1;
-        tft.fillRect(rect_pos_y, rect_pos_x + 20, 20, 20, ILI9341_BLUE);
-    }
+void init_timer0() 
+{
+    /*
+    Fast-PWM mode (TOP = OCRA) -> WGM0[2:0] = 0b111
+    Set on compare match and clear on bottom (effectively pulling OC0A low) -> COM0A[1:0] = 0b11
+    Prescale /8 -> CS0[2:0] = 0b010
+    */
+    TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
+    TCCR0B |= (1 << WGM02) | (1 << CS01);
 
-    if (Nunchuk.state.joy_y_axis > 140) {
-        rect_pos_y += 1;
-        tft.fillRect(rect_pos_y - 20, rect_pos_x, 20, 20, ILI9341_BLUE);
-    } else if (Nunchuk.state.joy_y_axis < 100) {
-        rect_pos_y -= 1;
-        tft.fillRect(rect_pos_y + 20, rect_pos_x, 20, 20, ILI9341_BLUE);
-    }
-
-    if (rect_pos_x <= 0) {
-        rect_pos_x = 0;
-    }
-    if (rect_pos_y <= 0) {
-        rect_pos_y = 0;
-    }
-    if (rect_pos_x >= 300) {
-        rect_pos_x = 300;
-    }
-    if (rect_pos_y >= 220) {
-        rect_pos_y = 220;
-    }
-
-    Serial.println(rect_pos_y);
-//    Serial.println(rect_pos_x);
-    tft.fillRect(rect_pos_y, rect_pos_x, 20, 20, ILI9341_WHITE);
-    _delay_ms(1);
-    return (true);
+    // Enable interupts on compare match
+    TIMSK0 |= (1 << OCIE0A);
 }
 
+void setFreq(uint8_t freq)
+{
+    OCR0A = freq;
+
+    if (freq == IR_38KHZ)
+    {
+        halfMsTime = 17;
+        startTime = 149;
+        zeroTime = 17;
+        oneTime = 55;
+        offTime = 17;
+    }
+    else
+    {
+        halfMsTime = 26;
+        startTime = 221;
+        zeroTime = 26;
+        oneTime = 82;
+        offTime = 26;
+    }
+}
+
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
+    tft.startWrite();
+        tft.setAddrWindow(x, y, w, h);
+        tft.writePixels(Array, w*h);
+    tft.endWrite();
+}

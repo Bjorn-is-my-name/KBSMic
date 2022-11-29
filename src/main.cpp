@@ -30,14 +30,15 @@ bool dataIsSend = false;
 uint8_t sendingData = 0b01010101;
 // The data bit to send;
 int8_t sendingBit = -2;
-uint8_t onTime = 0;
+uint16_t onTime = 0;
 unsigned long currentMs = 0;
 
-uint8_t halfMsTime;
-uint8_t startTime;
+uint8_t msTime;
+uint16_t startTime;
 uint8_t zeroTime;
 uint8_t oneTime;
 uint8_t offTime;
+uint16_t stopTime;
 
 ISR(PCINT2_vect)
 {
@@ -47,10 +48,10 @@ ISR(PCINT2_vect)
 // Toggle IR light
 ISR(TIMER0_COMPA_vect)
 {
-    static uint8_t counter = 0;
+    static uint16_t counter = 0;
     static uint8_t msCounter = 0;
 
-    if(++msCounter >= halfMsTime){
+    if(++msCounter >= msTime){
         currentMs++;
         msCounter = 0;
     }
@@ -81,6 +82,10 @@ ISR(TIMER0_COMPA_vect)
                 // Enabe TC0
                 TCCR0A &= ~(1 << COM0A1);
             }
+            else if (sendingBit == SENDINGDATA_LEN)
+            {
+                onTime = stopTime;
+            }
             else
             {
                 // Once all bits are send, reset for next run
@@ -103,11 +108,11 @@ int main(void) {
     init_timer0();
 
     // Setup IR recieving
-    //PORTD |= (1 << PORTD2); //pull up
-    //PCICR |= (1 << PCIE2);
-    //PCMSK2 |= (1 << PCINT18);
+    PORTD |= (1 << PORTD2); //pull up
+    PCICR |= (1 << PCIE2);
+    PCMSK2 |= (1 << PCINT18);
 
-    setFreq(IR_56KHZ);
+    setFreq(IR_38KHZ);
 
     // Setup screen
     sei();
@@ -181,19 +186,21 @@ void setFreq(uint8_t freq)
 
     if (freq == IR_38KHZ)
     {
-        halfMsTime = 17;
-        startTime = 149;
-        zeroTime = 17;
-        oneTime = 55;
-        offTime = 17;
+        msTime = 38;
+        startTime = 190;
+        zeroTime = 38;
+        oneTime = 114;
+        offTime = 76;
+        stopTime = 950;
     }
     else
     {
-        halfMsTime = 26;
-        startTime = 221;
-        zeroTime = 26;
-        oneTime = 82;
-        offTime = 26;
+        msTime = 56;
+        startTime = 280;
+        zeroTime = 56;
+        oneTime = 168;
+        offTime = 112;
+        stopTime = 1400;
     }
 }
 

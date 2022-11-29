@@ -3,22 +3,26 @@
 #include <Wire.h>
 #include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
+#include <Background.c>
 #include <spriteTest.c>
 
 void init_timer0();
+void setFreq(uint8_t);
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t*);
+void drawBackground(uint16_t*);
 
+#define BG_SPRITE_AMOUNT 192
+#define BG_SPRITE_SIZE 20
+
+#define TFT_CS 10
+#define TFT_DC 9
 #define NUNCHUK_ADDRESS 0x52
 #define IR_38KHZ 52
-#define IR_52KHZ 37
+#define IR_56KHZ 35
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
-#define PLAYER_WIDTH 8
-#define PLAYER_HEIGHT 8
-#define OFF_TIME 19
-#define START_TIME 190
-#define ZERO_TIME 19
-#define ONE_TIME 57
+#define PLAYER_WIDTH 16
+#define PLAYER_HEIGHT 16
 #define SENDINGDATA_LEN 8
 
 #define TFT_CS 10
@@ -28,15 +32,33 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
 // Data to send over IR
-uint8_t sendingData = 0;
+uint8_t sendingData = 0b01010101;
 // The data bit to send;
 int8_t sendingBit = -2;
 uint8_t onTime = 0;
+unsigned long currentMs = 0;
+
+uint8_t halfMsTime;
+uint8_t startTime;
+uint8_t zeroTime;
+uint8_t oneTime;
+uint8_t offTime;
+
+ISR(PCINT2_vect)
+{
+    PORTD ^= 1;
+}
 
 // Toggle IR light
 ISR(TIMER0_COMPA_vect)
 {
     static uint8_t counter = 0;
+    static uint8_t msCounter = 0;
+
+    if(++msCounter >= halfMsTime){
+        currentMs++;
+        msCounter = 0;
+    }
 
     if (++counter > onTime)
     {
@@ -44,7 +66,7 @@ ISR(TIMER0_COMPA_vect)
         if (dataIsSend)
         {
             // Time after which to continue to the next bit
-            onTime = OFF_TIME;
+            onTime = offTime;
             // Disable TC0
             TCCR0A |= (1 << COM0A1);
         }
@@ -55,11 +77,11 @@ ISR(TIMER0_COMPA_vect)
             {
                 // Send start bit
                 if (sendingBit == -1)
-                    onTime = START_TIME;
+                    onTime = startTime;
                 // Send data
                 else
                     // Set the time corresponding to the bit
-                    onTime = ((sendingData >> sendingBit) & 1) ? ONE_TIME : ZERO_TIME;
+                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime : zeroTime;
 
                 // Enabe TC0
                 TCCR0A &= ~(1 << COM0A1);
@@ -81,9 +103,16 @@ int main(void) {
     // Player position (x and y flipped because they are flipped on the joystick)
     uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
 
-    // Setup IR
-    DDRD |= (1 << DDD6);
+    // Setup IR sending
+    DDRD |= (1 << DDD6) | 1;
     init_timer0();
+
+    // Setup IR recieving
+    //PORTD |= (1 << PORTD2); //pull up
+    //PCICR |= (1 << PCIE2);
+    //PCMSK2 |= (1 << PCINT18);
+
+    setFreq(IR_38KHZ);
 
     // Setup screen
     sei();
@@ -95,11 +124,9 @@ int main(void) {
     while(!Nunchuk.begin(NUNCHUK_ADDRESS))
         tft.fillScreen(ILI9341_RED);
 
-    tft.fillScreen(ILI9341_BLACK);
+    drawBackground(Background);
 
     while (1) {
-        // Clear old position
-
         // Position change lambda function
         [&pos]()
         {
@@ -149,16 +176,53 @@ void init_timer0()
     TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
     TCCR0B |= (1 << WGM02) | (1 << CS01);
 
-    // Compare value
-    OCR0A = IR_38KHZ;
-
     // Enable interupts on compare match
     TIMSK0 |= (1 << OCIE0A);
 }
 
+void setFreq(uint8_t freq)
+{
+    OCR0A = freq;
+
+    if (freq == IR_38KHZ)
+    {
+        halfMsTime = 17;
+        startTime = 149;
+        zeroTime = 17;
+        oneTime = 55;
+        offTime = 17;
+    }
+    else
+    {
+        halfMsTime = 26;
+        startTime = 221;
+        zeroTime = 26;
+        oneTime = 82;
+        offTime = 26;
+    }
+}
+
 void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
+
     tft.startWrite();
         tft.setAddrWindow(x, y, w, h);
         tft.writePixels(Array, w*h);
     tft.endWrite();
+}
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
+    uint16_t Background[w*h]={};
+}
+
+void drawBackground(uint16_t* BG_Array){
+    static uint16_t x = 0;
+    static uint8_t y = 0;
+    static uint8_t s = BG_SPRITE_AMOUNT;
+    tft.startWrite();
+    for(uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++){
+        tft.setAddrWindow(x, y, s, s);
+        tft.writePixels(BG_Array, s*s);
+        if(x>=300){x=0;y+=s;}else{x+=s;}
+
+    }
+    tft.endWrite();  
 }

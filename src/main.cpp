@@ -3,28 +3,23 @@
 #include <Wire.h>
 #include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
-#include <qrcode.c>
 #include <spriteTest.c>
 
 void init_timer0();
-void init_timer2();
-void sendData();
-
-void drawSprite(uint8_t, uint8_t, uint8_t, uint8_t, const short unsigned int []);
+void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t*);
 
 #define NUNCHUK_ADDRESS 0x52
-#define IR_38KHZ 52 //with prescaler 8
-#define IR_52KHZ 37 //with prescaler 8
-
+#define IR_38KHZ 52
+#define IR_52KHZ 37
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
-
-#define PLAYER_WIDTH 20
-#define PLAYER_HEIGHT 20
-
-#define OFF_TIME 70
-#define ZERO_TIME 70
-#define ONE_TIME 210
+#define PLAYER_WIDTH 8
+#define PLAYER_HEIGHT 8
+#define OFF_TIME 19
+#define START_TIME 190
+#define ZERO_TIME 19
+#define ONE_TIME 57
+#define SENDINGDATA_LEN 8
 
 #define TFT_CS 10
 #define TFT_DC 9
@@ -33,52 +28,62 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
 // Data to send over IR
-uint8_t sendingData = 0b10011001;
+uint8_t sendingData = 0;
 // The data bit to send;
-uint8_t sendingBit = 0;
+int8_t sendingBit = -2;
+uint8_t onTime = 0;
 
 // Toggle IR light
-ISR(TIMER2_COMPB_vect)
+ISR(TIMER0_COMPA_vect)
 {
-    // If the bit is done sending, wait before sending the next bit
-    if (dataIsSend)
+    static uint8_t counter = 0;
+
+    if (++counter > onTime)
     {
-        // Time after which to continue to the next bit
-        OCR2A = OFF_TIME;
-        // Disable TC0
-        TCCR0A |= (1 << COM0A1);
-    }
-    // If the waiting time is passed, send the next bit
-    else
-    {
-        if (sendingBit < 8)
+        // If the bit is done sending, wait before sending the next bit
+        if (dataIsSend)
         {
-            // Set the time corresponding to the bit
-            OCR2A = ((sendingData >> sendingBit++) & 1) ? ONE_TIME : ZERO_TIME;
-            // Enable TC0
-            TCCR0A &= ~(1 << COM0A1);
+            // Time after which to continue to the next bit
+            onTime = OFF_TIME;
+            // Disable TC0
+            TCCR0A |= (1 << COM0A1);
         }
+        // If the waiting time is passed, send the next bit
         else
         {
-            // Once all bits are send, disable TC2 by removing the clock source
-            TCCR2B &= ~((1 << CS22) | (1 << CS20));
-            // Reset the sending bit for next run
-            sendingBit = 0;
-        }
-    }
+            if (++sendingBit < SENDINGDATA_LEN)
+            {
+                // Send start bit
+                if (sendingBit == -1)
+                    onTime = START_TIME;
+                // Send data
+                else
+                    // Set the time corresponding to the bit
+                    onTime = ((sendingData >> sendingBit) & 1) ? ONE_TIME : ZERO_TIME;
 
-    // Flip between sending a bit and waiting
-    dataIsSend = !dataIsSend;
+                // Enabe TC0
+                TCCR0A &= ~(1 << COM0A1);
+            }
+            else
+            {
+                // Once all bits are send, reset for next run
+                sendingBit = -2;
+            }
+        }
+
+        // Flip between sending a bit and waiting
+        dataIsSend = !dataIsSend;
+        counter = 0;
+    }
 }
 
 int main(void) {
     // Player position (x and y flipped because they are flipped on the joystick)
-    uint16_t pos[] = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
+    uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
 
     // Setup IR
     DDRD |= (1 << DDD6);
     init_timer0();
-    init_timer2();
 
     // Setup screen
     sei();
@@ -91,11 +96,9 @@ int main(void) {
         tft.fillScreen(ILI9341_RED);
 
     tft.fillScreen(ILI9341_BLACK);
-    drawSprite(40, 40, 8, 8, spriteTest);
 
     while (1) {
         // Clear old position
-        // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_BLACK);
 
         // Position change lambda function
         [&pos]()
@@ -118,18 +121,19 @@ int main(void) {
             }
 
             // Upwards acceleration
-            if (Nunchuk.state.accel_z_axis <= 10 && pos[1] <= SCREEN_HEIGHT - PLAYER_HEIGHT) {
-                pos[1]+= 5;
+            if (Nunchuk.state.accel_z_axis <= 10 && pos[1] > 5) {
+                pos[1]-= 5;
             }
-            else if(pos[1] >= 1){
-                pos[1]--;
+            else if(pos[1] < SCREEN_HEIGHT - PLAYER_HEIGHT){
+                pos[1]++;
             }
         }();
 
         // Draw new position
         // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
+        drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest);
+
         // Send the data over IR
-        sendData();
     }
 
     return (0);
@@ -147,39 +151,14 @@ void init_timer0()
 
     // Compare value
     OCR0A = IR_38KHZ;
-}
-
-void init_timer2()
-{
-    // CTC mode
-    TCCR2A |= (1 << WGM21);
 
     // Enable interupts on compare match
-    TIMSK2 |= (1 << OCIE2B);
+    TIMSK0 |= (1 << OCIE0A);
 }
 
-void sendData()
-{
-    // Return if already sending data
-    if((TCCR2B >> CS20) & 1)
-        return;
-
-    // Force an interupt to start the sending
-    OCR2A = 1;
-
-    // Enable TC2 by setting the prescaler (set to /128)
-    TCCR2B |= (1 << CS22) | (1 << CS20); 
-}
-
-void drawSprite(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const short unsigned int Array[]){
-    uint8_t X = 0;
-    uint8_t Y = 0;
-    for(uint16_t i = 0; i <64; i++){
-        if(i%w==0){
-            Y++;
-            X=0;
-        }
-        tft.drawPixel(x+X,y+Y,Array[i]);
-        X++;
-    }
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
+    tft.startWrite();
+        tft.setAddrWindow(x, y, w, h);
+        tft.writePixels(Array, w*h);
+    tft.endWrite();
 }

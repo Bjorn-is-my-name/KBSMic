@@ -6,6 +6,8 @@
 
 void init_timer0();
 
+#define TFT_CS 10
+#define TFT_DC 9
 #define NUNCHUK_ADDRESS 0x52
 #define IR_38KHZ 52
 #define IR_52KHZ 37
@@ -18,9 +20,8 @@ void init_timer0();
 #define ZERO_TIME 19
 #define ONE_TIME 57
 #define SENDINGDATA_LEN 8
+#define ONE_MS 38
 
-#define TFT_CS 10
-#define TFT_DC 9
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 // Check to see if the current bit is done sending
@@ -30,11 +31,23 @@ uint8_t sendingData = 0;
 // The data bit to send;
 int8_t sendingBit = -2;
 uint8_t onTime = 0;
+unsigned long current_ms = 0;
+
+ISR(PCINT2_vect)
+{
+    PORTD ^= 1;
+}
 
 // Toggle IR light
 ISR(TIMER0_COMPA_vect)
 {
     static uint8_t counter = 0;
+    static uint8_t ms_counter = 0;
+
+    if(++ms_counter >= ONE_MS){
+        current_ms++;
+        ms_counter = 0;
+    }
 
     if (++counter > onTime)
     {
@@ -79,14 +92,20 @@ int main(void) {
     // Player position (x and y flipped because they are flipped on the joystick)
     uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
 
-    // Setup IR
-    DDRD |= (1 << DDD6);
+    // Setup IR sending
+    DDRD |= (1 << DDD6) | 1;
     init_timer0();
+
+    // Setup IR recieving
+    PORTD |= (1 << PORTD2); //pull up
+    PCICR |= (1 << PCIE2);
+    PCMSK2 |= (1 << PCINT18);
 
     // Setup screen
     sei();
     Wire.begin();
     tft.begin();
+    tft.setRotation(1);
 
     // Check nunckuk connection
     while(!Nunchuk.begin(NUNCHUK_ADDRESS))

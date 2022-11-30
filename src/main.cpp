@@ -4,12 +4,14 @@
 #include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
 #include <Background.c>
-#include <spriteTest.c>
+#include <Player1.c>
+#include <Player2.c>
 
 void init_timer0();
 void setFreq(uint8_t);
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t*);
 void drawBackground(uint16_t*);
+void buffer(uint8_t, uint8_t, uint16_t*, uint16_t*);
 
 #define BG_SPRITE_AMOUNT 192
 #define BG_SPRITE_SIZE 20
@@ -17,12 +19,16 @@ void drawBackground(uint16_t*);
 #define TFT_CS 10
 #define TFT_DC 9
 #define NUNCHUK_ADDRESS 0x52
+
 #define IR_38KHZ 52
 #define IR_56KHZ 35
+
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
+
 #define PLAYER_WIDTH 16
-#define PLAYER_HEIGHT 16
+#define PLAYER_HEIGHT 20
+
 #define SENDINGDATA_LEN 8
 
 #define TFT_CS 10
@@ -158,7 +164,13 @@ int main(void) {
 
         // Draw new position
         // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
-        drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest);
+        // if(OCR0A == IR_38KHZ){
+            // drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
+        buffer(0, 0, Background, Player1);
+        // }else{
+            // buffer(pos[0], pos[1], Background, Player2);
+            // drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+        // }
 
         // Send the data over IR
     }
@@ -213,13 +225,29 @@ void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
 void drawBackground(uint16_t* BG_Array){
     static uint16_t x = 0;
     static uint8_t y = 0;
-    static uint8_t s = BG_SPRITE_AMOUNT;
     tft.startWrite();
     for(uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++){
-        tft.setAddrWindow(x, y, s, s);
-        tft.writePixels(BG_Array, s*s);
-        if(x>=300){x=0;y+=s;}else{x+=s;}
+        tft.setAddrWindow(x, y, BG_SPRITE_SIZE, BG_SPRITE_SIZE);
+        tft.writePixels(BG_Array, BG_SPRITE_SIZE*BG_SPRITE_SIZE);
+        if(x>=SCREEN_WIDTH-BG_SPRITE_SIZE){x=0;y+=BG_SPRITE_SIZE;}else{x+=BG_SPRITE_SIZE;}
 
     }
+    tft.endWrite();  
+}
+
+void buffer(uint8_t x, uint8_t y, uint16_t *BG, uint16_t *Sprite){
+
+    uint16_t Buf[480]={0x0000};
+    uint16_t *P_Buf = Buf;
+    // for(uint16_t i=0; i<480; i++){
+    //     if(Sprite[i]==0xFFFF){
+    //         Buf[i] = BG[10];
+    //     }else{
+    //         Buf[i] = Sprite[10];
+    //     }
+    // }
+    tft.startWrite();
+        tft.setAddrWindow(100, 100, 20, 24);
+        tft.writePixels(P_Buf, 480);
     tft.endWrite();  
 }

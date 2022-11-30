@@ -209,9 +209,6 @@ void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
         tft.writePixels(Array, w*h);
     tft.endWrite();
 }
-void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
-    uint16_t Background[w*h]={};
-}
 
 void drawBackground(uint16_t* BG_Array){
     static uint16_t x = 0;

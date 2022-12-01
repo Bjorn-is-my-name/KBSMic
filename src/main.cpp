@@ -3,103 +3,152 @@
 #include <Wire.h>
 #include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
+#include <spriteTest.c>
 
 void init_timer0();
+void setFreq(uint8_t);
+void update();
+void draw();
+void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t*);
 
 #define TFT_CS 10
 #define TFT_DC 9
 #define NUNCHUK_ADDRESS 0x52
 #define IR_38KHZ 52
-#define IR_52KHZ 37
+#define IR_56KHZ 35
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
-#define PLAYER_WIDTH 20
-#define PLAYER_HEIGHT 20
-#define OFF_TIME 19
-#define START_TIME 190
-#define ZERO_TIME 19
-#define ONE_TIME 57
-#define SENDINGDATA_LEN 8
-#define ONE_MS 38
+#define PLAYER_WIDTH 16
+#define PLAYER_HEIGHT 16
+#define SENDINGDATA_LEN 9
+#define SENDINGBIT_START_VALUE - 2
+#define STARTBIT_VALUE -1
+#define STARTBIT_MIN 3
+#define STARTBIT_MAX 6
+#define ZERO_MAX 2
+#define ONE_MIN 1
+#define ONE_MAX 4
+#define INITIAL_Y_VEL 10
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+
+struct player{
+public:
+    uint16_t x = 0;
+    uint8_t y = 0;
+    uint16_t xOld = 0;
+    uint8_t yOld = 0;
+    int8_t yVelocity = 0;
+    bool jumping = false;
+} player1;
+
+uint16_t pos2[] = {0, 0};
 
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
 // Data to send over IR
-uint8_t sendingData = 0;
+uint16_t sendingData = 0;
 // The data bit to send;
-int8_t sendingBit = -2;
-uint8_t onTime = 0;
-unsigned long current_ms = 0;
+int8_t sendingBit = SENDINGBIT_START_VALUE;
+uint16_t onTime = 0;
+unsigned long currentMs = 0;
+
+uint8_t msTime;
+uint16_t startTime;
+uint8_t zeroTime;
+uint8_t oneTime;
+uint8_t offTime;
+
+unsigned long startMs = 0;
+bool startBitReceived = false;
+uint16_t receivedData = 0;
+uint8_t bitCounter = 0;
+bool isDataBit = false;
 
 ISR(PCINT2_vect)
 {
-    PORTD ^= 1;
+    isDataBit = ((PIND >> PIND2) & 1) ? true : false; // Check for the pin state (high or low)
+
+    if (isDataBit)
+    {
+        uint8_t difference = currentMs - startMs; // Calculate the length to determin the value
+
+        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if its a start bit
+        {
+            startBitReceived = true;
+            bitCounter = 0;
+        }
+
+        if (startBitReceived) // If the start bit has been send, check what the data is
+        {
+            if (difference < ZERO_MAX) // Check if its a zero
+                receivedData &= ~(1 << bitCounter++);
+            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if its a one
+                receivedData |= (1 << bitCounter++);
+
+            if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
+            {
+                startBitReceived = false;
+                pos2[0] = receivedData;
+            }
+        }
+    }
+
+    startMs = currentMs; // Save the time from startup to now
 }
 
-// Toggle IR light
-ISR(TIMER0_COMPA_vect)
+ISR(TIMER0_COMPA_vect) // Toggle IR light
 {
-    static uint8_t counter = 0;
-    static uint8_t ms_counter = 0;
+    static uint16_t counter = 0;
+    static uint8_t msCounter = 0;
 
-    if(++ms_counter >= ONE_MS){
-        current_ms++;
-        ms_counter = 0;
+    if (++msCounter > msTime)
+    {
+        currentMs++;
+        msCounter = 0;
     }
 
     if (++counter > onTime)
     {
-        // If the bit is done sending, wait before sending the next bit
-        if (dataIsSend)
+        if (dataIsSend) // If the bit is done sending, wait before sending the next bit
         {
-            // Time after which to continue to the next bit
-            onTime = OFF_TIME;
-            // Disable TC0
-            TCCR0A |= (1 << COM0A1);
+            onTime = offTime;        // Time after which to continue to the next bit
+            TCCR0A |= (1 << COM0A1); // Disable TC0
         }
-        // If the waiting time is passed, send the next bit
-        else
+        else // If the waiting time is passed, send the next bit
         {
-            if (++sendingBit < SENDINGDATA_LEN)
+            if (sendingBit++ < SENDINGDATA_LEN)
             {
-                // Send start bit
-                if (sendingBit == -1)
-                    onTime = START_TIME;
-                // Send data
-                else
-                    // Set the time corresponding to the bit
-                    onTime = ((sendingData >> sendingBit) & 1) ? ONE_TIME : ZERO_TIME;
+                if (sendingBit == STARTBIT_VALUE) // Send start bit
+                    onTime = startTime;
+                else                                                                 // Send data
+                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime : zeroTime; // Set the time corresponding to the bit
 
-                // Enabe TC0
-                TCCR0A &= ~(1 << COM0A1);
+                TCCR0A &= ~(1 << COM0A1); // Enabe TC0
             }
             else
             {
-                // Once all bits are send, reset for next run
-                sendingBit = -2;
+                sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
+                sendingData = player1.x;
             }
         }
 
-        // Flip between sending a bit and waiting
-        dataIsSend = !dataIsSend;
+        dataIsSend = !dataIsSend; // Flip between sending a bit and waiting
         counter = 0;
     }
 }
 
 int main(void) {
-    // Player position (x and y flipped because they are flipped on the joystick)
-    uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
-
     // Setup IR sending
-    DDRD |= (1 << DDD6) | 1;
+    DDRD |= (1 << DDD6);
     init_timer0();
 
     // Setup IR recieving
     PORTD |= (1 << PORTD2); //pull up
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
+
+    setFreq(IR_38KHZ);
 
     // Setup screen
     sei();
@@ -114,42 +163,8 @@ int main(void) {
     tft.fillScreen(ILI9341_BLACK);
 
     while (1) {
-        // Clear old position
-        tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_BLACK);
-
-        // Position change lambda function
-        [&pos]()
-        {
-            // Check nunchuk connection
-            if(!Nunchuk.getState(NUNCHUK_ADDRESS))
-                return 0;
-
-            // Check for joystick usage
-
-            // Right
-            if (Nunchuk.state.joy_x_axis > 140) {
-                if (pos[1] + PLAYER_WIDTH < SCREEN_WIDTH)
-                    pos[1]++;
-            }
-            // Left
-            else if (Nunchuk.state.joy_x_axis < 100) {
-                if (pos[1] > 1)
-                    pos[1]--;
-            }
-
-            // Upwards acceleration
-            if (Nunchuk.state.accel_z_axis <= 10 && pos[0] <= SCREEN_HEIGHT - PLAYER_HEIGHT) {
-                pos[0]+= 5;
-            }
-            else if(pos[0] >= 1){
-                pos[0]--;
-            }
-        }();
-
-        // Draw new position
-        tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
-
-        // Send the data over IR
+        update();
+        draw();
     }
 
     return (0);
@@ -165,9 +180,84 @@ void init_timer0()
     TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
     TCCR0B |= (1 << WGM02) | (1 << CS01);
 
-    // Compare value
-    OCR0A = IR_38KHZ;
-
     // Enable interupts on compare match
     TIMSK0 |= (1 << OCIE0A);
+}
+
+void setFreq(uint8_t freq)
+{
+    OCR0A = freq;
+
+    if (freq == IR_38KHZ)
+    {
+        msTime = 37;
+        startTime = 189;
+        zeroTime = 37;
+        oneTime = 113;
+        offTime = 37;
+    }
+    else
+    {
+        msTime = 55;
+        startTime = 279;
+        zeroTime = 55;
+        oneTime = 167;
+        offTime = 55;
+    }
+}
+
+void update()
+{
+    player1.xOld = player1.x;
+    player1.yOld = player1.y;
+
+    // Get the nunchuck input data
+    if(!Nunchuk.getState(NUNCHUK_ADDRESS))
+        return;
+
+    // Check for movement to right (only move when not against the wall)
+    if (Nunchuk.state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH < SCREEN_WIDTH)
+        player1.x += 2;
+
+    // Check for movement to left (only move when not against the wall)
+    else if (Nunchuk.state.joy_x_axis < 100 && player1.x > 0)
+        player1.x -= 2;
+
+    // If jumping, lower the velocity until it hits the max (negative) velocity
+    if (player1.jumping)
+    {
+        player1.y += player1.yVelocity;
+
+        if (player1.yVelocity > -INITIAL_Y_VEL)
+            player1.yVelocity--;
+    }
+
+    // If the player is back on the ground, stop jumping
+    if (player1.y == 0)
+    {
+        player1.jumping = false;
+        player1.yVelocity = 0;
+    }
+
+    // Set the player to jump when the nunchuck movement is high enough and not jumping already
+    if (Nunchuk.state.accel_z_axis < 0xFF && !player1.jumping) {
+        player1.jumping = true;
+        player1.yVelocity = INITIAL_Y_VEL;
+    }
+}
+
+void draw()
+{
+    tft.fillRect(player1.xOld, SCREEN_HEIGHT - PLAYER_HEIGHT - player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_BLACK);
+    tft.fillRect(pos2[0] - 2, SCREEN_HEIGHT - PLAYER_HEIGHT - pos2[1] - 10, PLAYER_WIDTH + 4, PLAYER_HEIGHT + 20, ILI9341_BLACK);
+
+    drawSprite(player1.x, SCREEN_HEIGHT - PLAYER_HEIGHT - player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest1);
+    drawSprite(pos2[0], SCREEN_HEIGHT - PLAYER_HEIGHT - pos2[1], PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest2);
+}
+
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
+    tft.startWrite();
+    tft.setAddrWindow(x, y, w, h);
+    tft.writePixels(Array, w*h);
+    tft.endWrite();
 }

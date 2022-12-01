@@ -9,9 +9,9 @@
 
 void init_timer0();
 void setFreq(uint8_t);
-void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t*);
-void drawBackground(uint16_t*);
-void buffer(uint8_t, uint8_t, uint16_t*, uint16_t*);
+void drawSprite(uint16_t, uint8_t, const uint8_t, const uint8_t, const uint8_t);
+void drawBackground();
+void buffer(uint16_t, uint8_t, uint16_t*, uint16_t*);
 
 #define BG_SPRITE_AMOUNT 192
 #define BG_SPRITE_SIZE 20
@@ -49,6 +49,8 @@ uint8_t startTime;
 uint8_t zeroTime;
 uint8_t oneTime;
 uint8_t offTime;
+
+uint16_t Buf[480]={};
 
 ISR(PCINT2_vect)
 {
@@ -113,11 +115,6 @@ int main(void) {
     DDRD |= (1 << DDD6) | 1;
     init_timer0();
 
-    // Setup IR recieving
-    //PORTD |= (1 << PORTD2); //pull up
-    //PCICR |= (1 << PCIE2);
-    //PCMSK2 |= (1 << PCINT18);
-
     setFreq(IR_38KHZ);
 
     // Setup screen
@@ -130,7 +127,11 @@ int main(void) {
     while(!Nunchuk.begin(NUNCHUK_ADDRESS))
         tft.fillScreen(ILI9341_RED);
 
-    drawBackground(Background);
+    // drawBackground();
+    tft.fillScreen(ILI9341_BLACK);
+    // buffer(100, 100, Background, Player1);
+
+    // drawSprite(200,100,16,20, Player2);
 
     while (1) {
         // Position change lambda function
@@ -162,17 +163,8 @@ int main(void) {
             }
         }();
 
-        // Draw new position
-        // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
-        // if(OCR0A == IR_38KHZ){
-            // drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
-        buffer(0, 0, Background, Player1);
-        // }else{
-            // buffer(pos[0], pos[1], Background, Player2);
-            // drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
-        // }
-
-        // Send the data over IR
+        tft.fillScreen(ILI9341_BLACK);
+        drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, 1);
     }
 
     return (0);
@@ -214,40 +206,57 @@ void setFreq(uint8_t freq)
     }
 }
 
-void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
-
-    tft.startWrite();
-        tft.setAddrWindow(x, y, w, h);
-        tft.writePixels(Array, w*h);
-    tft.endWrite();
-}
-
-void drawBackground(uint16_t* BG_Array){
-    static uint16_t x = 0;
-    static uint8_t y = 0;
-    tft.startWrite();
-    for(uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++){
-        tft.setAddrWindow(x, y, BG_SPRITE_SIZE, BG_SPRITE_SIZE);
-        tft.writePixels(BG_Array, BG_SPRITE_SIZE*BG_SPRITE_SIZE);
-        if(x>=SCREEN_WIDTH-BG_SPRITE_SIZE){x=0;y+=BG_SPRITE_SIZE;}else{x+=BG_SPRITE_SIZE;}
-
+void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t PlayerNR){
+    if(PlayerNR == 1){
+        // tft.drawRGBBitmap(x, y, Player1, w, h);
+        for(uint16_t i = 1; i <= w*h; i++){
+            tft.drawPixel(x, y, Player1[i-1]);
+            if(i%w==0){
+                x-=w-1;
+                y++;
+            }else{
+                x++;
+            }
+        }
+    }else{
+        // tft.drawRGBBitmap(x, y, Player2, w, h);
     }
-    tft.endWrite();  
+
 }
 
-void buffer(uint8_t x, uint8_t y, uint16_t *BG, uint16_t *Sprite){
+void drawBackground(){
+    uint16_t x = 0;
+    uint8_t y = 0;
+    for(uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++){
+        tft.drawRGBBitmap(x, y, Background, BG_SPRITE_SIZE, BG_SPRITE_SIZE);
+        if(x>=SCREEN_WIDTH-BG_SPRITE_SIZE){
+            x=0;
+            y+=BG_SPRITE_SIZE;
+        }else
+            x+=BG_SPRITE_SIZE;
+    }  
+}
 
-    uint16_t Buf[480]={0x0000};
-    uint16_t *P_Buf = Buf;
-    // for(uint16_t i=0; i<480; i++){
-    //     if(Sprite[i]==0xFFFF){
-    //         Buf[i] = BG[10];
-    //     }else{
-    //         Buf[i] = Sprite[10];
-    //     }
-    // }
+void buffer(uint16_t x, uint8_t y, uint16_t *BG, uint16_t *Sprite){
+    uint16_t OffX = x-2;
+    uint8_t OffY = y-2;
+    uint16_t BGindex = (OffY%20*20)+(OffX%20);
+
+    for(uint16_t i=0; i<480; i++){
+        Buf[i]= BG[BGindex];
+        if(OffX < x+18){
+            OffX = x-2;
+            OffY++;
+        }else{
+            OffX++;
+        }
+        BGindex = (OffY%20*20)+(OffX%20);
+    }
+
     tft.startWrite();
-        tft.setAddrWindow(100, 100, 20, 24);
-        tft.writePixels(P_Buf, 480);
-    tft.endWrite();  
+
+    tft.setAddrWindow(x-2, y-2, 20, 24);
+    tft.writePixels(Buf, 480);
+
+    tft.endWrite();
 }

@@ -1,81 +1,247 @@
-#include "avr/io.h"
-#include "avr/interrupt.h"
-#include "util/delay.h"
-#include <Nunchuk.h>
-#include <HardwareSerial.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #include <Wire.h>
-#include "Adafruit_ILI9341.h"
-#include <Adafruit_STMPE610.h>
-#include "Arduino.h"
+#include <Adafruit_ILI9341.h>
+#include <Nunchuk.h>
+#include "spriteTest.c"
+// #include "Arduino.h"
 
-/*Info
+/*Info Arduino pins
 PORTD : PIN 0-7
 PORTB : PIN 8-13
 PORTC : PIN A0-A5
 */
 
-// Defines
-#define THIRTY_EIGHT_KHZ 51
-#define FIFTY_SIX_KHZ 34
-#define NUNCHUK_ADDRESS 0x52
-#define WAIT        0
-#define BAUDRATE    9600
-#define CHUNKSIZE    32
-#define BUFFERLEN    256
-// #define THIRTY_EIGHT_KHZ 26.3
-// #define FIFTY_SIX_KHZ 17.5
+//Prototype functions
+void init_timer0();
+void setFreq(uint8_t);
+void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t*);
+void LCD_write(uint8_t);
+void LCD_data_write(uint8_t);
+void LCD_command_write(uint8_t);
 
-//LCD defines
-#define TS_MINX 150
-#define TS_MINY 130
-#define TS_MAXX 3800
-#define TS_MAXY 4000
+//Defines
+#define TFT_CS 10
+#define TFT_DC 9
+#define NUNCHUK_ADDRESS 0x52
+#define IR_38KHZ 52
+#define IR_56KHZ 35
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define PLAYER_WIDTH 16
+#define PLAYER_HEIGHT 16
+#define SENDINGDATA_LEN 8
+
+#define TFT_CS 10
+#define TFT_DC 9
 #define LCD_RD PC0 //Read signal at rising edge.
 #define LCD_WR PC1 //Write signal at rising edge.
 #define LCD_RS PC2 //D/CX signal. 0 = command, 1 = data.
 #define LCD_CS PC3
-
-// The STMPE610 uses hardware SPI on the shield, and #8
-#define STMPE_CS 8
-Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
-
-// The display also uses hardware SPI, plus #9 & #10
-#define TFT_CS 10
-#define TFT_DC 9
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
-//Logic for the recieving of the data
-// for(int i = 0; i < 8; i++) {
-//         if(OntvangenData)          //output van IR ontvanger
-//             Data |= (1 << i);
-//     }
+//Variables
+// Check to see if the current bit is done sending
+bool dataIsSend = false;
+// Data to send over IR
+uint8_t sendingData = 0b01010101;
+// The data bit to send;
+int8_t sendingBit = -2;
+uint16_t onTime = 0;
+unsigned long currentMs = 0;
 
-// Size of the color selection boxes and the paintbrush size
-#define BOXSIZE 40
-#define PENRADIUS 3
-int oldcolor, currentcolor;
+uint8_t msTime;
+uint16_t startTime;
+uint8_t zeroTime;
+uint8_t oneTime;
+uint8_t offTime;
+uint16_t stopTime;
 
-// what to show
-#define STATE
-//#define MEM
-//#define CAL
+enum gameState{MENU, GAME, LEVELSELECT};
+gameState currentGameState = MENU;
 
-// prototypes
-bool show_memory(void);
-
-bool move_rect(void);
-
-bool show_calibration(void);
-
-//Interrupts
-
-//Timer1 compa interrupt
-ISR(TIMER0_COMPA_vect) 
-{ 
+ISR(PCINT2_vect)
+{
+    PORTD ^= 1;
 }
 
-//Functions
-void LCD_write(uint8_t data) 
+// Toggle IR light
+ISR(TIMER0_COMPA_vect)
+{
+    static uint16_t counter = 0;
+    static uint8_t msCounter = 0;
+
+    if(++msCounter >= msTime){
+        currentMs++;
+        msCounter = 0;
+    }
+
+    if (++counter > onTime)
+    {
+        // If the bit is done sending, wait before sending the next bit
+        if (dataIsSend)
+        {
+            // Time after which to continue to the next bit
+            onTime = offTime;
+            // Disable TC0
+            TCCR0A |= (1 << COM0A1);
+        }
+        // If the waiting time is passed, send the next bit
+        else
+        {
+            if (++sendingBit < SENDINGDATA_LEN)
+            {
+                // Send start bit
+                if (sendingBit == -1)
+                    onTime = startTime;
+                // Send data
+                else
+                    // Set the time corresponding to the bit
+                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime : zeroTime;
+
+                // Enabe TC0
+                TCCR0A &= ~(1 << COM0A1);
+            }
+            else if (sendingBit == SENDINGDATA_LEN)
+            {
+                onTime = stopTime;
+            }
+            else
+            {
+                // Once all bits are send, reset for next run
+                sendingBit = -2;
+            }
+        }
+
+        // Flip between sending a bit and waiting
+        dataIsSend = !dataIsSend;
+        counter = 0;
+    }
+}
+
+int main(void) {
+    // Player position (x and y flipped because they are flipped on the joystick)
+    uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
+
+    // Setup IR sending
+    DDRD |= (1 << DDD6) | 1;
+    init_timer0();
+
+    // Setup IR recieving
+    PORTD |= (1 << PORTD2); //pull up
+    PCICR |= (1 << PCIE2);
+    PCMSK2 |= (1 << PCINT18);
+
+    setFreq(IR_38KHZ);
+
+    // Setup screen
+    sei();
+    Wire.begin();
+    tft.begin();
+    tft.setRotation(1);
+
+    // Check nunckuk connection
+    while(!Nunchuk.begin(NUNCHUK_ADDRESS))
+        tft.fillScreen(ILI9341_RED);
+
+    tft.fillScreen(ILI9341_BLACK);
+
+    while (1) {
+        // // Position change lambda function
+        // [&pos]()
+        // {
+        //     // Check nunchuk connection
+        //     if(!Nunchuk.getState(NUNCHUK_ADDRESS))
+        //         return 0;
+
+        //     // Check for joystick usage
+
+        //     // Right
+        //     if (Nunchuk.state.joy_x_axis > 140) {
+        //         if (pos[0] + PLAYER_WIDTH < SCREEN_WIDTH)
+        //             pos[0]++;
+        //     }
+        //     // Left
+        //     else if (Nunchuk.state.joy_x_axis < 100) {
+        //         if (pos[0] > 1)
+        //             pos[0]--;
+        //     }
+
+        //     // Upwards acceleration
+        //     if (Nunchuk.state.accel_z_axis <= 10 && pos[1] > 5) {
+        //         pos[1]-= 5;
+        //     }
+        //     else if(pos[1] < SCREEN_HEIGHT - PLAYER_HEIGHT){
+        //         pos[1]++;
+        //     }
+        // }();
+
+        // // Draw new position
+        // // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
+        // drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest);
+
+        // // Send the data over IR
+
+        if(currentGameState == MENU)
+        {
+          
+        }
+    }
+
+    return (0);
+}
+
+void init_timer0() 
+{
+    /*
+    Fast-PWM mode (TOP = OCRA) -> WGM0[2:0] = 0b111
+    Set on compare match and clear on bottom (effectively pulling OC0A low) -> COM0A[1:0] = 0b11
+    Prescale /8 -> CS0[2:0] = 0b010
+    */
+    TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
+    TCCR0B |= (1 << WGM02) | (1 << CS01);
+
+    // Enable interupts on compare match
+    TIMSK0 |= (1 << OCIE0A);
+}
+
+void setFreq(uint8_t freq)
+{
+    OCR0A = freq;
+
+    if (freq == IR_38KHZ)
+    {
+        msTime = 38;
+        startTime = 190;
+        zeroTime = 38;
+        oneTime = 114;
+        offTime = 76;
+        stopTime = 950;
+    }
+    else
+    {
+        msTime = 56;
+        startTime = 280;
+        zeroTime = 56;
+        oneTime = 168;
+        offTime = 112;
+        stopTime = 1400;
+    }
+}
+
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
+    tft.startWrite();
+        tft.setAddrWindow(x, y, w, h);
+        tft.writePixels(Array, w*h);
+    tft.endWrite();
+}
+
+void LCD_data_write(uint8_t data)
+{
+  PORTC |= (1 << LCD_RS); //RS high
+  LCD_write(data);
+}
+void LCD_write(uint8_t data)
 {
   PORTC &= ~(1 << LCD_WR); //WR low
 
@@ -89,134 +255,4 @@ void LCD_command_write(uint8_t command)
 {
   PORTC &= ~(1 << LCD_RS); //RS low
   LCD_write(command);
-}
-
-void LCD_data_write(uint8_t data)
-{
-  PORTC |= (1 << LCD_RS); //RS high
-  LCD_write(data);
-}
-
-void sendData(int data, int khz)
-{
-  if(khz == 38)
-  {
-    OCR0A = THIRTY_EIGHT_KHZ;
-  }
-  if(khz == 56)
-  {
-    OCR0A = FIFTY_SIX_KHZ;
-  }
-  if(data == 0)
-  {
-    //Enable timer0 compa interrupt
-    TIMSK0 |= (1 << OCIE0A);
-    _delay_us(600);
-    //Disable timer0 compa interrupt
-    TIMSK0 &= ~(1 << OCIE0A);
-    _delay_us(600);
-  }
-  else
-  {
-    //Enable timer0 compa interrupt
-    TIMSK0 |= (1 << OCIE0A);
-    _delay_us(1200);
-    //Disable timer0 compa interrupt
-    TIMSK0 &= ~(1 << OCIE0A);
-    _delay_us(600);
-  }
-}
-
-void init_lcd()
-{
-  //lcd cs high
-  PORTC |= (1 << LCD_CS);
-  //lcd write high
-  PORTC |= (1 << LCD_WR);
-  //lcd read high
-  PORTC |= (1 << LCD_RD);
-  //lcd cs low
-  PORTC &= ~(1 << LCD_CS);
-}
-
-void init_timer0() 
-{
-  //Set timer0 to toggle led at 38kHz
-  //Set prescaler to 8
-  TCCR0A |= (1 << COM0A0) | (1 << WGM01);
-  TCCR0B |= (1 << CS01);
-  OCR0A = THIRTY_EIGHT_KHZ;
-}
-
-void init_timer2() 
-{
-  TCCR2A |= (1 << WGM21) | (1 << WGM20); //Turns on Fast PWM mode.
-  TCCR2B |= (1 << CS21); //Turns on timer with a prescaler of 8.
-  TIMSK2 |= (1 << OCIE2A); //Turns on interrupt for timer2.
-}
-
-void initPins()
-{
-  DDRD |= (1 << PD6); // Set PD6 as output
-}
-
-
-int main(int argc, char const *argv[])
-{
-  // init_timer0();
-  // init_timer2();
-  initPins();
-  init_lcd();
-
-  LCD_command_write(0x51);
-  LCD_data_write(0x0);
-  
-  // enable global interrupts
-  sei();
-  // use Serial for printing nunchuk data
-  Serial.begin(BAUDRATE);
-
-  // join I2C bus as master
-  Wire.begin();
-
-  tft.begin();
-
-  if (!ts.begin()) {
-        Serial.println("Couldn't start touchscreen controller");
-        while (1);
-    }
-    Serial.println("Touchscreen started");
-
-    tft.fillScreen(ILI9341_BLUE);
-
-  // handshake with nunchuk
-  if (!Nunchuk.begin(NUNCHUK_ADDRESS)) {
-      Serial.println("******** No nunchuk found");
-      Serial.flush();
-      return (1);
-  }
-
-  /*
-    * get identificaton (nunchuk should be 0xA4200000)
-    */
-  Serial.print("-------- Nunchuk with Id: ");
-  Serial.println(Nunchuk.id);
-
-  while (1) 
-  {
-    
-    // while(Nunchuk.state.joy_x_axis > 140) //Right
-    // {
-    //   // sendData(1, 38);
-    //   Serial.println("Right");
-    // }   
-    // while(Nunchuk.state.joy_x_axis < 100)//Left
-    // {
-    //   Serial.println("Left");
-    //   // sendData(0, 38);
-    // }
-    // sendData(1, 38);
-    // Serial.print("Working");
-  }
-  return 0;
 }

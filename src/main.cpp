@@ -12,6 +12,7 @@ void setFreq(uint8_t);
 void drawSprite(uint16_t, uint8_t, const uint8_t, const uint8_t, const uint8_t);
 void drawBackground();
 void buffer(uint16_t, uint8_t, uint16_t*, uint16_t*);
+uint16_t getColor(uint8_t);
 
 #define BG_SPRITE_AMOUNT 192
 #define BG_SPRITE_SIZE 20
@@ -131,7 +132,7 @@ int main(void) {
     tft.fillScreen(ILI9341_BLACK);
     // buffer(100, 100, Background, Player1);
 
-    // drawSprite(200,100,16,20, Player2);
+    // drawSprite(200, 100, 16, 20, 1);
 
     while (1) {
         // Position change lambda function
@@ -163,8 +164,10 @@ int main(void) {
             }
         }();
 
-        tft.fillScreen(ILI9341_BLACK);
+        // tft.fillScreen(ILI9341_BLACK);
         drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, 1);
+        // drawSprite(pos[0]+30, pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, 2);
+
     }
 
     return (0);
@@ -208,18 +211,31 @@ void setFreq(uint8_t freq)
 
 void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t PlayerNR){
     if(PlayerNR == 1){
-        // tft.drawRGBBitmap(x, y, Player1, w, h);
-        for(uint16_t i = 1; i <= w*h; i++){
-            tft.drawPixel(x, y, Player1[i-1]);
-            if(i%w==0){
-                x-=w-1;
+
+        for(uint16_t PixGroup = 0; PixGroup < (w/2)*h; PixGroup++){
+            if(PixGroup%(w/2)==0 && PixGroup!=0){
+                x-=w;
                 y++;
-            }else{
+            }
+            
+            for(uint8_t Pixel = 0; Pixel <=1; Pixel++){
+                if(!Pixel){
+                    tft.drawPixel(x,y,getColor(Player1[PixGroup]&240));
+                }else{
+                    tft.drawPixel(x+1,y,getColor(Player1[PixGroup]&15));
+                }
                 x++;
             }
         }
+
     }else{
-        // tft.drawRGBBitmap(x, y, Player2, w, h);
+        for (int16_t j = 0; j < h; j++, y++) {
+            for (int16_t i = 0; i < w; i++) {
+                if (Player2_MSK[j * w + i]) {
+                    tft.drawPixel(x + i, y, Player2[j * w + i]);
+                }
+            }
+        }
     }
 
 }
@@ -234,7 +250,7 @@ void drawBackground(){
             y+=BG_SPRITE_SIZE;
         }else
             x+=BG_SPRITE_SIZE;
-    }  
+    }
 }
 
 void buffer(uint16_t x, uint8_t y, uint16_t *BG, uint16_t *Sprite){
@@ -259,4 +275,55 @@ void buffer(uint16_t x, uint8_t y, uint16_t *BG, uint16_t *Sprite){
     tft.writePixels(Buf, 480);
 
     tft.endWrite();
+}
+
+
+uint16_t getColor(uint8_t Color){
+    switch (Color) {
+  	case 0:
+		return ILI9341_RED;
+		break;
+  	case 1:
+		return ILI9341_BLACK;
+    		break;
+  	case 2:
+		return ILI9341_GREEN;
+		break;
+  	case 3:
+		return ILI9341_OLIVE;
+    		break;
+	case 4:
+		return ILI9341_ORANGE;
+		break;
+  	case 5:
+		return ILI9341_YELLOW;
+    		break;
+  	case 6:
+		return ILI9341_LIGHTGREY;
+		break;
+  	case 7:
+		return ILI9341_DARKGREY;
+    		break;
+	case 8:
+		return ILI9341_BLUE;
+		break;
+  	case 9:
+		return ILI9341_CYAN;
+    		break;
+  	case 10:
+		return ILI9341_WHITE;
+		break;
+  	case 11:
+		// return ILI9341_---;
+    		break;
+	case 12:
+		// return ILI9341_---;
+		break;
+  	case 13:
+		// return ILI9341_---;
+    		break;
+  	case 14:
+		// return ILI9341_---;
+		break;
+  	}
 }

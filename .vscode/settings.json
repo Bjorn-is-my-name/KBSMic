@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "qrcode.c": "cpp"
+        "qrcode.c": "cpp",
+        "background.c": "cpp"
     }
 }

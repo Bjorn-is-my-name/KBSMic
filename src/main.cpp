@@ -242,22 +242,8 @@ void drawBackground(){
     }
 }
 
-void buffer(uint16_t x, uint8_t y, uint16_t *BG, uint16_t *Sprite){
-    uint16_t OffX = x-2;
-    uint8_t OffY = y-2;
-    uint16_t BGindex = (OffY%20*20)+(OffX%20);
-
-    for(uint16_t i=0; i<480; i++){
-        // Buf[i]= BG[BGindex];
-        if(OffX < x+18){
-            OffX = x-2;
-            OffY++;
-        }else{
-            OffX++;
-        }
-        BGindex = (OffY%20*20)+(OffX%20);
-    }
-    //drawSprite(X,Y,W,H,SPRITE);
+void buffer(/*OldPos, NewPos, UsedSprite*/){
+    
 }
 
 

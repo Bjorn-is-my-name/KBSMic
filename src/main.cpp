@@ -3,16 +3,16 @@
 #include <Wire.h>
 #include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
-#include <spriteTest.c>
 #include "Player1.c"
 #include "Player2.c"
+#include "Background.c"
 
 
 void init_timer0();
 
 void setFreq(uint8_t);
 
-void drawSprite(uint16_t, uint8_t, const uint8_t, const uint8_t, const uint8_t);
+void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
 
 void drawBackground();
 
@@ -30,37 +30,58 @@ void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t *);
 
 #define TFT_CS 10
 #define TFT_DC 9
+
 #define NUNCHUK_ADDRESS 0x52
+
 #define IR_38KHZ 52
 #define IR_56KHZ 35
+
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
+
 #define PLAYER_WIDTH 16
-#define PLAYER_HEIGHT 16
+#define PLAYER_HEIGHT 20
+
 #define SENDINGDATA_LEN 9
 #define SENDINGBIT_START_VALUE - 2
+
 #define STARTBIT_VALUE -1
 #define STARTBIT_MIN 3
 #define STARTBIT_MAX 6
+
 #define ZERO_MAX 2
 #define ONE_MIN 1
 #define ONE_MAX 4
+
 #define INITIAL_Y_VEL 10
-#define FRAME_TIME 33
+#define FRAME_TIME 32 //(1000/30FPS)-1 == 32
+
+#define BG_SPRITE_AMOUNT 192
+#define BG_SPRITE_SIZE 20
+
+#define ILI9341_BACKGROUND_DARK 0x1900  ///<   3,   8,   0
+#define ILI9341_BACKGROUND_LIGHT 0x2961 ///<   5,  11,   1
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
-struct player {
+struct {
 public:
     uint16_t x = 0;
-    uint8_t y = 0;
+    uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
     uint16_t xOld = 0;
-    uint8_t yOld = 0;
+    uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
     int8_t yVelocity = 0;
     bool jumping = false;
 } player1;
 
-uint16_t pos2[] = {0, 0};
+struct {
+public:
+    uint16_t x = 0;
+    uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
+    uint16_t xOld = 0;
+    uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
+//    uint8_t animation
+} player2;
 
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
@@ -106,7 +127,7 @@ ISR(PCINT2_vect) {
             if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
             {
                 startBitReceived = false;
-                pos2[0] = receivedData;
+                player2.x = receivedData;
             }
         }
     }
@@ -142,7 +163,7 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
                 TCCR0A &= ~(1 << COM0A1); // Enabe TC0
             } else {
                 sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
-                sendingData = player1.x;
+                sendingData = player2.x;
             }
         }
 
@@ -173,11 +194,9 @@ int main(void) {
     while (!Nunchuk.begin(NUNCHUK_ADDRESS))
         tft.fillScreen(ILI9341_RED);
 
-    tft.fillScreen(ILI9341_BLACK);
+    drawBackground();
 
-
-    volatile int frameCounter = 0; //#TODO reset deze ergens
-
+    volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
     while (1) {
         if (intCurrentMs > FRAME_TIME) {
@@ -221,6 +240,7 @@ void setFreq(uint8_t freq) {
     }
 }
 
+
 void update() {
     player1.xOld = player1.x;
     player1.yOld = player1.y;
@@ -239,14 +259,14 @@ void update() {
 
     // If jumping, lower the velocity until it hits the max (negative) velocity
     if (player1.jumping) {
-        player1.y += player1.yVelocity;
+        player1.y -= player1.yVelocity;
 
         if (player1.yVelocity > -INITIAL_Y_VEL)
             player1.yVelocity--;
     }
 
     // If the player is back on the ground, stop jumping
-    if (player1.y == 0) {
+    if (player1.y == SCREEN_HEIGHT - PLAYER_HEIGHT) {
         player1.jumping = false;
         player1.yVelocity = 0;
     }
@@ -259,92 +279,84 @@ void update() {
 }
 
 void draw() {
-    tft.fillRect(player1.xOld, SCREEN_HEIGHT - PLAYER_HEIGHT - player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT,
-                 ILI9341_BLACK);
-    tft.fillRect(pos2[0] - 2, SCREEN_HEIGHT - PLAYER_HEIGHT - pos2[1] - 10, PLAYER_WIDTH + 4, PLAYER_HEIGHT + 20,
-                 ILI9341_BLACK);
-
-    drawSprite(player1.x, SCREEN_HEIGHT - PLAYER_HEIGHT - player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, 1);
-    drawSprite(pos2[0], SCREEN_HEIGHT - PLAYER_HEIGHT - pos2[1], PLAYER_WIDTH, PLAYER_HEIGHT, 2);
+    drawSprite(player1.x, player1.y, 16, 20, Player1);
+    drawSprite(player2.x, player2.y, 16, 20, Player2);
 }
 
-void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t PlayerNR) {
-    if (PlayerNR == 1) {
-
-        for (uint16_t PixGroup = 0; PixGroup < (w / 2) * h; PixGroup++) {
-            if (PixGroup % (w / 2) == 0 && PixGroup != 0) {
-                x -= w;
-                y++;
-            }
-
-            for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
-                if (!Pixel) {
-                    tft.drawPixel(x, y, getColor(Player1[PixGroup] & 240));
-                } else {
-                    tft.drawPixel(x + 1, y, getColor(Player1[PixGroup] & 15));
-                }
-                x++;
-            }
+void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t *Sprite) {
+    for (uint16_t PixGroup = 0; PixGroup < (w / 2) * h; PixGroup++) {
+        if (PixGroup % (w / 2) == 0 && PixGroup != 0) {
+            x -= w;
+            y++;
         }
-
-    } else {
-        for (int16_t j = 0; j < h; j++, y++) {
-            for (int16_t i = 0; i < w; i++) {
-                if (Player2_MSK[j * w + i]) {
-                    tft.drawPixel(x + i, y, Player2[j * w + i]);
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
+            if (Pixel == 0) {
+                if (getColor((Sprite[PixGroup] & 0xF0) >> 4) != 255) {
+                    tft.drawPixel(x, y, getColor((Sprite[PixGroup] & 0xF0) >> 4));
+                }
+            } else {
+                if (getColor((Sprite[PixGroup] & 0x0F)) != 255) {
+                    tft.drawPixel(x, y, getColor(Sprite[PixGroup] & 0x0F));
                 }
             }
+            x++;
         }
     }
+}
 
+void drawBackground() {
+    uint16_t x = 0;
+    uint8_t y = 0;
+    for (uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++) {
+        drawSprite(x, y, BG_SPRITE_SIZE, BG_SPRITE_SIZE, Background);
+        if (x >= SCREEN_WIDTH - BG_SPRITE_SIZE) {
+            x = 0;
+            y += BG_SPRITE_SIZE;
+        } else
+            x += BG_SPRITE_SIZE;
+    }
+}
+
+void buffer(/*OldPos, NewPos, UsedSprite*/) {
+    //fix dan jan ❤️
 }
 
 uint16_t getColor(uint8_t Color) {
     switch (Color) {
         case 0:
             return ILI9341_RED;
-            break;
         case 1:
             return ILI9341_BLACK;
-            break;
         case 2:
             return ILI9341_GREEN;
-            break;
         case 3:
             return ILI9341_OLIVE;
-            break;
         case 4:
             return ILI9341_ORANGE;
-            break;
         case 5:
             return ILI9341_YELLOW;
-            break;
         case 6:
             return ILI9341_LIGHTGREY;
-            break;
         case 7:
             return ILI9341_DARKGREY;
-            break;
         case 8:
             return ILI9341_BLUE;
-            break;
         case 9:
             return ILI9341_CYAN;
-            break;
         case 10:
             return ILI9341_WHITE;
-            break;
         case 11:
-            // return ILI9341_---;
-            break;
+            return ILI9341_BACKGROUND_DARK;
         case 12:
-            // return ILI9341_---;
-            break;
+            return ILI9341_BACKGROUND_LIGHT;
         case 13:
             // return ILI9341_---;
             break;
         case 14:
             // return ILI9341_---;
             break;
-    }
+        case 15:
+            return 255;
+    };
+    return 0;
 }

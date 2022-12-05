@@ -56,6 +56,7 @@
 #endif
 #include <limits.h>
 
+
 #if defined(ARDUINO_ARCH_ARC32) || defined(ARDUINO_MAXIM)
 #define SPI_DEFAULT_FREQ 16000000
 // Teensy 3.0, 3.1/3.2, 3.5, 3.6

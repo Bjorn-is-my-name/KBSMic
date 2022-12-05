@@ -1,143 +1,350 @@
-/*
- * read data from nunchuk and write to Serial
- */
-#include <util/delay.h>
+#include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
-#include <HardwareSerial.h>
+#include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
-#include "Adafruit_ILI9341.h"
-#include <Adafruit_STMPE610.h>
+#include <spriteTest.c>
+#include "Player1.c"
+#include "Player2.c"
 
 
-#define NUNCHUK_ADDRESS 0x52
-#define WAIT        0
-#define BAUDRATE    9600
-#define CHUNKSIZE    32
-#define BUFFERLEN    256
-int rect_pos_x = 0;
-int rect_pos_y = 0;
+void init_timer0();
 
+void setFreq(uint8_t);
 
-//SCHERM ZOOI
-#define TS_MINX 150
-#define TS_MINY 130
-#define TS_MAXX 3800
-#define TS_MAXY 4000
+void drawSprite(uint16_t, uint8_t, const uint8_t, const uint8_t, const uint8_t);
 
-// The STMPE610 uses hardware SPI on the shield, and #8
-#define STMPE_CS 8
-Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
+void drawBackground();
 
-// The display also uses hardware SPI, plus #9 & #10
+void buffer(uint16_t, uint8_t, uint16_t *, uint16_t *);
+
+uint16_t getColor(uint8_t);
+
+void setFreq(uint8_t);
+
+void update();
+
+void draw();
+
+void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t *);
+
 #define TFT_CS 10
 #define TFT_DC 9
+#define NUNCHUK_ADDRESS 0x52
+#define IR_38KHZ 52
+#define IR_56KHZ 35
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define PLAYER_WIDTH 16
+#define PLAYER_HEIGHT 16
+#define SENDINGDATA_LEN 9
+#define SENDINGBIT_START_VALUE - 2
+#define STARTBIT_VALUE -1
+#define STARTBIT_MIN 3
+#define STARTBIT_MAX 6
+#define ZERO_MAX 2
+#define ONE_MIN 1
+#define ONE_MAX 4
+#define INITIAL_Y_VEL 10
+#define FRAME_TIME 33
+
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
-// Size of the color selection boxes and the paintbrush size
-#define BOXSIZE 40
-#define PENRADIUS 3
-int oldcolor, currentcolor;
+struct player {
+public:
+    uint16_t x = 0;
+    uint8_t y = 0;
+    uint16_t xOld = 0;
+    uint8_t yOld = 0;
+    int8_t yVelocity = 0;
+    bool jumping = false;
+} player1;
 
-// what to show
-#define STATE
-//#define MEM
-//#define CAL
+uint16_t pos2[] = {0, 0};
 
-// prototypes
-bool show_memory(void);
+// Check to see if the current bit is done sending
+bool dataIsSend = false;
+// Data to send over IR
+uint16_t sendingData = 0;
+// The data bit to send;
+int8_t sendingBit = SENDINGBIT_START_VALUE;
+uint16_t onTime = 0;
+volatile unsigned long currentMs = 0;
+volatile unsigned char intCurrentMs = 0;
 
-bool move_rect(void);
+uint8_t msTime;
+uint16_t startTime;
+uint8_t zeroTime;
+uint8_t oneTime;
+uint8_t offTime;
 
-bool show_calibration(void);
+unsigned long startMs = 0;
+bool startBitReceived = false;
+uint16_t receivedData = 0;
+uint8_t bitCounter = 0;
+bool isDataBit = false;
 
-/*
- * main
- */
+ISR(PCINT2_vect) {
+    isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)
+
+    if (isDataBit) {
+        uint8_t difference = currentMs - startMs; // Calculate the length to determin the value
+
+        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if its a start bit
+        {
+            startBitReceived = true;
+            bitCounter = 0;
+        }
+
+        if (startBitReceived) // If the start bit has been send, check what the data is
+        {
+            if (difference < ZERO_MAX) // Check if its a zero
+                receivedData &= ~(1 << bitCounter++);
+            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if its a one
+                receivedData |= (1 << bitCounter++);
+
+            if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
+            {
+                startBitReceived = false;
+                pos2[0] = receivedData;
+            }
+        }
+    }
+
+    startMs = currentMs; // Save the time from startup to now
+}
+
+ISR(TIMER0_COMPA_vect) // Toggle IR light
+{
+    static uint16_t counter = 0;
+    static uint8_t msCounter = 0;
+
+    if (++msCounter > msTime) {
+        currentMs++;
+        intCurrentMs++;
+        msCounter = 0;
+    }
+
+    if (++counter > onTime) {
+        if (dataIsSend) // If the bit is done sending, wait before sending the next bit
+        {
+            onTime = offTime;        // Time after which to continue to the next bit
+            TCCR0A |= (1 << COM0A1); // Disable TC0
+        } else // If the waiting time is passed, send the next bit
+        {
+            if (sendingBit++ < SENDINGDATA_LEN) {
+                if (sendingBit == STARTBIT_VALUE) // Send start bit
+                    onTime = startTime;
+                else                                                                 // Send data
+                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime
+                                                               : zeroTime; // Set the time corresponding to the bit
+
+                TCCR0A &= ~(1 << COM0A1); // Enabe TC0
+            } else {
+                sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
+                sendingData = player1.x;
+            }
+        }
+
+        dataIsSend = !dataIsSend; // Flip between sending a bit and waiting
+        counter = 0;
+    }
+}
+
 int main(void) {
-    // enable global interrupts
+    // Setup IR sending
+    DDRD |= (1 << DDD6);
+    init_timer0();
+
+    // Setup IR recieving
+    PORTD |= (1 << PORTD2); //pull up
+    PCICR |= (1 << PCIE2);
+    PCMSK2 |= (1 << PCINT18);
+
+    setFreq(IR_38KHZ);
+
+    // Setup screen
     sei();
-    // use Serial for printing nunchuk data
-    Serial.begin(BAUDRATE);
-
-    // join I2C bus as master
     Wire.begin();
-
     tft.begin();
+    tft.setRotation(1);
 
-    if (!ts.begin()) {
-        Serial.println("Couldn't start touchscreen controller");
-        while (1);
-    }
-    Serial.println("Touchscreen started");
+    // Check nunckuk connection
+    while (!Nunchuk.begin(NUNCHUK_ADDRESS))
+        tft.fillScreen(ILI9341_RED);
 
-    tft.fillScreen(ILI9341_BLUE);
+    tft.fillScreen(ILI9341_BLACK);
 
 
-    // handshake with nunchuk
-    if (!Nunchuk.begin(NUNCHUK_ADDRESS)) {
-        Serial.println("******** No nunchuk found");
-        Serial.flush();
-        return (1);
-    }
+    volatile int frameCounter = 0; //#TODO reset deze ergens
 
-    /*
-     * get identificaton (nunchuk should be 0xA4200000)
-     */
-    Serial.print("-------- Nunchuk with Id: ");
-    Serial.println(Nunchuk.id);
 
     while (1) {
-        if (!move_rect()) {
-            Serial.println("******** No nunchuk found");
+        if (intCurrentMs > FRAME_TIME) {
+            intCurrentMs = 0;
+            update();
+            draw();
+            frameCounter++;
         }
     }
     return (0);
 }
 
-bool move_rect(void) {
-    if (!Nunchuk.getState(NUNCHUK_ADDRESS))
-        return (false);
-//    uint8_t		joy_x_axis;
-//    uint8_t		joy_y_axis;
-//    uint16_t	accel_x_axis;
-//    uint16_t	accel_y_axis;
-//    uint16_t	accel_z_axis;
-//    uint8_t		z_button;
-//    uint8_t		c_button;
-    if (Nunchuk.state.joy_x_axis > 140) {
-        rect_pos_x += 1;
-        tft.fillRect(rect_pos_y, rect_pos_x - 20, 20, 20, ILI9341_BLUE);
-    } else if (Nunchuk.state.joy_x_axis < 100) {
-        rect_pos_x -= 1;
-        tft.fillRect(rect_pos_y, rect_pos_x + 20, 20, 20, ILI9341_BLUE);
-    }
+void init_timer0() {
+    /*
+    Fast-PWM mode (TOP = OCRA) -> WGM0[2:0] = 0b111
+    Set on compare match and clear on bottom (effectively pulling OC0A low) -> COM0A[1:0] = 0b11
+    Prescale /8 -> CS0[2:0] = 0b010
+    */
+    TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
+    TCCR0B |= (1 << WGM02) | (1 << CS01);
 
-    if (Nunchuk.state.joy_y_axis > 140) {
-        rect_pos_y += 1;
-        tft.fillRect(rect_pos_y - 20, rect_pos_x, 20, 20, ILI9341_BLUE);
-    } else if (Nunchuk.state.joy_y_axis < 100) {
-        rect_pos_y -= 1;
-        tft.fillRect(rect_pos_y + 20, rect_pos_x, 20, 20, ILI9341_BLUE);
-    }
-
-    if (rect_pos_x <= 0) {
-        rect_pos_x = 0;
-    }
-    if (rect_pos_y <= 0) {
-        rect_pos_y = 0;
-    }
-    if (rect_pos_x >= 300) {
-        rect_pos_x = 300;
-    }
-    if (rect_pos_y >= 220) {
-        rect_pos_y = 220;
-    }
-
-    Serial.println(rect_pos_y);
-//    Serial.println(rect_pos_x);
-    tft.fillRect(rect_pos_y, rect_pos_x, 20, 20, ILI9341_WHITE);
-    _delay_ms(1);
-    return (true);
+    // Enable interupts on compare match
+    TIMSK0 |= (1 << OCIE0A);
 }
 
+void setFreq(uint8_t freq) {
+    OCR0A = freq;
+
+    if (freq == IR_38KHZ) {
+        msTime = 37;
+        startTime = 189;
+        zeroTime = 37;
+        oneTime = 113;
+        offTime = 37;
+    } else {
+        msTime = 55;
+        startTime = 279;
+        zeroTime = 55;
+        oneTime = 167;
+        offTime = 55;
+    }
+}
+
+void update() {
+    player1.xOld = player1.x;
+    player1.yOld = player1.y;
+
+    // Get the nunchuck input data
+    if (!Nunchuk.getState(NUNCHUK_ADDRESS))
+        return;
+
+    // Check for movement to right (only move when not against the wall)
+    if (Nunchuk.state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH < SCREEN_WIDTH)
+        player1.x += 2;
+
+        // Check for movement to left (only move when not against the wall)
+    else if (Nunchuk.state.joy_x_axis < 100 && player1.x > 0)
+        player1.x -= 2;
+
+    // If jumping, lower the velocity until it hits the max (negative) velocity
+    if (player1.jumping) {
+        player1.y += player1.yVelocity;
+
+        if (player1.yVelocity > -INITIAL_Y_VEL)
+            player1.yVelocity--;
+    }
+
+    // If the player is back on the ground, stop jumping
+    if (player1.y == 0) {
+        player1.jumping = false;
+        player1.yVelocity = 0;
+    }
+
+    // Set the player to jump when the nunchuck movement is high enough and not jumping already
+    if (Nunchuk.state.accel_z_axis < 0xFF && !player1.jumping) {
+        player1.jumping = true;
+        player1.yVelocity = INITIAL_Y_VEL;
+    }
+}
+
+void draw() {
+    tft.fillRect(player1.xOld, SCREEN_HEIGHT - PLAYER_HEIGHT - player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT,
+                 ILI9341_BLACK);
+    tft.fillRect(pos2[0] - 2, SCREEN_HEIGHT - PLAYER_HEIGHT - pos2[1] - 10, PLAYER_WIDTH + 4, PLAYER_HEIGHT + 20,
+                 ILI9341_BLACK);
+
+    drawSprite(player1.x, SCREEN_HEIGHT - PLAYER_HEIGHT - player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, 1);
+    drawSprite(pos2[0], SCREEN_HEIGHT - PLAYER_HEIGHT - pos2[1], PLAYER_WIDTH, PLAYER_HEIGHT, 2);
+}
+
+void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t PlayerNR) {
+    if (PlayerNR == 1) {
+
+        for (uint16_t PixGroup = 0; PixGroup < (w / 2) * h; PixGroup++) {
+            if (PixGroup % (w / 2) == 0 && PixGroup != 0) {
+                x -= w;
+                y++;
+            }
+
+            for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
+                if (!Pixel) {
+                    tft.drawPixel(x, y, getColor(Player1[PixGroup] & 240));
+                } else {
+                    tft.drawPixel(x + 1, y, getColor(Player1[PixGroup] & 15));
+                }
+                x++;
+            }
+        }
+
+    } else {
+        for (int16_t j = 0; j < h; j++, y++) {
+            for (int16_t i = 0; i < w; i++) {
+                if (Player2_MSK[j * w + i]) {
+                    tft.drawPixel(x + i, y, Player2[j * w + i]);
+                }
+            }
+        }
+    }
+
+}
+
+uint16_t getColor(uint8_t Color) {
+    switch (Color) {
+        case 0:
+            return ILI9341_RED;
+            break;
+        case 1:
+            return ILI9341_BLACK;
+            break;
+        case 2:
+            return ILI9341_GREEN;
+            break;
+        case 3:
+            return ILI9341_OLIVE;
+            break;
+        case 4:
+            return ILI9341_ORANGE;
+            break;
+        case 5:
+            return ILI9341_YELLOW;
+            break;
+        case 6:
+            return ILI9341_LIGHTGREY;
+            break;
+        case 7:
+            return ILI9341_DARKGREY;
+            break;
+        case 8:
+            return ILI9341_BLUE;
+            break;
+        case 9:
+            return ILI9341_CYAN;
+            break;
+        case 10:
+            return ILI9341_WHITE;
+            break;
+        case 11:
+            // return ILI9341_---;
+            break;
+        case 12:
+            // return ILI9341_---;
+            break;
+        case 13:
+            // return ILI9341_---;
+            break;
+        case 14:
+            // return ILI9341_---;
+            break;
+    }
+}

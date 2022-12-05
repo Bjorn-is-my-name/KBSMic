@@ -9,7 +9,7 @@
 
 void init_timer0();
 void setFreq(uint8_t);
-void drawSprite(uint16_t, uint8_t, const uint8_t, const uint8_t, const uint8_t);
+void drawSprite(uint16_t, uint8_t, const uint8_t, const uint8_t, const uint8_t*);
 void drawBackground();
 void buffer(uint16_t, uint8_t, uint16_t*, uint16_t*);
 uint16_t getColor(uint8_t);
@@ -50,8 +50,6 @@ uint8_t startTime;
 uint8_t zeroTime;
 uint8_t oneTime;
 uint8_t offTime;
-
-uint16_t Buf[480]={};
 
 ISR(PCINT2_vect)
 {
@@ -128,8 +126,8 @@ int main(void) {
     while(!Nunchuk.begin(NUNCHUK_ADDRESS))
         tft.fillScreen(ILI9341_RED);
 
-    // drawBackground();
-    tft.fillScreen(ILI9341_BLACK);
+    drawBackground();
+    // tft.fillScreen(ILI9341_BLACK);
     // buffer(100, 100, Background, Player1);
 
     // drawSprite(200, 100, 16, 20, 1);
@@ -164,9 +162,8 @@ int main(void) {
             }
         }();
 
-        // tft.fillScreen(ILI9341_BLACK);
-        drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, 1);
-        // drawSprite(pos[0]+30, pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, 2);
+        drawSprite(pos[0], pos[1], 16, 20, Player1);
+        drawSprite(200, pos[1], 16, 20, Player2);
 
     }
 
@@ -209,42 +206,34 @@ void setFreq(uint8_t freq)
     }
 }
 
-void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t PlayerNR){
-    if(PlayerNR == 1){
-
-        for(uint16_t PixGroup = 0; PixGroup < (w/2)*h; PixGroup++){
-            if(PixGroup%(w/2)==0 && PixGroup!=0){
-                x-=w;
-                y++;
-            }
-            
-            for(uint8_t Pixel = 0; Pixel <=1; Pixel++){
-                if(!Pixel){
-                    tft.drawPixel(x,y,getColor(Player1[PixGroup]&240));
-                }else{
-                    tft.drawPixel(x+1,y,getColor(Player1[PixGroup]&15));
-                }
-                x++;
-            }
+void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t *Sprite){
+    for(uint16_t PixGroup = 0; PixGroup < (w/2)*h; PixGroup++){
+        if(PixGroup%(w/2)==0 && PixGroup!=0){
+            x-=w;
+            y++;
         }
+        
+        for(uint8_t Pixel = 0; Pixel <=1; Pixel++){
 
-    }else{
-        for (int16_t j = 0; j < h; j++, y++) {
-            for (int16_t i = 0; i < w; i++) {
-                if (Player2_MSK[j * w + i]) {
-                    tft.drawPixel(x + i, y, Player2[j * w + i]);
+            if(Pixel==0){
+                if(getColor((Sprite[PixGroup]&0xF0)>>4)!=255){
+                    tft.drawPixel(x,y,getColor((Sprite[PixGroup]&0xF0)>>4));
+                }
+            }else{
+                if(getColor((Sprite[PixGroup]&0x0F))!=255){
+                    tft.drawPixel(x,y,getColor(Sprite[PixGroup]&0x0F));
                 }
             }
+            x++;
         }
-    }
-
+    } 
 }
 
 void drawBackground(){
     uint16_t x = 0;
     uint8_t y = 0;
     for(uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++){
-        tft.drawRGBBitmap(x, y, Background, BG_SPRITE_SIZE, BG_SPRITE_SIZE);
+        drawSprite(x, y, BG_SPRITE_SIZE, BG_SPRITE_SIZE, Background);
         if(x>=SCREEN_WIDTH-BG_SPRITE_SIZE){
             x=0;
             y+=BG_SPRITE_SIZE;
@@ -259,7 +248,7 @@ void buffer(uint16_t x, uint8_t y, uint16_t *BG, uint16_t *Sprite){
     uint16_t BGindex = (OffY%20*20)+(OffX%20);
 
     for(uint16_t i=0; i<480; i++){
-        Buf[i]= BG[BGindex];
+        // Buf[i]= BG[BGindex];
         if(OffX < x+18){
             OffX = x-2;
             OffY++;
@@ -268,13 +257,7 @@ void buffer(uint16_t x, uint8_t y, uint16_t *BG, uint16_t *Sprite){
         }
         BGindex = (OffY%20*20)+(OffX%20);
     }
-
-    tft.startWrite();
-
-    tft.setAddrWindow(x-2, y-2, 20, 24);
-    tft.writePixels(Buf, 480);
-
-    tft.endWrite();
+    //drawSprite(X,Y,W,H,SPRITE);
 }
 
 
@@ -285,45 +268,48 @@ uint16_t getColor(uint8_t Color){
 		break;
   	case 1:
 		return ILI9341_BLACK;
-    		break;
+    	break;
   	case 2:
 		return ILI9341_GREEN;
 		break;
   	case 3:
 		return ILI9341_OLIVE;
-    		break;
+    	break;
 	case 4:
 		return ILI9341_ORANGE;
 		break;
   	case 5:
 		return ILI9341_YELLOW;
-    		break;
+    	break;
   	case 6:
 		return ILI9341_LIGHTGREY;
 		break;
   	case 7:
 		return ILI9341_DARKGREY;
-    		break;
+    	break;
 	case 8:
 		return ILI9341_BLUE;
 		break;
   	case 9:
 		return ILI9341_CYAN;
-    		break;
+    	break;
   	case 10:
 		return ILI9341_WHITE;
 		break;
   	case 11:
-		// return ILI9341_---;
-    		break;
+		return ILI9341_BACKGROUND_DARK;
+    	break;
 	case 12:
-		// return ILI9341_---;
+		return ILI9341_BACKGROUND_LIGHT;
 		break;
   	case 13:
 		// return ILI9341_---;
-    		break;
+    	break;
   	case 14:
 		// return ILI9341_---;
 		break;
-  	}
+    case 15:
+        return 255;
+        break;
+  	};
 }

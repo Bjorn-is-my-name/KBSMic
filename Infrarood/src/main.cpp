@@ -19,6 +19,7 @@ void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t*);
 void LCD_write(uint8_t);
 void LCD_data_write(uint8_t);
 void LCD_command_write(uint8_t);
+bool checkCollision(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);
 
 //Defines
 #define TFT_CS 10
@@ -147,44 +148,57 @@ int main(void) {
     tft.fillScreen(ILI9341_BLACK);
 
     while (1) {
-        // // Position change lambda function
-        // [&pos]()
-        // {
-        //     // Check nunchuk connection
-        //     if(!Nunchuk.getState(NUNCHUK_ADDRESS))
-        //         return 0;
-
-        //     // Check for joystick usage
-
-        //     // Right
-        //     if (Nunchuk.state.joy_x_axis > 140) {
-        //         if (pos[0] + PLAYER_WIDTH < SCREEN_WIDTH)
-        //             pos[0]++;
-        //     }
-        //     // Left
-        //     else if (Nunchuk.state.joy_x_axis < 100) {
-        //         if (pos[0] > 1)
-        //             pos[0]--;
-        //     }
-
-        //     // Upwards acceleration
-        //     if (Nunchuk.state.accel_z_axis <= 10 && pos[1] > 5) {
-        //         pos[1]-= 5;
-        //     }
-        //     else if(pos[1] < SCREEN_HEIGHT - PLAYER_HEIGHT){
-        //         pos[1]++;
-        //     }
-        // }();
-
-        // // Draw new position
-        // // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
-        // drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest);
-
-        // // Send the data over IR
+        
 
         if(currentGameState == MENU)
         {
+          //Menu code
+
+        }
+        else
+        {
+          //Game code
+          // Position change lambda function
+          if(!checkCollision()) //Check if one of the players is colliding with a wall.
+          {
+            [&pos]()
+            {
+              // Check nunchuk connection
+              if(!Nunchuk.getState(NUNCHUK_ADDRESS))
+                  return 0;
+
+              // Check for joystick usage
+
+              // Right
+              if (Nunchuk.state.joy_x_axis > 140) {
+                  if (pos[0] + PLAYER_WIDTH < SCREEN_WIDTH)
+                      pos[0]++;
+              }
+              // Left
+              else if (Nunchuk.state.joy_x_axis < 100) {
+                  if (pos[0] > 1)
+                      pos[0]--;
+              }
+
+              // Upwards acceleration
+              if (Nunchuk.state.accel_z_axis <= 10 && pos[1] > 5) 
+              {
+                  pos[1]-= 5;
+              }
+              else if(pos[1] < SCREEN_HEIGHT - PLAYER_HEIGHT){
+                  pos[1]++;
+              }
+            }();
+
+            // Draw new position
+            // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
+            drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest);
+          }
           
+
+          
+
+          // Send the data over IR
         }
     }
 
@@ -255,4 +269,9 @@ void LCD_command_write(uint8_t command)
 {
   PORTC &= ~(1 << LCD_RS); //RS low
   LCD_write(command);
+}
+
+bool checkCollision(uint8_t xRect1, uint8_t yRect1, uint8_t wRect1, uint8_t hRect1, uint8_t xRect2, uint8_t yRect2, uint8_t hRect2, uint8_t wRect2)
+{
+  return xRect1 + wRect1 >= xRect2 && xRect1 <= xRect2 + wRect2 && yRect1 + hRect1 >= yRect2 && yRect1 <= yRect2 + hRect2;
 }

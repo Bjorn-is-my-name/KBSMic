@@ -2,8 +2,7 @@
 2P-Game on Arduino Uno with ILI 9341 LCD screen
 
 
-Credits:
-This application uses Open Source components. You can find the source code of their open source projects along with license information below. We acknowledge and are grateful to these developers for their contributions to open source.
+This application uses Open Source components. You can find the source code of their open source projects along with license information below.
 
 
 

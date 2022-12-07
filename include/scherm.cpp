@@ -19,10 +19,11 @@
 #define ILI9341_GREEN 0x07E0       ///<   0, 255,   0
 #define ILI9341_CYAN 0x07FF        ///<   0, 255, 255
 #define ILI9341_RED 0xF800         ///< 255,   0,   0
-#define ILI9341_MAGENTA 0xF81F     ///< 255,   0, 255
 #define ILI9341_YELLOW 0xFFE0      ///< 255, 255,   0
 #define ILI9341_WHITE 0xFFFF       ///< 255, 255, 255
 #define ILI9341_ORANGE 0xFD20      ///< 255, 165,   0
+#define ILI9341_BACKGROUND_DARK 0x1900  ///<   3,   8,   0
+#define ILI9341_BACKGROUND_LIGHT 0x2961 ///<   5,  11,   1
 
 // Prototypes
 void setupSPI();
@@ -37,6 +38,7 @@ void SPI_WRITE16(uint16_t);
 void SPI_WRITE_COMMAND(uint8_t);
 void SEND_COMMAND_WITH_ARGUMENTS(uint8_t, uint8_t *, uint8_t);
 void START_UP();
+void fillScreen(uint16_t color);
 
 
 void setupSPI()
@@ -64,6 +66,14 @@ void drawPixel(uint16_t x, uint16_t y, uint16_t color)
         setAddrWindow(x, y, 1, 1);
         SPI_WRITE16(color);
         SPI_CS_HIGH();
+    }
+}
+
+void fillScreen(uint16_t color){
+    for (int x = 0; x < 320; ++x) {
+        for (int y = 0; y < 240; ++y) {
+            drawPixel(x, y, color);
+        }
     }
 }
 

@@ -58,8 +58,7 @@ void draw();
 #define BG_SPRITE_AMOUNT 192
 #define BG_SPRITE_SIZE 20
 
-#define ILI9341_BACKGROUND_DARK 0x1900  ///<   3,   8,   0
-#define ILI9341_BACKGROUND_LIGHT 0x2961 ///<   5,  11,   1
+
 
 //Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
@@ -190,18 +189,17 @@ int main(void) {
     START_UP();
 
 
-//    tft.setRotation(1);
 
     // Check nunckuk connection
-    while (!Nunchuk.begin(NUNCHUK_ADDRESS))
-//        tft.fillScreen(ILI9341_RED);
+    while (!Nunchuk.begin(NUNCHUK_ADDRESS)) {
+        fillScreen(ILI9341_RED);
+    }
 
     drawBackground();
-
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
     while (1) {
-        if (intCurrentMs > FRAME_TIME) {
+        if (intCurrentMs > FRAME_TIME) { //30 FPS
             intCurrentMs = 0;
             update();
             draw();

@@ -61,6 +61,7 @@ uint16_t stopTime;
 enum gameState{MENU, GAME, LEVELSELECT};
 gameState currentGameState = MENU;
 
+//Interrupt routines
 ISR(PCINT2_vect)
 {
     PORTD ^= 1;
@@ -120,7 +121,8 @@ ISR(TIMER0_COMPA_vect)
     }
 }
 
-int main(void) {
+int main(void) 
+{
     // Player position (x and y flipped because they are flipped on the joystick)
     uint16_t pos[] = {SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2};
 
@@ -147,19 +149,13 @@ int main(void) {
 
     tft.fillScreen(ILI9341_BLACK);
 
-    while (1) {
-        
-
-        if(currentGameState == MENU)
-        {
-          //Menu code
-
-        }
-        else
+    while (1) 
+    {     
+        if(currentGameState == GAME)
         {
           //Game code
           // Position change lambda function
-          if(!checkCollision()) //Check if one of the players is colliding with a wall.
+          if(!checkCollision(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, 50, 50, 20, 20)) //Check if one of the players is colliding with a wall.
           {
             [&pos]()
             {
@@ -185,7 +181,8 @@ int main(void) {
               {
                   pos[1]-= 5;
               }
-              else if(pos[1] < SCREEN_HEIGHT - PLAYER_HEIGHT){
+              else if(pos[1] < SCREEN_HEIGHT - PLAYER_HEIGHT)
+              {
                   pos[1]++;
               }
             }();
@@ -194,11 +191,15 @@ int main(void) {
             // tft.fillRect(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, ILI9341_WHITE);
             drawSprite(pos[0], pos[1], PLAYER_WIDTH, PLAYER_HEIGHT, spriteTest);
           }
-          
 
-          
-
-          // Send the data over IR
+          if(currentGameState == MENU)
+          {
+            //Menu code
+          }
+          if(currentGameState == LEVELSELECT)
+          {
+            //Level select code
+          }    
         }
     }
 
@@ -243,7 +244,8 @@ void setFreq(uint8_t freq)
     }
 }
 
-void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array){
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint16_t* Array)
+{
     tft.startWrite();
         tft.setAddrWindow(x, y, w, h);
         tft.writePixels(Array, w*h);

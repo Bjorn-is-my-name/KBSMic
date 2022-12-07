@@ -42,7 +42,7 @@ void setup(void) {
 
   tft.begin();
   tft.setRotation(1);
-  tft.fillScreen(ILI9341_BLACK);
+    tft.fillRect(ILI9341_BLACK);
 
   // Turn on backlight (required on PyPortal)
 #if defined(TFT_BACKLIGHT)

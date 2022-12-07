@@ -78,7 +78,7 @@ void setup(void)
     Serial.println("Touchscreen started."); 
   }
 
-  tft.fillScreen(ILI9341_BLUE);
+    tft.fillRect(ILI9341_BLUE);
   // origin = left,top landscape (USB left upper)
   tft.setRotation(1); 
   redBtn();

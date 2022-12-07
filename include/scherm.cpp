@@ -27,22 +27,33 @@
 
 // Prototypes
 void setupSPI();
+
 void drawPixel(uint16_t, uint16_t, uint16_t);
+
 void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h);
+
 void SPI_CS_LOW();
+
 void SPI_CS_HIGH();
+
 void SPI_DC_LOW();
+
 void SPI_DC_HIGH();
+
 void SPI_WRITE8(uint8_t);
+
 void SPI_WRITE16(uint16_t);
+
 void SPI_WRITE_COMMAND(uint8_t);
+
 void SEND_COMMAND_WITH_ARGUMENTS(uint8_t, uint8_t *, uint8_t);
+
 void START_UP();
-void fillScreen(uint16_t color);
+
+void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color);
 
 
-void setupSPI()
-{
+void setupSPI() {
     /*
     SS pins on internal pull-up (DC & CD)
     SS (DC & CD) & MOSI & SCK pins on output
@@ -57,10 +68,8 @@ void setupSPI()
     SPCR &= ~((1 << DORD) | (1 << CPOL) | (1 << CPHA));
 }
 
-void drawPixel(uint16_t x, uint16_t y, uint16_t color)
-{
-    if ((x >= 0) && (x < WIDTH) && (y >= 0) && (y < HEIGHT))
-    {
+void drawPixel(uint16_t x, uint16_t y, uint16_t color) {
+    if ((x >= 0) && (x < WIDTH) && (y >= 0) && (y < HEIGHT)) {
         // Set coords and send color
         SPI_CS_LOW();
         setAddrWindow(x, y, 1, 1);
@@ -69,16 +78,15 @@ void drawPixel(uint16_t x, uint16_t y, uint16_t color)
     }
 }
 
-void fillScreen(uint16_t color){
-    for (int x = 0; x < 320; ++x) {
-        for (int y = 0; y < 240; ++y) {
-            drawPixel(x, y, color);
+void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color) {
+    for (uint16_t this_x = 0; this_x < width; ++this_x) {
+        for (int this_y = 0; this_y < height; ++this_y) {
+            drawPixel(this_x + x, this_y + y, color);
         }
     }
 }
 
-void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h)
-{
+void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h) {
     // Keep track of address window coords, only reset when different from last time
     static uint16_t old_x1 = 0xFFFF, old_x2 = 0xFFFF;
     static uint16_t old_y1 = 0xFFFF, old_y2 = 0xFFFF;
@@ -86,8 +94,7 @@ void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h)
     uint16_t x2 = (x1 + w - 1), y2 = (y1 + h - 1);
 
     // If addr-x changed, set to new x
-    if (x1 != old_x1 || x2 != old_x2)
-    {
+    if (x1 != old_x1 || x2 != old_x2) {
         SPI_WRITE_COMMAND(COLUMN_ADDRESS_SET);
         // Set x-range (columns effected)
         SPI_WRITE16(x1);
@@ -97,8 +104,7 @@ void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h)
     }
 
     // If addr-y changed, set to new y
-    if (y1 != old_y1 || y2 != old_y2)
-    {
+    if (y1 != old_y1 || y2 != old_y2) {
         SPI_WRITE_COMMAND(PAGE_ADDRESS_SET);
         // Set y-range (rows effected)
         SPI_WRITE16(y1);
@@ -111,62 +117,53 @@ void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h)
     SPI_WRITE_COMMAND(MEMORY_WRITE);
 }
 
-void SPI_CS_LOW()
-{
+void SPI_CS_LOW() {
     // Set CS pin to low
     PORTB &= ~(1 << PB2);
 }
 
-void SPI_CS_HIGH()
-{
+void SPI_CS_HIGH() {
     // Set CS pin to high
     PORTB |= (1 << PB2);
 }
 
-void SPI_DC_LOW()
-{
+void SPI_DC_LOW() {
     // Set DC pin to low
     PORTB &= ~(1 << PB1);
 }
 
-void SPI_DC_HIGH()
-{
+void SPI_DC_HIGH() {
     // Set DC pin to high
     PORTB |= (1 << PB1);
 }
 
-void SPI_WRITE8(uint8_t data)
-{
+void SPI_WRITE8(uint8_t data) {
     SPDR = data;
 
     // Wait for the data to finish sending
     while (!((SPSR >> SPIF) & 1));
 }
 
-void SPI_WRITE16(uint16_t data)
-{
+void SPI_WRITE16(uint16_t data) {
     // Send left byte first (Because of MSB)
     SPI_WRITE8(data >> 8);
     SPI_WRITE8(data);
 }
 
-void SPI_WRITE_COMMAND(uint8_t cmd)
-{
+void SPI_WRITE_COMMAND(uint8_t cmd) {
     SPI_DC_LOW();
     SPI_WRITE8(cmd);
     SPI_DC_HIGH();
 }
 
-void SEND_COMMAND_WITH_ARGUMENTS(uint8_t cmd, uint8_t *args, uint8_t len)
-{
+void SEND_COMMAND_WITH_ARGUMENTS(uint8_t cmd, uint8_t *args, uint8_t len) {
     SPI_CS_LOW();
 
     // Send the command
     SPI_WRITE_COMMAND(cmd);
 
     // Send the arguments
-    for (uint8_t idx = 0; idx < len; idx++)
-    {
+    for (uint8_t idx = 0; idx < len; idx++) {
         SPI_WRITE8(*args);
         args++;
     }
@@ -174,8 +171,7 @@ void SEND_COMMAND_WITH_ARGUMENTS(uint8_t cmd, uint8_t *args, uint8_t len)
     SPI_CS_HIGH();
 }
 
-void START_UP()
-{
+void START_UP() {
     SPI_CS_LOW();
     SPI_WRITE_COMMAND(SOFTWARE_RESET);
     SPI_CS_HIGH();
@@ -209,15 +205,13 @@ void START_UP()
     // Send all commands with arguments
     uint8_t cmd, x, numArgs;
     uint8_t *addr = startup_commands;
-    while ((cmd = *(addr++)) > 0)
-    {
+    while ((cmd = *(addr++)) > 0) {
         x = *(addr++);
         numArgs = x & 0x7F;
         SEND_COMMAND_WITH_ARGUMENTS(cmd, addr, numArgs);
         addr += numArgs;
         // Wait after the last 2 commands. idk why needed tho, adafruit uses it and won't work without it
-        if (x & 0x80)
-        {
+        if (x & 0x80) {
             _delay_ms(150);
         }
     }

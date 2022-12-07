@@ -191,8 +191,8 @@ int main(void) {
 
 
     // Check nunckuk connection
-    while (!Nunchuk.begin(NUNCHUK_ADDRESS)) {
-        fillScreen(ILI9341_RED);
+    while (Nunchuk.begin(NUNCHUK_ADDRESS)) {
+        fillRect(0, 0, 320, 240, ILI9341_RED);
     }
 
     drawBackground();

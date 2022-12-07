@@ -85,7 +85,7 @@ void setup(void)
   Serial.begin(9600);
   tft.begin();
 
-  tft.fillScreen(ILI9341_BLUE);
+    tft.fillRect(ILI9341_BLUE);
   // origin = left,top landscape (USB left upper)
   tft.setRotation(1); 
   redBtn();

@@ -46,7 +46,7 @@ void setup() {
 void loop(void) {
   for(uint8_t r=0; r<4; r++) {
     tft.setRotation(r);
-    tft.fillScreen(ILI9341_BLACK);
+      tft.fillRect(ILI9341_BLACK);
     for(uint8_t j=0; j<20; j++) {
       tft.drawRGBBitmap(
         random(-DRAGON_WIDTH , tft.width()),

@@ -36,7 +36,7 @@ void setup(void) {
 
   tft.begin();
 
-  tft.fillScreen(ILI9341_BLACK);
+    tft.fillRect(ILI9341_BLACK);
   
   // make the color selection boxes
   tft.fillRect(0, 0, BOXSIZE, BOXSIZE, ILI9341_RED);

@@ -20,14 +20,10 @@ void buffer(uint16_t, uint8_t, uint16_t *, uint16_t *);
 
 uint16_t getColor(uint8_t);
 
-void setFreq(uint8_t);
-
 void update();
 
 void draw();
 
-#define TFT_CS 10
-#define TFT_DC 9
 
 #define NUNCHUK_ADDRESS 0x52
 
@@ -41,9 +37,9 @@ void draw();
 #define PLAYER_HEIGHT 20
 
 #define SENDINGDATA_LEN 9
-#define SENDINGBIT_START_VALUE - 2
+#define SENDINGBIT_START_VALUE (- 2)
 
-#define STARTBIT_VALUE -1
+#define STARTBIT_VALUE (-1)
 #define STARTBIT_MIN 3
 #define STARTBIT_MAX 6
 
@@ -73,7 +69,7 @@ public:
     uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
     uint16_t xOld = 0;
     uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
-//    uint8_t animation
+//    uint8_t animation = 0;
 } player2;
 
 // Check to see if the current bit is done sending
@@ -102,19 +98,19 @@ ISR(PCINT2_vect) {
     isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)
 
     if (isDataBit) {
-        uint8_t difference = currentMs - startMs; // Calculate the length to determin the value
+        uint8_t difference = currentMs - startMs; // Calculate the length to determine the value
 
-        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if its a start bit
+        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if it's a start bit
         {
             startBitReceived = true;
             bitCounter = 0;
         }
 
-        if (startBitReceived) // If the start bit has been send, check what the data is
+        if (startBitReceived) // If the start bit has been sent, check what the data is
         {
-            if (difference < ZERO_MAX) // Check if its a zero
+            if (difference < ZERO_MAX) // Check if it's a zero
                 receivedData &= ~(1 << bitCounter++);
-            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if its a one
+            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if it's a one
                 receivedData |= (1 << bitCounter++);
 
             if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
@@ -153,10 +149,10 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
                     onTime = ((sendingData >> sendingBit) & 1) ? oneTime
                                                                : zeroTime; // Set the time corresponding to the bit
 
-                TCCR0A &= ~(1 << COM0A1); // Enabe TC0
+                TCCR0A &= ~(1 << COM0A1); // Enable TC0
             } else {
                 sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
-                sendingData = player2.x;
+                sendingData = player1.x;
             }
         }
 
@@ -170,7 +166,7 @@ int main(void) {
     DDRD |= (1 << DDD6);
     init_timer0();
 
-    // Setup IR recieving
+    // Setup IR receiving
     PORTD |= (1 << PORTD2); //pull up
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
@@ -186,14 +182,15 @@ int main(void) {
 
 
     // Check nunckuk connection
-    while (!startNunchuck(NUNCHUK_ADDRESS)) {
+    while (!startNunchuk(NUNCHUK_ADDRESS)) {
         fillRect(0, 0, 320, 240, ILI9341_RED);
     }
 
+    //Draws the background 😮
     drawBackground();
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
-    while (1) {
+    while (true) {
         if (intCurrentMs > FRAME_TIME) { //30 FPS
             intCurrentMs = 0;
             update();
@@ -213,7 +210,7 @@ void init_timer0() {
     TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
     TCCR0B |= (1 << WGM02) | (1 << CS01);
 
-    // Enable interupts on compare match
+    // Enable interrupts on compare match
     TIMSK0 |= (1 << OCIE0A);
 }
 
@@ -248,7 +245,7 @@ void update() {
     if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH < SCREEN_WIDTH)
         player1.x += 2;
 
-    // Check for movement to left (only move when not against the wall)
+        // Check for movement to left (only move when not against the wall)
     else if (state.joy_x_axis < 100 && player1.x > 0)
         player1.x -= 2;
 
@@ -346,12 +343,13 @@ uint16_t getColor(uint8_t Color) {
             return ILI9341_BACKGROUND_LIGHT;
         case 13:
             // return ILI9341_---;
-            break;
+            return 255;
         case 14:
             // return ILI9341_---;
-            break;
+            return 255;
         case 15:
             return 255;
-    };
-    return 0;
+        default:
+            return 255;
+    }
 }

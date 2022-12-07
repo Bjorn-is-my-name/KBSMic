@@ -40,7 +40,7 @@ bool _getId(uint8_t address);
 
 uint8_t _read(uint8_t address, uint8_t offset, uint8_t len);
 
-bool startNunchuck(uint8_t address) {
+bool startNunchuk(uint8_t address) {
     {
         Wire.beginTransmission(address);
         Wire.write(0xF0);

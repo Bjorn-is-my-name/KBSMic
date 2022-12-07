@@ -16,6 +16,9 @@ void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
 
 void drawBackground();
 
+void drawBackground_jan();
+
+
 void buffer(uint16_t, uint8_t, uint16_t *, uint16_t *);
 
 uint16_t getColor(uint8_t);
@@ -179,8 +182,6 @@ int main(void) {
     sei();
     START_UP();
 
-
-
     // Check nunchuk connection
     while (!startNunchuk(NUNCHUK_ADDRESS)) {
         fillRect(0, 0, 320, 240, ILI9341_RED);
@@ -189,7 +190,6 @@ int main(void) {
     //Draws the background 😮
     drawBackground();
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
-
     while (true) {
         if (intCurrentMs > FRAME_TIME) { //30 FPS
             intCurrentMs = 0;
@@ -237,7 +237,7 @@ void update() {
     player1.xOld = player1.x;
     player1.yOld = player1.y;
 
-    // Get the nunchuck input data
+    // Get the nunchuk input data
     if (!getState(NUNCHUK_ADDRESS))
         return;
 
@@ -263,7 +263,7 @@ void update() {
         player1.yVelocity = 0;
     }
 
-    // Set the player to jump when the nunchuck movement is high enough and not jumping already
+    // Set the player to jump when the nunchuk movement is high enough and not jumping already
     if (state.accel_z_axis < 0xFF && !player1.jumping) {
         player1.jumping = true;
         player1.yVelocity = INITIAL_Y_VEL;
@@ -297,15 +297,10 @@ void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const u
 }
 
 void drawBackground() {
-    uint16_t x = 0;
-    uint8_t y = 0;
-    for (uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++) {
-        drawSprite(x, y, BG_SPRITE_SIZE, BG_SPRITE_SIZE, Background);
-        if (x >= SCREEN_WIDTH - BG_SPRITE_SIZE) {
-            x = 0;
-            y += BG_SPRITE_SIZE;
-        } else
-            x += BG_SPRITE_SIZE;
+    for (uint8_t x = 0; x < 12; x++) {
+        for (int y = 0; y < 16; ++y) {
+            drawSprite(y * BG_SPRITE_SIZE, x * BG_SPRITE_SIZE, BG_SPRITE_SIZE, BG_SPRITE_SIZE, Background);
+        }
     }
 }
 

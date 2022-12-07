@@ -1,7 +1,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
-#include <Adafruit_ILI9341.h>
+//#include <Adafruit_ILI9341.h>
+#include "scherm.cpp"
 #include <Nunchuk.h>
 #include "Player1.c"
 #include "Player2.c"
@@ -25,8 +26,6 @@ void setFreq(uint8_t);
 void update();
 
 void draw();
-
-void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t *);
 
 #define TFT_CS 10
 #define TFT_DC 9
@@ -62,7 +61,7 @@ void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint16_t *);
 #define ILI9341_BACKGROUND_DARK 0x1900  ///<   3,   8,   0
 #define ILI9341_BACKGROUND_LIGHT 0x2961 ///<   5,  11,   1
 
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+//Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 struct {
 public:
@@ -185,14 +184,17 @@ int main(void) {
     setFreq(IR_38KHZ);
 
     // Setup screen
-    sei();
     Wire.begin();
-    tft.begin();
-    tft.setRotation(1);
+    setupSPI();
+    sei();
+    START_UP();
+
+
+//    tft.setRotation(1);
 
     // Check nunckuk connection
     while (!Nunchuk.begin(NUNCHUK_ADDRESS))
-        tft.fillScreen(ILI9341_RED);
+//        tft.fillScreen(ILI9341_RED);
 
     drawBackground();
 
@@ -292,11 +294,11 @@ void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const u
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
             if (Pixel == 0) {
                 if (getColor((Sprite[PixGroup] & 0xF0) >> 4) != 255) {
-                    tft.drawPixel(x, y, getColor((Sprite[PixGroup] & 0xF0) >> 4));
+                    drawPixel(x, y, getColor((Sprite[PixGroup] & 0xF0) >> 4));
                 }
             } else {
                 if (getColor((Sprite[PixGroup] & 0x0F)) != 255) {
-                    tft.drawPixel(x, y, getColor(Sprite[PixGroup] & 0x0F));
+                    drawPixel(x, y, getColor(Sprite[PixGroup] & 0x0F));
                 }
             }
             x++;

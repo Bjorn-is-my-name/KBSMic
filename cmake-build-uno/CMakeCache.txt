@@ -31,7 +31,7 @@ CMAKE_COLOR_DIAGNOSTICS:BOOL=ON
 CMAKE_CONFIGURATION_TYPES:STRING=uno
 
 //CXX compiler
-CMAKE_CXX_COMPILER:STRING=C:/msys64/mingw64/bin/cc.exe
+CMAKE_CXX_COMPILER:FILEPATH=C:/msys64/mingw64/bin/cc.exe
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -60,7 +60,7 @@ CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 CMAKE_CXX_FLAGS_UNO:STRING=
 
 //C compiler
-CMAKE_C_COMPILER:STRING=C:/msys64/mingw64/bin/cc.exe
+CMAKE_C_COMPILER:FILEPATH=C:/msys64/mingw64/bin/cc.exe
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -116,7 +116,7 @@ CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=
 CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/pkgRedirects
 
 //Install path prefix, prepended onto install directories.
-CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/test_lcd
+CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/KBSMic
 
 //Path to a program.
 CMAKE_LINKER:FILEPATH=C:/msys64/mingw64/bin/ld.exe
@@ -164,7 +164,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=test_lcd
+CMAKE_PROJECT_NAME:STATIC=KBSMic
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=C:/msys64/mingw64/bin/ranlib.exe
@@ -237,13 +237,13 @@ CMAKE_STRIP:FILEPATH=C:/msys64/mingw64/bin/strip.exe
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //Value Computed by CMake
-test_lcd_BINARY_DIR:STATIC=C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno
+KBSMic_BINARY_DIR:STATIC=C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno
 
 //Value Computed by CMake
-test_lcd_IS_TOP_LEVEL:STATIC=ON
+KBSMic_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-test_lcd_SOURCE_DIR:STATIC=C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic
+KBSMic_SOURCE_DIR:STATIC=C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic
 
 
 ########################

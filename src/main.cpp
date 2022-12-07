@@ -242,7 +242,7 @@ void update() {
         return;
 
     // Check for movement to right (only move when not against the wall)
-    if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH * 2 < SCREEN_WIDTH)
+    if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
         player1.x += 2;
 
     // Check for movement to left (only move when not against the wall)
@@ -293,7 +293,7 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOud, uint8_t yOud, uint8_t w, 
 
             if (color != 255 && !(xOud >= x && xOud <= x + w * 2 - 1 && yOud >= y && yOud <= y + h - 1))
             {
-                drawPixel(xOud, yOud, getColor((Background[xOud % (BG_SPRITE_WIDTH * 2) / 2 + yOud % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+                drawPixel(xOud, yOud, getColor((Background[xOud % BG_SPRITE_ACTUAL_WIDTH / 2 + yOud % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
             }
 
             xOud++;
@@ -312,7 +312,7 @@ void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, uint8_t
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
-            drawPixel(x, y, (color == 255) ? getColor((Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)) : color);
+            drawPixel(x, y, (color == 255) ? getColor((Background[x % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)) : color);
 
             x++;
         }
@@ -322,7 +322,7 @@ void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, uint8_t
 void drawBackground() {
     for (uint8_t y = 0; y < 12; y++) {
         for (uint8_t x = 0; x < 16; x++) {
-            drawSprite(x * BG_SPRITE_WIDTH * 2, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT, Background);
+            drawSprite(x * BG_SPRITE_ACTUAL_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT, Background);
         }
     }
 }

@@ -25,7 +25,7 @@ void setup() {
   Serial.println();
 
   // read a register by writing first, then reading
-  buffer[0] = 0x8F;  // we'll reuse the same buffer
+  buffer[0] = 0x8F;  // we'll reuse the same nunchuck_buffer
   spi_dev.write_then_read(buffer, 1, buffer, 2, false);
   Serial.print("Write then Read: ");
   for (uint8_t i=0; i<2; i++) {

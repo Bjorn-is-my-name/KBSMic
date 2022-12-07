@@ -59,7 +59,7 @@ public:
   ~Adafruit_GrayOLED(void);
 
   /**
-   @brief The function that sub-classes define that writes out the buffer to
+   @brief The function that sub-classes define that writes out the nunchuck_buffer to
    the display over I2C or SPI
    **/
   virtual void display(void) = 0;

@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
       for (x = 0; x < bitmap->width; x++) {
         byte = x / 8;
         bit = 0x80 >> (x & 7);
-        enbit(bitmap->buffer[y * bitmap->pitch + byte] & bit);
+        enbit(bitmap->nunchuck_buffer[y * bitmap->pitch + byte] & bit);
       }
     }
 

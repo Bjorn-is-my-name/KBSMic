@@ -10,7 +10,7 @@
   #define TFT_BACKLIGHT 25
   // ILI9341 with 8-bit parallel interface:
   Adafruit_ILI9341 tft = Adafruit_ILI9341(tft8bitbus, TFT_D0, TFT_WR, TFT_DC, TFT_CS, TFT_RST, TFT_RD);
-  #define USE_BUFFER   // buffer all 155 KB of data for bliting - uses passive ram but looks nicer?
+  #define USE_BUFFER   // nunchuck_buffer all 155 KB of data for bliting - uses passive ram but looks nicer?
 #else
   // Use SPI
   #define STMPE_CS 6
@@ -33,7 +33,7 @@ float
   rangeImag   =  3.0;
 
 #if defined(USE_BUFFER)
-  uint16_t buffer[pixelWidth * pixelHeight];
+  uint16_t nunchuck_buffer[pixelWidth * pixelHeight];
 #endif
 
 void setup(void) {
@@ -78,7 +78,7 @@ void loop() {
         a  = posReal + a2 - b2;
       }
       #if defined(USE_BUFFER)
-        buffer[y * pixelWidth + x] = (n * 29)<<8 | (n * 67);
+        nunchuck_buffer[y * pixelWidth + x] = (n * 29)<<8 | (n * 67);
       #else
         tft.drawPixel(x, y, (n * 29)<<8 | (n * 67)); // takes 500ms with individual pixel writes
       #endif
@@ -87,7 +87,7 @@ void loop() {
     posImag -= incImag;
   }
   #if defined(USE_BUFFER)
-    tft.drawRGBBitmap(0, 0, buffer, pixelWidth, pixelHeight); // takes 169 ms
+    tft.drawRGBBitmap(0, 0, nunchuck_buffer, pixelWidth, pixelHeight); // takes 169 ms
   #endif
   elapsedTime = millis()-startTime;
   Serial.print("Took "); Serial.print(elapsedTime); Serial.println(" ms");

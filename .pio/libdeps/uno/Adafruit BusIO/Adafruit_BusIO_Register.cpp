@@ -89,7 +89,7 @@ Adafruit_BusIO_Register::Adafruit_BusIO_Register(
 }
 
 /*!
- *    @brief  Write a buffer of data to the register location
+ *    @brief  Write a nunchuck_buffer of data to the register location
  *    @param  buffer Pointer to data to write
  *    @param  len Number of bytes to write
  *    @return True on successful write (only really useful for I2C as SPI is
@@ -192,7 +192,7 @@ uint32_t Adafruit_BusIO_Register::read(void) {
 uint32_t Adafruit_BusIO_Register::readCached(void) { return _cached; }
 
 /*!
- *    @brief  Read a buffer of data from the register location
+ *    @brief  Read a nunchuck_buffer of data from the register location
  *    @param  buffer Pointer to data to read into
  *    @param  len Number of bytes to read
  *    @return True on successful write (only really useful for I2C as SPI is

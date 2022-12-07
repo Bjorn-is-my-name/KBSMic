@@ -1735,7 +1735,7 @@ bool Adafruit_GFX_Button::justReleased() { return (!currstate && laststate); }
 // libraries at this time).  This is here mostly to help with the recently-
 // added proportionally-spaced fonts; adds a way to refresh a section of the
 // screen without a massive flickering clear-and-redraw...but maybe you'll
-// find other uses too.  VERY RAM-intensive, since the buffer is in MCU
+// find other uses too.  VERY RAM-intensive, since the nunchuck_buffer is in MCU
 // memory and not the display driver...GXFcanvas1 might be minimally useful
 // on an Uno-class board, but this and the others are much more likely to
 // require at least a Mega or various recent ARM-type boards (recommended,
@@ -2005,7 +2005,7 @@ void GFXcanvas1::drawFastHLine(int16_t x, int16_t y, int16_t w,
 
 /**************************************************************************/
 /*!
-   @brief    Speed optimized vertical line drawing into the raw canvas buffer
+   @brief    Speed optimized vertical line drawing into the raw canvas nunchuck_buffer
    @param    x   Line horizontal start point
    @param    y   Line vertical start point
    @param    h   length of vertical line to be drawn, including first point
@@ -2043,7 +2043,7 @@ void GFXcanvas1::drawFastRawVLine(int16_t x, int16_t y, int16_t h,
 
 /**************************************************************************/
 /*!
-   @brief    Speed optimized horizontal line drawing into the raw canvas buffer
+   @brief    Speed optimized horizontal line drawing into the raw canvas nunchuck_buffer
    @param    x   Line horizontal start point
    @param    y   Line vertical start point
    @param    w   length of horizontal line to be drawn, including first point
@@ -2340,7 +2340,7 @@ void GFXcanvas8::drawFastHLine(int16_t x, int16_t y, int16_t w,
 
 /**************************************************************************/
 /*!
-   @brief    Speed optimized vertical line drawing into the raw canvas buffer
+   @brief    Speed optimized vertical line drawing into the raw canvas nunchuck_buffer
    @param    x   Line horizontal start point
    @param    y   Line vertical start point
    @param    h   length of vertical line to be drawn, including first point
@@ -2360,7 +2360,7 @@ void GFXcanvas8::drawFastRawVLine(int16_t x, int16_t y, int16_t h,
 
 /**************************************************************************/
 /*!
-   @brief    Speed optimized horizontal line drawing into the raw canvas buffer
+   @brief    Speed optimized horizontal line drawing into the raw canvas nunchuck_buffer
    @param    x   Line horizontal start point
    @param    y   Line vertical start point
    @param    w   length of horizontal line to be drawn, including first point
@@ -2633,7 +2633,7 @@ void GFXcanvas16::drawFastHLine(int16_t x, int16_t y, int16_t w,
 
 /**************************************************************************/
 /*!
-   @brief    Speed optimized vertical line drawing into the raw canvas buffer
+   @brief    Speed optimized vertical line drawing into the raw canvas nunchuck_buffer
    @param    x   Line horizontal start point
    @param    y   Line vertical start point
    @param    h   length of vertical line to be drawn, including first point
@@ -2652,7 +2652,7 @@ void GFXcanvas16::drawFastRawVLine(int16_t x, int16_t y, int16_t h,
 
 /**************************************************************************/
 /*!
-   @brief    Speed optimized horizontal line drawing into the raw canvas buffer
+   @brief    Speed optimized horizontal line drawing into the raw canvas nunchuck_buffer
    @param    x   Line horizontal start point
    @param    y   Line vertical start point
    @param    w   length of horizontal line to be drawn, including first point

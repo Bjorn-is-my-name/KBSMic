@@ -80,15 +80,15 @@ bool Adafruit_I2CDevice::detected(void) {
 }
 
 /*!
- *    @brief  Write a buffer or two to the I2C device. Cannot be more than
+ *    @brief  Write a nunchuck_buffer or two to the I2C device. Cannot be more than
  * maxBufferSize() bytes.
- *    @param  buffer Pointer to buffer of data to write. This is const to
- *            ensure the content of this buffer doesn't change.
- *    @param  len Number of bytes from buffer to write
+ *    @param  buffer Pointer to nunchuck_buffer of data to write. This is const to
+ *            ensure the content of this nunchuck_buffer doesn't change.
+ *    @param  len Number of bytes from nunchuck_buffer to write
  *    @param  prefix_buffer Pointer to optional array of data to write before
- * buffer. Cannot be more than maxBufferSize() bytes. This is const to
- *            ensure the content of this buffer doesn't change.
- *    @param  prefix_len Number of bytes from prefix buffer to write
+ * nunchuck_buffer. Cannot be more than maxBufferSize() bytes. This is const to
+ *            ensure the content of this nunchuck_buffer doesn't change.
+ *    @param  prefix_len Number of bytes from prefix nunchuck_buffer to write
  *    @param  stop Whether to send an I2C STOP signal on write
  *    @return True if write was successful, otherwise false.
  */
@@ -98,9 +98,9 @@ bool Adafruit_I2CDevice::write(const uint8_t *buffer, size_t len, bool stop,
   if ((len + prefix_len) > maxBufferSize()) {
     // currently not guaranteed to work if more than 32 bytes!
     // we will need to find out if some platforms have larger
-    // I2C buffer sizes :/
+    // I2C nunchuck_buffer sizes :/
 #ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.println(F("\tI2CDevice could not write such a large buffer"));
+    DEBUG_SERIAL.println(F("\tI2CDevice could not write such a large nunchuck_buffer"));
 #endif
     return false;
   }
@@ -139,7 +139,7 @@ bool Adafruit_I2CDevice::write(const uint8_t *buffer, size_t len, bool stop,
   }
   for (uint16_t i = 0; i < len; i++) {
     DEBUG_SERIAL.print(F("0x"));
-    DEBUG_SERIAL.print(buffer[i], HEX);
+    DEBUG_SERIAL.print(nunchuck_buffer[i], HEX);
     DEBUG_SERIAL.print(F(", "));
     if (i % 32 == 31) {
       DEBUG_SERIAL.println();
@@ -166,10 +166,10 @@ bool Adafruit_I2CDevice::write(const uint8_t *buffer, size_t len, bool stop,
 }
 
 /*!
- *    @brief  Read from I2C into a buffer from the I2C device.
+ *    @brief  Read from I2C into a nunchuck_buffer from the I2C device.
  *    Cannot be more than maxBufferSize() bytes.
- *    @param  buffer Pointer to buffer of data to read into
- *    @param  len Number of bytes from buffer to read.
+ *    @param  buffer Pointer to nunchuck_buffer of data to read into
+ *    @param  len Number of bytes from nunchuck_buffer to read.
  *    @param  stop Whether to send an I2C STOP signal on read
  *    @return True if read was successful, otherwise false.
  */
@@ -214,7 +214,7 @@ bool Adafruit_I2CDevice::_read(uint8_t *buffer, size_t len, bool stop) {
   DEBUG_SERIAL.print(F(" :: "));
   for (uint16_t i = 0; i < len; i++) {
     DEBUG_SERIAL.print(F("0x"));
-    DEBUG_SERIAL.print(buffer[i], HEX);
+    DEBUG_SERIAL.print(nunchuck_buffer[i], HEX);
     DEBUG_SERIAL.print(F(", "));
     if (len % 32 == 31) {
       DEBUG_SERIAL.println();
@@ -227,13 +227,13 @@ bool Adafruit_I2CDevice::_read(uint8_t *buffer, size_t len, bool stop) {
 }
 
 /*!
- *    @brief  Write some data, then read some data from I2C into another buffer.
+ *    @brief  Write some data, then read some data from I2C into another nunchuck_buffer.
  *    Cannot be more than maxBufferSize() bytes. The buffers can point to
  *    same/overlapping locations.
- *    @param  write_buffer Pointer to buffer of data to write from
- *    @param  write_len Number of bytes from buffer to write.
- *    @param  read_buffer Pointer to buffer of data to read into.
- *    @param  read_len Number of bytes from buffer to read.
+ *    @param  write_buffer Pointer to nunchuck_buffer of data to write from
+ *    @param  write_len Number of bytes from nunchuck_buffer to write.
+ *    @param  read_buffer Pointer to nunchuck_buffer of data to read into.
+ *    @param  read_len Number of bytes from nunchuck_buffer to read.
  *    @param  stop Whether to send an I2C STOP signal between the write and read
  *    @return True if write & read was successful, otherwise false.
  */

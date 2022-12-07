@@ -57,7 +57,7 @@
             because other devices on the I2C bus might not be compatible
             with the faster rate. (Ignored if using pre-1.5.7 Arduino
             software, which operates I2C at a fixed 100 KHz.)
-    @note   Call the object's begin() function before use -- buffer
+    @note   Call the object's begin() function before use -- nunchuck_buffer
             allocation is performed there!
 */
 Adafruit_GrayOLED::Adafruit_GrayOLED(uint8_t bpp, uint16_t w, uint16_t h,
@@ -93,7 +93,7 @@ Adafruit_GrayOLED::Adafruit_GrayOLED(uint8_t bpp, uint16_t w, uint16_t h,
     @param  cs_pin
             Chip-select pin (using Arduino pin numbering) for sharing the
             bus with other devices. Active low.
-    @note   Call the object's begin() function before use -- buffer
+    @note   Call the object's begin() function before use -- nunchuck_buffer
             allocation is performed there!
 */
 Adafruit_GrayOLED::Adafruit_GrayOLED(uint8_t bpp, uint16_t w, uint16_t h,
@@ -129,7 +129,7 @@ Adafruit_GrayOLED::Adafruit_GrayOLED(uint8_t bpp, uint16_t w, uint16_t h,
     @param  bitrate
             SPI clock rate for transfers to this display. Default if
             unspecified is 8000000UL (8 MHz).
-    @note   Call the object's begin() function before use -- buffer
+    @note   Call the object's begin() function before use -- nunchuck_buffer
             allocation is performed there!
 */
 Adafruit_GrayOLED::Adafruit_GrayOLED(uint8_t bpp, uint16_t w, uint16_t h,
@@ -201,7 +201,7 @@ bool Adafruit_GrayOLED::oled_commandList(const uint8_t *c, uint8_t n) {
 // ALLOCATE & INIT DISPLAY -------------------------------------------------
 
 /*!
-    @brief  Allocate RAM for image buffer, initialize peripherals and pins.
+    @brief  Allocate RAM for image nunchuck_buffer, initialize peripherals and pins.
             Note that subclasses must call this before other begin() init
     @param  addr
             I2C address of corresponding oled display.
@@ -277,7 +277,7 @@ bool Adafruit_GrayOLED::_init(uint8_t addr, bool reset) {
     @param  color
             Pixel color, one of: MONOOLED_BLACK, MONOOLED_WHITE or
    MONOOLED_INVERT.
-    @note   Changes buffer contents only, no immediate effect on display.
+    @note   Changes nunchuck_buffer contents only, no immediate effect on display.
             Follow up with a call to display(), or with other graphics
             commands as needed by one's own application.
 */
@@ -335,8 +335,8 @@ void Adafruit_GrayOLED::drawPixel(int16_t x, int16_t y, uint16_t color) {
 }
 
 /*!
-    @brief  Clear contents of display buffer (set all pixels to off).
-    @note   Changes buffer contents only, no immediate effect on display.
+    @brief  Clear contents of display nunchuck_buffer (set all pixels to off).
+    @note   Changes nunchuck_buffer contents only, no immediate effect on display.
             Follow up with a call to display(), or with other graphics
             commands as needed by one's own application.
 */
@@ -350,14 +350,14 @@ void Adafruit_GrayOLED::clearDisplay(void) {
 }
 
 /*!
-    @brief  Return color of a single pixel in display buffer.
+    @brief  Return color of a single pixel in display nunchuck_buffer.
     @param  x
             Column of display -- 0 at left to (screen width - 1) at right.
     @param  y
             Row of display -- 0 at top to (screen height -1) at bottom.
     @return true if pixel is set (usually MONOOLED_WHITE, unless display invert
    mode is enabled), false if clear (MONOOLED_BLACK).
-    @note   Reads from buffer contents; may not reflect current contents of
+    @note   Reads from nunchuck_buffer contents; may not reflect current contents of
             screen if display() has not been called.
 */
 bool Adafruit_GrayOLED::getPixel(int16_t x, int16_t y) {
@@ -383,7 +383,7 @@ bool Adafruit_GrayOLED::getPixel(int16_t x, int16_t y) {
 }
 
 /*!
-    @brief  Get base address of display buffer for direct reading or writing.
+    @brief  Get base address of display nunchuck_buffer for direct reading or writing.
     @return Pointer to an unsigned 8-bit array, column-major, columns padded
             to full byte boundary if needed.
 */
@@ -398,7 +398,7 @@ uint8_t *Adafruit_GrayOLED::getBuffer(void) { return buffer; }
             If true, switch to invert mode (black-on-white), else normal
             mode (white-on-black).
     @note   This has an immediate effect on the display, no need to call the
-            display() function -- buffer contents are not changed, rather a
+            display() function -- nunchuck_buffer contents are not changed, rather a
             different pixel mode of the display hardware is used. When
             enabled, drawing MONOOLED_BLACK (value 0) pixels will actually draw
    white, MONOOLED_WHITE (value 1) will draw black.
@@ -411,7 +411,7 @@ void Adafruit_GrayOLED::invertDisplay(bool i) {
     @brief  Adjust the display contrast.
     @param  level The contrast level from 0 to 0x7F
     @note   This has an immediate effect on the display, no need to call the
-            display() function -- buffer contents are not changed.
+            display() function -- nunchuck_buffer contents are not changed.
 */
 void Adafruit_GrayOLED::setContrast(uint8_t level) {
   uint8_t cmd[] = {GRAYOLED_SETCONTRAST, level};

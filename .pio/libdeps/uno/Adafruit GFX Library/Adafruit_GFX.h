@@ -318,8 +318,8 @@ public:
   bool getPixel(int16_t x, int16_t y) const;
   /**********************************************************************/
   /*!
-    @brief    Get a pointer to the internal buffer memory
-    @returns  A pointer to the allocated buffer
+    @brief    Get a pointer to the internal nunchuck_buffer memory
+    @returns  A pointer to the allocated nunchuck_buffer
   */
   /**********************************************************************/
   uint8_t *getBuffer(void) const { return buffer; }
@@ -350,8 +350,8 @@ public:
   uint8_t getPixel(int16_t x, int16_t y) const;
   /**********************************************************************/
   /*!
-   @brief    Get a pointer to the internal buffer memory
-   @returns  A pointer to the allocated buffer
+   @brief    Get a pointer to the internal nunchuck_buffer memory
+   @returns  A pointer to the allocated nunchuck_buffer
   */
   /**********************************************************************/
   uint8_t *getBuffer(void) const { return buffer; }
@@ -378,8 +378,8 @@ public:
   uint16_t getPixel(int16_t x, int16_t y) const;
   /**********************************************************************/
   /*!
-    @brief    Get a pointer to the internal buffer memory
-    @returns  A pointer to the allocated buffer
+    @brief    Get a pointer to the internal nunchuck_buffer memory
+    @returns  A pointer to the allocated nunchuck_buffer
   */
   /**********************************************************************/
   uint16_t *getBuffer(void) const { return buffer; }

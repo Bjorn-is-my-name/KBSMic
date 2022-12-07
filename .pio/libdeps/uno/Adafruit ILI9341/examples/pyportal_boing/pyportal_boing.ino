@@ -35,7 +35,7 @@ float ballx     = 20.0, bally     = YBOTTOM, // Current ball position
       ballframe = 3;                         // Ball animation frame #
 int   balloldx  = ballx, balloldy = bally;   // Prior ball position
 
-// Working buffer for ball rendering...2 scanlines that alternate,
+// Working nunchuck_buffer for ball rendering...2 scanlines that alternate,
 // one is rendered while the other is transferred via DMA.
 uint16_t renderbuf[2][SCREENWIDTH];
 

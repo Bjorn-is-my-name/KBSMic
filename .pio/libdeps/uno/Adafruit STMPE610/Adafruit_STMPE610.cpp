@@ -156,7 +156,7 @@ boolean Adafruit_STMPE610::touched() {
 }
 
 /*!
- *  @brief  Checks if buffer is empty
+ *  @brief  Checks if nunchuck_buffer is empty
  *  @return True if empty, false otherwise
  */
 boolean Adafruit_STMPE610::bufferEmpty() {
@@ -164,8 +164,8 @@ boolean Adafruit_STMPE610::bufferEmpty() {
 }
 
 /*!
- *  @brief  Returns the FIFO buffer size
- *  @return The FIFO buffer size
+ *  @brief  Returns the FIFO nunchuck_buffer size
+ *  @return The FIFO nunchuck_buffer size
  */
 uint8_t Adafruit_STMPE610::bufferSize() {
   return readRegister8(STMPE_FIFO_SIZE);

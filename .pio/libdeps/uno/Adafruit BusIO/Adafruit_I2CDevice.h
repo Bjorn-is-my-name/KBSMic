@@ -22,7 +22,7 @@ public:
   bool setSpeed(uint32_t desiredclk);
 
   /*!   @brief  How many bytes we can read in a transaction
-   *    @return The size of the Wire receive/transmit buffer */
+   *    @return The size of the Wire receive/transmit nunchuck_buffer */
   size_t maxBufferSize() { return _maxBufferSize; }
 
 private:

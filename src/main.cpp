@@ -1,12 +1,11 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
-//#include <Adafruit_ILI9341.h>
-#include "scherm.cpp"
-#include <Nunchuk.h>
+#include "LCD.cpp"
 #include "Player1.c"
 #include "Player2.c"
 #include "Background.c"
+#include "Nunchuk.cpp"
 
 
 void init_timer0();
@@ -57,10 +56,6 @@ void draw();
 
 #define BG_SPRITE_AMOUNT 192
 #define BG_SPRITE_SIZE 20
-
-
-
-//Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 struct {
 public:
@@ -191,7 +186,7 @@ int main(void) {
 
 
     // Check nunckuk connection
-    while (!Nunchuk.begin(NUNCHUK_ADDRESS)) {
+    while (!startNunchuck(NUNCHUK_ADDRESS)) {
         fillRect(0, 0, 320, 240, ILI9341_RED);
     }
 
@@ -246,15 +241,15 @@ void update() {
     player1.yOld = player1.y;
 
     // Get the nunchuck input data
-    if (!Nunchuk.getState(NUNCHUK_ADDRESS))
+    if (!getState(NUNCHUK_ADDRESS))
         return;
 
     // Check for movement to right (only move when not against the wall)
-    if (Nunchuk.state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH < SCREEN_WIDTH)
+    if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH < SCREEN_WIDTH)
         player1.x += 2;
 
-        // Check for movement to left (only move when not against the wall)
-    else if (Nunchuk.state.joy_x_axis < 100 && player1.x > 0)
+    // Check for movement to left (only move when not against the wall)
+    else if (state.joy_x_axis < 100 && player1.x > 0)
         player1.x -= 2;
 
     // If jumping, lower the velocity until it hits the max (negative) velocity
@@ -272,7 +267,7 @@ void update() {
     }
 
     // Set the player to jump when the nunchuck movement is high enough and not jumping already
-    if (Nunchuk.state.accel_z_axis < 0xFF && !player1.jumping) {
+    if (state.accel_z_axis < 0xFF && !player1.jumping) {
         player1.jumping = true;
         player1.yVelocity = INITIAL_Y_VEL;
     }

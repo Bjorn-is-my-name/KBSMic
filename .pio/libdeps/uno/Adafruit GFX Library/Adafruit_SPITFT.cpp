@@ -662,7 +662,7 @@ void Adafruit_SPITFT::initSPI(uint32_t freq, uint8_t spiMode) {
       int major = (WIDTH > HEIGHT) ? WIDTH : HEIGHT;
       major += (major & 1);   // -> next 2-pixel bound, if needed.
       maxFillLen = major * 2; // 2 scanlines
-      // Note to future self: if you decide to make the pixel buffer
+      // Note to future self: if you decide to make the pixel nunchuck_buffer
       // much larger, remember that DMA transfer descriptors can't
       // exceed 65,535 bytes (not 65,536), meaning 32,767 pixels max.
       // Not that we have that kind of RAM to throw around right now.
@@ -953,15 +953,15 @@ void Adafruit_SPITFT::writePixel(int16_t x, int16_t y, uint16_t color) {
     @brief  Swap bytes in an array of pixels; converts little-to-big or
             big-to-little endian. Used by writePixels() below in some
             situations, but may also be helpful for user code occasionally.
-    @param  src   Source address of 16-bit pixels buffer.
+    @param  src   Source address of 16-bit pixels nunchuck_buffer.
     @param  len   Number of pixels to byte-swap.
     @param  dest  Optional destination address if different than src --
                   otherwise, if NULL (default) or same address is passed,
-                  pixel buffer is overwritten in-place.
+                  pixel nunchuck_buffer is overwritten in-place.
 */
 void Adafruit_SPITFT::swapBytes(uint16_t *src, uint32_t len, uint16_t *dest) {
   if (!dest)
-    dest = src; // NULL -> overwrite src buffer
+    dest = src; // NULL -> overwrite src nunchuck_buffer
   for (uint32_t i = 0; i < len; i++) {
     dest[i] = __builtin_bswap16(src[i]);
   }
@@ -1018,7 +1018,7 @@ void Adafruit_SPITFT::writePixels(uint16_t *colors, uint32_t len, bool block,
   }
   hwspi._spi->transfer(colors, NULL, 2 * len); // NULL RX to avoid overwrite
   if (!bigEndian) {
-    swapBytes(colors, len); // big-to-little endian to restore pixel buffer
+    swapBytes(colors, len); // big-to-little endian to restore pixel nunchuck_buffer
   }
 
   return;
@@ -1041,7 +1041,7 @@ void Adafruit_SPITFT::writePixels(uint16_t *colors, uint32_t len, bool block,
     (defined(__SAMD51__) || defined(ARDUINO_SAMD_ZERO))
   if ((connection == TFT_HARD_SPI) || (connection == TFT_PARALLEL)) {
     int maxSpan = maxFillLen / 2; // One scanline max
-    uint8_t pixelBufIdx = 0;      // Active pixel buffer number
+    uint8_t pixelBufIdx = 0;      // Active pixel nunchuck_buffer number
 #if defined(__SAMD51__)
     if (connection == TFT_PARALLEL) {
       // Switch WR pin to PWM or CCL
@@ -1054,7 +1054,7 @@ void Adafruit_SPITFT::writePixels(uint16_t *colors, uint32_t len, bool block,
 
         // Because TFT and SAMD endianisms are different, must swap
         // bytes from the 'colors' array passed into a DMA working
-        // buffer. This can take place while the prior DMA transfer
+        // nunchuck_buffer. This can take place while the prior DMA transfer
         // is in progress, hence the need for two pixelBufs.
         swapBytes(colors, count, pixelBuf[pixelBufIdx]);
         colors += count;
@@ -1206,12 +1206,12 @@ void Adafruit_SPITFT::writeColor(uint16_t color, uint32_t len) {
     uint32_t c32 = color * 0x00010001;
     uint16_t bufLen = (len < TMPBUF_PIXELS) ? len : TMPBUF_PIXELS, xferLen,
              fillLen;
-    // Fill temp buffer 32 bits at a time
+    // Fill temp nunchuck_buffer 32 bits at a time
     fillLen = (bufLen + 1) / 2; // Round up to next 32-bit boundary
     for (uint32_t t = 0; t < fillLen; t++) {
       temp[t] = c32;
     }
-    // Issue pixels in blocks from temp buffer
+    // Issue pixels in blocks from temp nunchuck_buffer
     while (len) {                              // While pixels remain
       xferLen = (bufLen < len) ? bufLen : len; // How many this pass?
       writePixels((uint16_t *)temp, xferLen);
@@ -1225,12 +1225,12 @@ void Adafruit_SPITFT::writeColor(uint16_t color, uint32_t len) {
   uint32_t const pixbufcount = min(len, ((uint32_t)2 * width()));
   uint16_t *pixbuf = (uint16_t *)rtos_malloc(2 * pixbufcount);
 
-  // use SPI3 DMA if we could allocate buffer, else fall back to writing each
+  // use SPI3 DMA if we could allocate nunchuck_buffer, else fall back to writing each
   // pixel loop below
   if (pixbuf) {
     uint16_t const swap_color = __builtin_bswap16(color);
 
-    // fill buffer with color
+    // fill nunchuck_buffer with color
     for (uint32_t i = 0; i < pixbufcount; i++) {
       pixbuf[i] = swap_color;
     }
@@ -1267,17 +1267,17 @@ void Adafruit_SPITFT::writeColor(uint16_t color, uint32_t len) {
       descriptor[d - 1].DESCADDR.reg = 0;
     } else {
       // If high and low bytes are distinct, it's necessary to fill
-      // a buffer with pixel data (swapping high and low bytes because
+      // a nunchuck_buffer with pixel data (swapping high and low bytes because
       // TFT and SAMD are different endianisms) and create a longer
       // descriptor list pointing repeatedly to this data. We can do
       // this slightly faster working 2 pixels (32 bits) at a time.
       uint32_t *pixelPtr = (uint32_t *)pixelBuf[0],
                twoPixels = __builtin_bswap16(color) * 0x00010001;
-      // We can avoid some or all of the buffer-filling if the color
+      // We can avoid some or all of the nunchuck_buffer-filling if the color
       // is the same as last time...
       if (color == lastFillColor) {
         // If length is longer than prior instance, fill only the
-        // additional pixels in the buffer and update lastFillLen.
+        // additional pixels in the nunchuck_buffer and update lastFillLen.
         if (len > lastFillLen) {
           int fillStart = lastFillLen / 2,
               fillEnd = (((len < maxFillLen) ? len : maxFillLen) + 1) / 2;

@@ -3,10 +3,10 @@ This example is intended to demonstrate the use of getPixel() versus
 getRawPixel() and the fast horizontal and vertical drawing routines
 in the GFXcanvas family of classes,
 
-When using the GFXcanvas* classes as the image buffer for a hardware driver,
+When using the GFXcanvas* classes as the image nunchuck_buffer for a hardware driver,
 there is a need to get individual pixel color values at given physical
 coordinates. Rather than subclasses or client classes call getBuffer() and
-reinterpret the byte layout of the buffer, two methods are added to each of the
+reinterpret the byte layout of the nunchuck_buffer, two methods are added to each of the
 GFXcanvas* classes that allow fetching of specific pixel values.
 
   * getPixel(x, y)   : Gets the pixel color value at the rotated coordinates in
@@ -17,7 +17,7 @@ pixel location. This method was made protected as only the hardware driver
 should be accessing it.
 
 The GFXcanvas*SerialDemo classes in this example will print to Serial the
-contents of the underlying GFXcanvas buffer in both the current rotated layout
+contents of the underlying GFXcanvas nunchuck_buffer in both the current rotated layout
 and the underlying physical layout.
 ***/
 

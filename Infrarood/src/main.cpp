@@ -1,9 +1,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
-#include <Adafruit_ILI9341.h>
+// #include <Adafruit_ILI9341.h>
 #include <Nunchuk.h>
-#include "spriteTest.c"
+
 // #include "Arduino.h"
 
 /*Info Arduino pins
@@ -24,14 +24,21 @@ bool checkCollision(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_
 //Defines
 #define TFT_CS 10
 #define TFT_DC 9
+
 #define NUNCHUK_ADDRESS 0x52
+
 #define IR_38KHZ 52
 #define IR_56KHZ 35
+
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
+
 #define PLAYER_WIDTH 16
 #define PLAYER_HEIGHT 16
+
 #define SENDINGDATA_LEN 8
+#define SENDINGBIT_START_VALUE - 2
+
 
 #define TFT_CS 10
 #define TFT_DC 9
@@ -39,7 +46,7 @@ bool checkCollision(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_
 #define LCD_WR PC1 //Write signal at rising edge.
 #define LCD_RS PC2 //D/CX signal. 0 = command, 1 = data.
 #define LCD_CS PC3
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+// Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 //Variables
 // Check to see if the current bit is done sending

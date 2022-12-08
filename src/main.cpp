@@ -183,7 +183,7 @@ int main(void) {
 
 
     // Check nunckuk connection
-    while (!startNunchuck(NUNCHUK_ADDRESS)) {
+    while (!startNunchuk(NUNCHUK_ADDRESS)) {
         fillRect(0, 0, 320, 240, ILI9341_RED);
     }
 

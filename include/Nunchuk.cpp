@@ -34,13 +34,13 @@ bool getState(uint8_t address);
 char id[2 * IDLEN + 3]; // '0xAABBCCDD\0'
 uint8_t read(uint8_t address, uint8_t offset, uint8_t len);
 
-static uint8_t nunchuck_buffer[CHUNKLEN];
+static uint8_t nunchuk_buffer[CHUNKLEN];
 
 bool _getId(uint8_t address);
 
 uint8_t _read(uint8_t address, uint8_t offset, uint8_t len);
 
-bool startNunchuck(uint8_t address) {
+bool startNunchuk(uint8_t address) {
     {
         Wire.beginTransmission(address);
         Wire.write(0xF0);
@@ -62,14 +62,14 @@ bool getState(uint8_t address) {
         return (false);
 
     // set parameters
-    state.joy_x_axis = nunchuck_buffer[0];
-//    state.joy_y_axis = nunchuck_buffer[1];
-//    state.accel_x_axis = (nunchuck_buffer[2] << 2) | ((nunchuck_buffer[5] & 0x0C) >> 2);
-//    state.accel_y_axis = (nunchuck_buffer[3] << 2) | ((nunchuck_buffer[5] & 0x30) >> 4);
-    state.accel_z_axis = (nunchuck_buffer[4] << 2) | ((nunchuck_buffer[5] & 0xC0) >> 6);
+    state.joy_x_axis = nunchuk_buffer[0];
+//    state.joy_y_axis = nunchuk_buffer[1];
+//    state.accel_x_axis = (nunchuk_buffer[2] << 2) | ((nunchuk_buffer[5] & 0x0C) >> 2);
+//    state.accel_y_axis = (nunchuk_buffer[3] << 2) | ((nunchuk_buffer[5] & 0x30) >> 4);
+    state.accel_z_axis = (nunchuk_buffer[4] << 2) | ((nunchuk_buffer[5] & 0xC0) >> 6);
     /* 0 = pressed */
-//    state.z_button = !(nunchuck_buffer[5] & 0x01);
-//    state.c_button = !((nunchuck_buffer[5] & 0x02) >> 1);
+//    state.z_button = !(nunchuk_buffer[5] & 0x01);
+//    state.c_button = !((nunchuk_buffer[5] & 0x02) >> 1);
 
     return (true);
 }
@@ -83,12 +83,12 @@ bool _getId(uint8_t address) {
     if (_read(address, NCID, IDLEN) != IDLEN)
         return false;
 
-    // copy nunchuck_buffer to id string
+    // copy nunchuk_buffer to id string
     id[0] = '0';
     id[1] = 'x';
     for (uint8_t i = 0; i < IDLEN; i++) {
-        id[2 + 2 * i] = btoa[(nunchuck_buffer[i] >> 4)];
-        id[2 + 2 * i + 1] = btoa[(nunchuck_buffer[i] & 0x0F)];
+        id[2 + 2 * i] = btoa[(nunchuk_buffer[i] >> 4)];
+        id[2 + 2 * i + 1] = btoa[(nunchuk_buffer[i] & 0x0F)];
     }
     id[2 * IDLEN + 2] = '\0';
 
@@ -111,7 +111,7 @@ uint8_t _read(uint8_t address, uint8_t offset, uint8_t len) {
 
     // read bytes
     while (Wire.available() && n <= len) {
-        nunchuck_buffer[n++] = Wire.read();
+        nunchuk_buffer[n++] = Wire.read();
     }
 
     /* return nr bytes */

@@ -6,7 +6,7 @@
 # It is included in the main 'build.ninja'.
 
 # =============================================================================
-# Project: test_lcd
+# Project: KBSMIC
 # Configurations: Debug
 # =============================================================================
 # =============================================================================
@@ -17,7 +17,7 @@
 rule CXX_COMPILER__Z_DUMMY_TARGET_Debug
   depfile = $DEP_FILE
   deps = gcc
-  command = C:\Users\Frank\.platformio\packages\toolchain-atmelavr\bin\avr-g++.exe $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = C:\Users\FRANKR~1\PLATFO~1\packages\TOOLCH~1\bin\AVR-G_~1.EXE $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -25,7 +25,7 @@ rule CXX_COMPILER__Z_DUMMY_TARGET_Debug
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__Z_DUMMY_TARGET_Debug
-  command = cmd.exe /C "$PRE_LINK && C:\Users\Frank\.platformio\packages\toolchain-atmelavr\bin\avr-g++.exe $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
+  command = cmd.exe /C "$PRE_LINK && C:\Users\FRANKR~1\PLATFO~1\packages\TOOLCH~1\bin\AVR-G_~1.EXE $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "C:\Program Files\JetBrains\CLion 2021.3.3\bin\cmake\win\bin\cmake.exe" --regenerate-during-build -SC:\Users\Frank\Desktop\test_lcd -BC:\Users\Frank\Desktop\test_lcd\cmake-build-debug
+  command = "D:\Program Files\CLion 2021.3.3\bin\cmake\win\bin\cmake.exe" --regenerate-during-build -S"C:\Users\Frank Rietman\Documents\KBSMIC" -B"C:\Users\Frank Rietman\Documents\KBSMIC\cmake-build-debug"
   description = Re-running CMake...
   generator = 1
 
@@ -51,7 +51,7 @@ rule RERUN_CMAKE
 # Rule for cleaning all built files.
 
 rule CLEAN
-  command = "C:\Program Files\JetBrains\CLion 2021.3.3\bin\ninja\win\ninja.exe" $FILE_ARG -t clean $TARGETS
+  command = "D:\Program Files\CLion 2021.3.3\bin\ninja\win\ninja.exe" $FILE_ARG -t clean $TARGETS
   description = Cleaning all built files...
 
 
@@ -59,6 +59,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-  command = "C:\Program Files\JetBrains\CLion 2021.3.3\bin\ninja\win\ninja.exe" -t targets
+  command = "D:\Program Files\CLion 2021.3.3\bin\ninja\win\ninja.exe" -t targets
   description = All primary targets available:
 

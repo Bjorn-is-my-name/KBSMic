@@ -15,8 +15,8 @@ file(TO_CMAKE_PATH $ENV{HOMEDRIVE}$ENV{HOMEPATH} ENV_HOME_PATH)
 
 SET(CMAKE_C_COMPILER "${ENV_HOME_PATH}/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe")
 SET(CMAKE_CXX_COMPILER "${ENV_HOME_PATH}/.platformio/packages/toolchain-atmelavr/bin/avr-g++.exe")
-SET(CMAKE_CXX_FLAGS "-fno-exceptions -fno-threadsafe-statics -fpermissive -std=gnu++11 -mmcu=atmega328p -Os -Wall -ffunction-sections -fdata-sections -flto")
-SET(CMAKE_C_FLAGS "-std=gnu11 -fno-fat-lto-objects -mmcu=atmega328p -Os -Wall -ffunction-sections -fdata-sections -flto")
+SET(CMAKE_CXX_FLAGS "-fno-exceptions -fno-threadsafe-statics -fpermissive -std=gnu++11 -Os -Wall -ffunction-sections -fdata-sections -flto -mmcu=atmega328p")
+SET(CMAKE_C_FLAGS "-std=gnu11 -fno-fat-lto-objects -Os -Wall -ffunction-sections -fdata-sections -flto -mmcu=atmega328p")
 
 SET(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)

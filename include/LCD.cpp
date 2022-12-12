@@ -11,19 +11,30 @@
 #define PAGE_ADDRESS_SET 0x2B
 #define MEMORY_WRITE 0x2C
 
-#define ILI9341_BLACK 0x0000       ///<   0,   0,   0
-#define ILI9341_OLIVE 0x7BE0       ///< 123, 125,   0
-#define ILI9341_LIGHTGREY 0xC618   ///< 198, 195, 198
-#define ILI9341_DARKGREY 0x7BEF    ///< 123, 125, 123
-#define ILI9341_BLUE 0x001F        ///<   0,   0, 255
-#define ILI9341_GREEN 0x07E0       ///<   0, 255,   0
-#define ILI9341_CYAN 0x07FF        ///<   0, 255, 255
-#define ILI9341_RED 0xF800         ///< 255,   0,   0
-#define ILI9341_YELLOW 0xFFE0      ///< 255, 255,   0
-#define ILI9341_WHITE 0xFFFF       ///< 255, 255, 255
-#define ILI9341_ORANGE 0xFD20      ///< 255, 165,   0
-#define ILI9341_BACKGROUND_DARK 0x1900  ///<   3,   8,   0
-#define ILI9341_BACKGROUND_LIGHT 0x2961 ///<   5,  11,   1
+// Colors-------------------------------------------------
+#define BLACK 0x0000                    ///<   0,   0,   0
+
+#define PLAYER_DARK_BLUE 0x007f         ///<   0,   3,  31
+#define PLAYER_BLUE 0x033f              ///<   0,  25,  31
+#define PLAYER_LIGHT_BLUE 0x05BF        ///<   0,  45,  31
+
+#define PLAYER_RED 0xF803               ///< 255,   0,   0
+#define PLAYER_YELLOW 0xFE03            ///<  31,  48,   3
+#define PLAYER_ORANGE 0xFAC3            ///<  31,  22,   3
+
+#define INTER_BROWN 0x49A2              ///<   9,  13,   2
+#define INTER_GOLD 0xFCE5               ///<  31,  39,   5
+#define INTER_PURPLE 0xD25F             ///<  26,  18,  31
+#define INTER_YELLOW 0xC600             ///<  24,  48    0
+
+#define SWAMP_GREEN 0x23C0              ///<   4,  30,   0
+
+#define BACKGROUND_DARK 0x1900          ///<   3,   8,   0
+#define BACKGROUND_LIGHT 0x2961         ///<   5,  11,   1
+
+#define FOREGROUND_LIGHT 0x7346         ///<  14,  26,   6
+#define FOREGROUND_DARK 0x5A85          ///<  11,  20,   5
+//--------------------------------------------------------
 
 // Prototypes
 void setupSPI();

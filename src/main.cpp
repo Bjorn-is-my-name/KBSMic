@@ -2,31 +2,28 @@
 #include <avr/interrupt.h>
 #include <Wire.h>
 #include "LCD.cpp"
+#include "Nunchuk.cpp"
+
 #include "Player1.c"
 #include "Player2.c"
 #include "Background.c"
-#include "Nunchuk.cpp"
-
+#include "DiaRed.c"
 
 void init_timer0();
 
 void setFreq(uint8_t);
 
+void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t, const uint8_t *Sprite);
+
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
 
 void drawBackground();
-
-void drawBackground_jan();
-
-
-void buffer(uint16_t, uint8_t, uint16_t *, uint16_t *);
 
 uint16_t getColor(uint8_t);
 
 void update();
 
 void draw();
-
 
 #define NUNCHUK_ADDRESS 0x52
 
@@ -36,8 +33,8 @@ void draw();
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
-#define PLAYER_WIDTH 16
-#define PLAYER_HEIGHT 20
+#define PLAYER_WIDTH 8      //player width is 16        half of player width because program runs faster when not needing to devide
+#define PLAYER_HEIGHT 20    //player height is 20
 
 #define SENDINGDATA_LEN 9
 #define SENDINGBIT_START_VALUE (- 2)
@@ -45,7 +42,6 @@ void draw();
 #define STARTBIT_VALUE (-1)
 #define STARTBIT_MIN 3
 #define STARTBIT_MAX 6
-
 #define ZERO_MAX 2
 #define ONE_MIN 1
 #define ONE_MAX 4
@@ -54,7 +50,8 @@ void draw();
 #define FRAME_TIME 32 //(1000/30FPS)-1 == 32
 
 #define BG_SPRITE_AMOUNT 192
-#define BG_SPRITE_SIZE 20
+#define BG_SPRITE_WIDTH 10
+#define BG_SPRITE_HEIGHT 20
 
 struct {
 public:
@@ -72,7 +69,7 @@ public:
     uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
     uint16_t xOld = 0;
     uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
-//    uint8_t animation = 0;
+//    uint8_t animation
 } player2;
 
 // Check to see if the current bit is done sending
@@ -101,7 +98,7 @@ ISR(PCINT2_vect) {
     isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)
 
     if (isDataBit) {
-        uint8_t difference = currentMs - startMs; // Calculate the length to determine the value
+        uint8_t difference = currentMs - startMs; // Calculate the length to determin the value
 
         if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if it's a start bit
         {
@@ -152,7 +149,7 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
                     onTime = ((sendingData >> sendingBit) & 1) ? oneTime
                                                                : zeroTime; // Set the time corresponding to the bit
 
-                TCCR0A &= ~(1 << COM0A1); // Enable TC0
+                TCCR0A &= ~(1 << COM0A1); // Enabe TC0
             } else {
                 sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
                 sendingData = player1.x;
@@ -169,7 +166,7 @@ int main(void) {
     DDRD |= (1 << DDD6);
     init_timer0();
 
-    // Setup IR receiving
+    // Setup IR recieving
     PORTD |= (1 << PORTD2); //pull up
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
@@ -182,14 +179,17 @@ int main(void) {
     sei();
     START_UP();
 
-    // Check nunchuk connection
+
+
+    // Check nunckuk connection
     while (!startNunchuk(NUNCHUK_ADDRESS)) {
-        fillRect(0, 0, 320, 240, ILI9341_RED);
+        fillRect(0, 0, 320, 240, PLAYER_RED);
     }
 
-    //Draws the background 😮
     drawBackground();
+    drawSprite(100, 100, 3, 9, DiaRed);
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
+
     while (true) {
         if (intCurrentMs > FRAME_TIME) { //30 FPS
             intCurrentMs = 0;
@@ -210,7 +210,7 @@ void init_timer0() {
     TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
     TCCR0B |= (1 << WGM02) | (1 << CS01);
 
-    // Enable interrupts on compare match
+    // Enable interupts on compare match
     TIMSK0 |= (1 << OCIE0A);
 }
 
@@ -237,12 +237,12 @@ void update() {
     player1.xOld = player1.x;
     player1.yOld = player1.y;
 
-    // Get the nunchuk input data
+    // Get the nunchuck input data
     if (!getState(NUNCHUK_ADDRESS))
         return;
 
     // Check for movement to right (only move when not against the wall)
-    if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH < SCREEN_WIDTH)
+    if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH * 2 < SCREEN_WIDTH)
         player1.x += 2;
 
         // Check for movement to left (only move when not against the wall)
@@ -263,7 +263,7 @@ void update() {
         player1.yVelocity = 0;
     }
 
-    // Set the player to jump when the nunchuk movement is high enough and not jumping already
+    // Set the player to jump when the nunchuck movement is high enough and not jumping already
     if (state.accel_z_axis < 0xFF && !player1.jumping) {
         player1.jumping = true;
         player1.yVelocity = INITIAL_Y_VEL;
@@ -271,78 +271,115 @@ void update() {
 }
 
 void draw() {
-    drawSprite(player1.x, player1.y, 16, 20, Player1);
-    drawSprite(player2.x, player2.y, 16, 20, Player2);
+    clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
+    drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
+
+    clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+    drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+}
+
+void clearSprite(uint16_t x, uint8_t y, uint16_t xOud, uint8_t yOud, uint16_t w, uint8_t h, const uint8_t *Sprite) {
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++) {
+        if (PixGroup % w == 0 && PixGroup != 0) {
+            xOud -= w * 2;
+            yOud++;
+        }
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
+            uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+
+            if (color != 255 && !(xOud >= x && xOud <= x + w * 2 - 1 && yOud >= y && yOud <= y + h - 1)) {
+                drawPixel(xOud, yOud, getColor(
+                        (Background[xOud % (BG_SPRITE_WIDTH * 2) / 2 + yOud % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] &
+                         ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+            }
+
+            xOud++;
+        }
+    }
 }
 
 void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t *Sprite) {
-    for (uint16_t PixGroup = 0; PixGroup < (w / 2) * h; PixGroup++) {
-        if (PixGroup % (w / 2) == 0 && PixGroup != 0) {
-            x -= w;
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++) {
+        if (PixGroup % w == 0 && PixGroup != 0) {
+            x -= w * 2;
             y++;
         }
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
-            if (Pixel == 0) {
-                if (getColor((Sprite[PixGroup] & 0xF0) >> 4) != 255) {
-                    drawPixel(x, y, getColor((Sprite[PixGroup] & 0xF0) >> 4));
-                }
-            } else {
-                if (getColor((Sprite[PixGroup] & 0x0F)) != 255) {
-                    drawPixel(x, y, getColor(Sprite[PixGroup] & 0x0F));
-                }
-            }
+            uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+            drawPixel(x, y, (color == 255) ? getColor(
+                    (Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] &
+                     ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)) : color);
+
             x++;
         }
     }
 }
 
 void drawBackground() {
-    for (uint8_t x = 0; x < 12; x++) {
-        for (int y = 0; y < 16; ++y) {
-            drawSprite(y * BG_SPRITE_SIZE, x * BG_SPRITE_SIZE, BG_SPRITE_SIZE, BG_SPRITE_SIZE, Background);
-        }
+    uint16_t x = 0;
+    uint8_t y = 0;
+    for (uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++) {
+        drawSprite(x, y, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT, Background);
+        if (x >= SCREEN_WIDTH - BG_SPRITE_WIDTH * 2) {
+            x = 0;
+            y += BG_SPRITE_HEIGHT;
+        } else
+            x += BG_SPRITE_WIDTH * 2;
     }
-}
-
-void buffer(/*OldPos, NewPos, UsedSprite*/) {
-    //fix dan jan ❤️
 }
 
 uint16_t getColor(uint8_t Color) {
     switch (Color) {
-        case 0:
-            return ILI9341_RED;
-        case 1:
-            return ILI9341_BLACK;
-        case 2:
-            return ILI9341_GREEN;
-        case 3:
-            return ILI9341_OLIVE;
-        case 4:
-            return ILI9341_ORANGE;
-        case 5:
-            return ILI9341_YELLOW;
-        case 6:
-            return ILI9341_LIGHTGREY;
-        case 7:
-            return ILI9341_DARKGREY;
-        case 8:
-            return ILI9341_BLUE;
-        case 9:
-            return ILI9341_CYAN;
-        case 10:
-            return ILI9341_WHITE;
-        case 11:
-            return ILI9341_BACKGROUND_DARK;
-        case 12:
-            return ILI9341_BACKGROUND_LIGHT;
-        case 13:
-            // return ILI9341_---;
-            return 255;
-        case 14:
-            // return ILI9341_---;
-            return 255;
-        case 15:
+        case 0:             //0000
+            return BLACK;
+
+        case 1:             //0001
+            return PLAYER_RED;
+
+        case 2:             //0010
+            return PLAYER_ORANGE;
+
+        case 3:             //0011
+            return PLAYER_YELLOW;
+
+        case 4:             //0100
+            return PLAYER_DARK_BLUE;
+
+        case 5:             //0101
+            return PLAYER_BLUE;
+
+        case 6:             //0110
+            return PLAYER_LIGHT_BLUE;
+
+        case 7:             //0111
+            return SWAMP_GREEN;
+
+        case 8:             //1000
+            return INTER_BROWN;
+
+        case 9:             //1001
+            return INTER_GOLD;
+
+        case 10:            //1010
+            return INTER_PURPLE;
+
+        case 11:            //1011
+            return INTER_YELLOW;
+
+        case 12:            //1100
+            //if background
+            return BACKGROUND_LIGHT;
+            //else return FOREGROUND_DARK;
+
+        case 13:            //1101
+            //if background
+            return BACKGROUND_DARK;
+            //else return FOREGROUND_LIGHT;
+
+        case 14:            //1110
+            return 0xFFFF;  //white
+
+        case 15:            //1111
             return 255;
         default:
             return 255;

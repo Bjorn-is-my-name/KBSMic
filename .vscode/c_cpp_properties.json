@@ -10,7 +10,6 @@
             "includePath": [
                 "C:/Users/Jan/Projects/MIC/GIT/include",
                 "C:/Users/Jan/Projects/MIC/GIT/src",
-                "C:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/src",
                 "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit ILI9341",
                 "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit GFX Library",
                 "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit BusIO",
@@ -18,6 +17,7 @@
                 "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 "C:/Users/Jan/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/Jan/.platformio/packages/framework-arduino-avr/variants/standard",
+                "C:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/src",
                 "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit STMPE610",
                 "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit TouchScreen",
                 "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
@@ -30,7 +30,6 @@
                 "path": [
                     "C:/Users/Jan/Projects/MIC/GIT/include",
                     "C:/Users/Jan/Projects/MIC/GIT/src",
-                    "C:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/src",
                     "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit ILI9341",
                     "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit GFX Library",
                     "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit BusIO",
@@ -38,6 +37,7 @@
                     "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     "C:/Users/Jan/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/Jan/.platformio/packages/framework-arduino-avr/variants/standard",
+                    "C:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/src",
                     "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit STMPE610",
                     "C:/Users/Jan/Projects/MIC/GIT/.pio/libdeps/uno/Adafruit TouchScreen",
                     "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",

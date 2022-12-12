@@ -2,10 +2,12 @@
 #include <avr/interrupt.h>
 #include <Wire.h>
 #include "LCD.cpp"
+#include "Nunchuk.cpp"
+
 #include "Player1.c"
 #include "Player2.c"
 #include "Background.c"
-#include "Nunchuk.cpp"
+#include "DiaRed.c"
 
 void init_timer0();
 void setFreq(uint8_t);
@@ -183,6 +185,7 @@ int main(void) {
     }
 
     drawBackground();
+    drawSprite(100, 100, 3, 9, DiaRed);
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
     while (1) {
@@ -367,12 +370,12 @@ uint16_t getColor(uint8_t Color) {
 
         case 12:            //1100
             //if background
-            return BACKGROUND_DARK;
+            return BACKGROUND_LIGHT;
             //else return FOREGROUND_DARK;
 
         case 13:            //1101
             //if background
-            return BACKGROUND_LIGHT;
+            return BACKGROUND_DARK;
             //else return FOREGROUND_LIGHT;
 
         case 14:            //1110

@@ -24,7 +24,7 @@
 
 #define INTER_BROWN 0x49A2              ///<   9,  13,   2
 #define INTER_GOLD 0xFCE5               ///<  31,  39,   5
-#define INTER_LIGHT_PURPLE 0xD25F       ///<  26,  18,  31
+#define INTER_PURPLE 0xD25F             ///<  26,  18,  31
 #define INTER_YELLOW 0xC600             ///<  24,  48    0
 
 #define SWAMP_GREEN 0x23C0              ///<   4,  30,   0

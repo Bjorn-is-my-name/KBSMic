@@ -310,20 +310,37 @@ void draw() {
 
 void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, uint8_t h, uint8_t *Sprite)
 {
+    // Loop through all the bytes
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
+        // If at the end of a row, go to next row
         if (PixGroup % w == 0 && PixGroup != 0)
         {
             xOld -= w * 2;
             yOld++;
         }
+
+        // Loop through the byte to get both pixel colors
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
+            // Get the sprite color
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
+            // If it isn't alpha and not in the sprite its current pos (prevent flickering), the pixel has to be gedrawn with the correct background pixel
             if (color != 255 && !pointInRect(xOld, yOld, x, y, w, h))
-                drawPixel(xOld, yOld, getColor((Background[xOld % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((xOld % BG_SPRITE_ACTUAL_WIDTH / 2) ? 0x0F : 0xF0)) >> ((xOld % BG_SPRITE_ACTUAL_WIDTH / 2) ? 0 : 4)));
+            {
+                /*
+                Get and draw the background pixel
+                1: check the row (if the brick needs to be shifted)
+                2: get the idx (x + y * w) but use modulation (to get correct idx if stading on a brick further down)
+                3: don't forget to devide x by 2 (2 colors in 1 byte)
+                4: use the getColor function on the value from the background and execute & opperation and a bitshift to get correct part of the byte
+                */
+                uint8_t idx = ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
+            }
 
+            // Go to the next pixel
             xOld++;
         }
     }
@@ -335,27 +352,40 @@ bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t
 }
 
 void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite) {
+    // Loop through all the bytes
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
+        // If at the end of a row, go to the next row
         if (PixGroup % w == 0 && PixGroup != 0)
         {
             x -= w * 2;
             y++;
         }
+
+        // Loop through the byte to get both pixel colors
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
+            // Get the sprite color
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
+            // If its alpha, draw the background
             if (color == 255)
             {
-                if (y % BG_SPRITE_HEIGHT == 0)
-                    color = getColor((Background[x % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((x % BG_SPRITE_ACTUAL_WIDTH / 2) ? 0x0F : 0xF0)) >> ((x % BG_SPRITE_ACTUAL_WIDTH / 2) ? 0 : 4));
-                else
-                    color = getColor((Background[x % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((x % BG_SPRITE_ACTUAL_WIDTH / 2) ? 0x0F : 0xF0)) >> ((x % BG_SPRITE_ACTUAL_WIDTH / 2) ? 0 : 4));
+                /*
+                Get the background pixel
+                1: check the row (if the brick needs to be shifted)
+                2: get the idx (x + y * w) but use modulation (to get correct idx if stading on a brick further down)
+                3: don't forget to devide x by 2 (2 colors in 1 byte)
+                4: use the getColor function on the value from the background and execute & opperation and a bitshift to get correct part of the byte
+                */
+                uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                color = getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4));
             }
 
+            // Draw the pixel
             drawPixel(x, y, color);
 
+            // Go to the next pixel
             x++;
         }
     }
@@ -364,39 +394,49 @@ void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite) {
 void drawBackground() {
     for (uint8_t y = 0; y < 24; y++)
     {
+        // If its an even row, draw the brick pattern, if uneven the bricks should be shifted 50%
         if (y % 2 == 0)
             for (uint8_t x = 0; x < 16; x++)
                 drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
         else
-            for (uint8_t x = 0; x < 17; x++)
+            for (uint8_t x = 0; x < 17; x++) // Draw extra brick to make up for the shift
                 drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH - BG_SPRITE_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
     }
 }
 
 void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
+    // Loop through all the bytes
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
+        // If at the end of row, go to the next row
         if (PixGroup % w == 0 && PixGroup != 0)
         {
             x -= w * 2;
             y++;
         }
+
+        // Loop through the byte
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
+            // Get the background color
             uint16_t color = getColor(((Background[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
+            Check if its foreground or background
             for (uint8_t i = 0; i < NUM_OF_WALLS; i++)
             {
                 Rect &r = walls[i];
                 if (pointInRect(x, y, r.x, r.y, r.w, r.h))
                 {
+                    // Change the color if its foreground
                     color = (color == BACKGROUND_DARK) ? FOREGROUND_DARK : FOREGROUND_LIGHT;
                     break;
                 }
             }
 
+            // Draw the pixel
             drawPixel(x, y, color);
 
+            // Go to the next pixel
             x++;
         }
     }

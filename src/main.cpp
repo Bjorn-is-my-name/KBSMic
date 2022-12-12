@@ -14,6 +14,7 @@ void setFreq(uint8_t);
 
 void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t, uint8_t *Sprite);
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *);
+void drawSpriteMirror(uint16_t, uint8_t, const uint8_t, const uint8_t, uint8_t *);
 void drawBackground();
 uint16_t getColor(uint8_t);
 
@@ -185,7 +186,7 @@ int main(void) {
     }
 
     drawBackground();
-    drawSprite(100, 100, 3, 9, DiaRed);
+
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
     while (1) {
@@ -274,6 +275,10 @@ void draw() {
 
     clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
     drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+
+    drawSprite(100, 220, 3, 9, DiaRed);
+    drawSpriteMirror(104, 220, 3, 9, DiaRed);
+
 }
 
 void clearSprite(uint16_t x, uint8_t y, uint16_t xOud, uint8_t yOud, uint16_t w, uint8_t h, uint8_t *Sprite)
@@ -299,7 +304,7 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOud, uint8_t yOud, uint16_t w,
     }
 }
 
-void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, uint8_t *Sprite) {
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite) {
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
         if (PixGroup % w == 0 && PixGroup != 0)
@@ -314,6 +319,27 @@ void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, uint8_t
 
             x++;
         }
+    }
+}
+
+void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite){
+    uint8_t Mirr = w;
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+    {
+        for (int8_t Pixel = 1; Pixel >= 0; Pixel--)
+        {
+            uint16_t color = getColor(((Sprite[Mirr] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+            drawPixel(x, y, (color == 255) ? getColor((Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)) : color);
+
+            x++;
+        }
+        if (PixGroup % w == 0 && PixGroup != 0)
+        {
+            x -= w * 2;
+            y++;
+            Mirr+=w*2;
+        }
+        Mirr--;
     }
 }
 
@@ -371,12 +397,12 @@ uint16_t getColor(uint8_t Color) {
         case 12:            //1100
             //if background
             return BACKGROUND_LIGHT;
-            //else return FOREGROUND_DARK;
+            //else return FOREGROUND_LIGHT;
 
         case 13:            //1101
             //if background
             return BACKGROUND_DARK;
-            //else return FOREGROUND_LIGHT;
+            //else return FOREGROUND_DARK;
 
         case 14:            //1110
             return 0xFFFF;  //white

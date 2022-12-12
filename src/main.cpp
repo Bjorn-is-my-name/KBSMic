@@ -8,6 +8,7 @@
 #include "Player2.c"
 #include "Background.c"
 #include "DiaRed.c"
+#include "Button.c"
 
 void init_timer0();
 void setFreq(uint8_t);
@@ -276,8 +277,11 @@ void draw() {
     clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
     drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
 
-    drawSprite(100, 220, 3, 9, DiaRed);
-    drawSpriteMirror(104, 220, 3, 9, DiaRed);
+    // drawSprite(100, 220, 3, 9, DiaRed);
+    // drawSpriteMirror(104, 220, 3, 9, DiaRed);
+
+    drawSprite(100, 220, 4, 5, Button);
+    drawSpriteMirror(105, 220, 4, 5, Button);
 
 }
 

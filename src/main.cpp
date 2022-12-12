@@ -329,37 +329,56 @@ void drawBackground() {
 
 uint16_t getColor(uint8_t Color) {
     switch (Color) {
-        case 0:
-            // return PLAYER_RED;
-        case 1:
-            // return BLACK;
-        case 2:
-            // return SWAMP_GREEN;
-        case 3:
-            // return ILI9341_OLIVE;
-        case 4:
-            // return PLAYER_ORANGE;
-        case 5:
-            // return PLAYER_YELLOW;
-        case 6:
-            // return ILI9341_LIGHTGREY;
-        case 7:
-            // return ILI9341_DARKGREY;
-        case 8:
-            // return ILI9341_BLUE;
-        case 9:
-            // return ILI9341_CYAN;
-        case 10:
-            // return ILI9341_WHITE;
-        case 11:
-            // return BACKGROUND_DARK;
-        case 12:
-            // return BACKGROUND_LIGHT;
-        case 13:
-            // return ILI9341_---;
-        case 14:
-            // return ILI9341_---;
-        case 15:
+        case 0:             //0000
+            return BLACK;
+
+        case 1:             //0001
+            return PLAYER_RED;
+
+        case 2:             //0010
+            return PLAYER_ORANGE;
+
+        case 3:             //0011
+            return PLAYER_YELLOW;
+
+        case 4:             //0100
+            return PLAYER_DARK_BLUE;
+
+        case 5:             //0101
+            return PLAYER_BLUE;
+
+        case 6:             //0110
+            return PLAYER_LIGHT_BLUE;
+
+        case 7:             //0111
+            return SWAMP_GREEN;
+
+        case 8:             //1000
+            return INTER_BROWN;
+
+        case 9:             //1001
+            return INTER_GOLD;
+
+        case 10:            //1010
+            return INTER_PURPLE;
+
+        case 11:            //1011
+            return INTER_YELLOW;
+
+        case 12:            //1100
+            //if background
+            return BACKGROUND_DARK;
+            //else return FOREGROUND_DARK;
+
+        case 13:            //1101
+            //if background
+            return BACKGROUND_LIGHT;
+            //else return FOREGROUND_LIGHT;
+
+        case 14:            //1110
+            return 0xFFFF;  //white
+            
+        case 15:            //1111
             return 255;
         default:
             return 255;

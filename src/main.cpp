@@ -9,7 +9,9 @@
 
 void init_timer0();
 
-void updateCollision();
+void checkPlayerCollision();
+
+void CheckWallCollision();
 
 void setFreq(uint8_t);
 
@@ -302,7 +304,7 @@ void update() {
     else if (state.joy_x_axis < 100 && player1.x > 0)
         player1.x -= 2;
 
-    updateCollision();
+    CheckWallCollision();
 
     //Jumping and falling mechanics
     if (state.c_button == 1 && !player1.jumping) {
@@ -311,35 +313,26 @@ void update() {
     }
 }
 
-void updateCollision() {
+void CheckWallCollision() {
     for (auto &wall: walls) {
-        // Check for movement to right (only move when not against the wall)
-
-        //Top collision detection.
-        if (player1.y + PLAYER_HEIGHT <= wall.y && player1.y + PLAYER_HEIGHT + player1.yVelocity >= wall.y &&
-            player1.x + PLAYER_ACTUAL_WIDTH >= wall.x && player1.x <= wall.x + wall.width) {
-            player1.yVelocity = 0;
-            player1.jumping = false;
-        }
-
-//        Bottom collision detection.
-        if (player1.y <= wall.y + wall.height && player1.x + PLAYER_ACTUAL_WIDTH >= wall.x &&
-            player1.x <= wall.x + wall.width) {
-            player1.yVelocity = 1;
-        }
-
-        if (wall.y + wall.height > player1.y) //Checking if player is not underneath the wall.
-        {
-            //Right collision detection.
-            if (player1.x + PLAYER_ACTUAL_WIDTH >= wall.x && player1.y + PLAYER_HEIGHT > wall.y &&
-                player1.x <= wall.x + wall.width / 2) {
+        // Check if the player is colliding with the wall using the wall.x and wall.y and wall.width and wall.height
+        if (player1.x + PLAYER_ACTUAL_WIDTH > wall.x && player1.x < wall.x + (wall.width * 2) &&
+            player1.y + PLAYER_HEIGHT > wall.y && player1.y < wall.y + wall.height) {
+            // Check if the player is colliding with the wall from the top
+            if (player1.yOld + PLAYER_HEIGHT <= wall.y) {
+                player1.y = wall.y - PLAYER_HEIGHT;
+                player1.yVelocity = 0;
+                player1.jumping = false;
+            } else if (player1.yOld >=
+                       wall.y + wall.height) { // Check if the player is colliding with the wall from the bottom
+                player1.y = wall.y + wall.height;
+                player1.yVelocity = 0;
+            } else if (player1.xOld + PLAYER_ACTUAL_WIDTH <=
+                       wall.x) { // Check if the player is colliding with the wall from the left
                 player1.x = wall.x - PLAYER_ACTUAL_WIDTH;
-            }
-
-            //Left collision detection.
-            if (player1.x <= wall.x + wall.width && player1.y + PLAYER_HEIGHT > wall.y &&
-                player1.x >= wall.x + wall.width / 2) {
-                player1.x = wall.x + wall.width;
+            } else if (player1.xOld >=
+                       wall.x + (wall.width * 2)) { // Check if the player is colliding with the wall from the right
+                player1.x = wall.x + (wall.width * 2);
             }
         }
     }

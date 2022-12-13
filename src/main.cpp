@@ -320,7 +320,6 @@ void updateCollision() {
             player1.x + PLAYER_ACTUAL_WIDTH >= wall.x && player1.x <= wall.x + wall.width) {
             player1.yVelocity = 0;
             player1.jumping = false;
-            player1.y = wall.y - PLAYER_HEIGHT;
         }
 
 //        Bottom collision detection.

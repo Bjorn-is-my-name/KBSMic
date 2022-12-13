@@ -294,6 +294,14 @@ void update() {
     if (!getState(NUNCHUK_ADDRESS)) {
         return;
     }
+
+    if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
+        player1.x += 2;
+
+        // Check for movement to left (only move when not against the wall)
+    else if (state.joy_x_axis < 100 && player1.x > 0)
+        player1.x -= 2;
+
     updateCollision();
 
     //Jumping and falling mechanics
@@ -306,27 +314,19 @@ void update() {
 void updateCollision() {
     for (auto &wall: walls) {
         // Check for movement to right (only move when not against the wall)
-        if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
-            player1.x += 2;
-
-            // Check for movement to left (only move when not against the wall)
-        else if (state.joy_x_axis < 100 && player1.x > 0)
-            player1.x -= 2;
-
 
         //Top collision detection.
         if (player1.y + PLAYER_HEIGHT <= wall.y && player1.y + PLAYER_HEIGHT + player1.yVelocity >= wall.y &&
             player1.x + PLAYER_ACTUAL_WIDTH >= wall.x && player1.x <= wall.x + wall.width) {
             player1.yVelocity = 0;
             player1.jumping = false;
-            player1.y = wall.y-PLAYER_HEIGHT;
+            player1.y = wall.y - PLAYER_HEIGHT;
         }
 
-        //Bottom collision detection.
+//        Bottom collision detection.
         if (player1.y <= wall.y + wall.height && player1.x + PLAYER_ACTUAL_WIDTH >= wall.x &&
             player1.x <= wall.x + wall.width) {
             player1.yVelocity = 1;
-            player1.y = wall.y + wall.height;
         }
 
         if (wall.y + wall.height > player1.y) //Checking if player is not underneath the wall.

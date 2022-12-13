@@ -123,7 +123,7 @@ struct Rect {
     uint8_t height;
 };
 
-struct Collect {
+struct Interactables {
     uint16_t x;
     uint8_t y;
     uint8_t w;
@@ -149,11 +149,11 @@ Rect walls[] = {
         Rect{10, 190, 40, 10}
 };
 
-Collect Dias[] = {
-        Collect{12, 12, DIA_WIDTH * 2, DIA_HEIGHT},
-        Collect{164, 216, DIA_WIDTH * 2, DIA_HEIGHT},
-        Collect{26, 12, DIA_WIDTH * 2, DIA_HEIGHT},
-        Collect{229, 216, DIA_WIDTH * 2, DIA_HEIGHT}
+Interactables Interactable[] = {
+        Interactables{12, 12, DIA_WIDTH * 2, DIA_HEIGHT},
+        Interactables{164, 216, DIA_WIDTH * 2, DIA_HEIGHT},
+        Interactables{26, 12, DIA_WIDTH * 2, DIA_HEIGHT},
+        Interactables{229, 216, DIA_WIDTH * 2, DIA_HEIGHT}
 };
 
 
@@ -392,6 +392,8 @@ void CheckWallCollision() {
         }
     }
 }
+
+
 
 void draw() {
     clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);

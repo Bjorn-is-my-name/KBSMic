@@ -2,22 +2,39 @@
 #include <avr/interrupt.h>
 #include <Wire.h>
 #include "LCD.cpp"
-#include "Nunchuk.cpp"
-
 #include "Player1.c"
 #include "Player2.c"
-#include "Background.c"
-#include "DiaRed.c"
+
 #include "Button.c"
+#include "WaterBlue.c"
+#include "DoorCorner.c"
+#include "DoorEdge.c"
+#include "SignBlue.c"
+#include "SignRed.c"
+#include "PlatformEdge.c"
+#include "PlatformMiddle.c"
+#include "LeverBase.c"
+#include "LeverTop.c"
+#include "DiaBlue.c"
+#include "DiaRed.c"
+
+#include "Background.c"
+#include "Nunchuk.cpp"
 
 void init_timer0();
 void setFreq(uint8_t);
 
-void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t, uint8_t *Sprite);
-void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *);
-void drawSpriteMirror(uint16_t, uint8_t, const uint8_t, const uint8_t, uint8_t *);
+void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
+void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *);
+bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
+
+void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
+void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
+
 void drawBackground();
-uint16_t getColor(uint8_t);
+void drawInterectibles();
+
+uint16_t getColor(uint8_t, uint8_t);
 
 void update();
 void draw();
@@ -33,8 +50,9 @@ void draw();
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
-#define PLAYER_WIDTH 8      //player width is 16        half of player width because program runs faster when not needing to devide
-#define PLAYER_HEIGHT 20    //player height is 20
+#define PLAYER_WIDTH 8
+#define PLAYER_ACTUAL_WIDTH 16
+#define PLAYER_HEIGHT 20
 
 #define SENDINGDATA_LEN 9
 #define SENDINGBIT_START_VALUE - 2
@@ -46,31 +64,77 @@ void draw();
 #define ONE_MIN 1
 #define ONE_MAX 4
 
-#define INITIAL_Y_VEL 10
-#define FRAME_TIME 32 //(1000/30FPS)-1 == 32
+#define INITIAL_Y_VEL 8
+#define FRAME_TIME 32 //(1000/30FPS)-1 = 32
 
 #define BG_SPRITE_AMOUNT 192
 #define BG_SPRITE_WIDTH 10
-#define BG_SPRITE_HEIGHT 20
+#define BG_SPRITE_ACTUAL_WIDTH 20
+#define BG_SPRITE_HEIGHT 10
+
+#define BUTTON_WIDTH 3
+#define BUTTON_HEIGHT 4
+#define WATER_WIDTH 10
+#define WATER_HEIGHT 5
+#define DOOR_WIDTH 5
+#define DOOR_HEIGHT 10
+#define SIGN_WIDTH 2
+#define SIGN_HEIGHT 13
+#define PLATFORM_WIDTH 5
+#define PLATFORM_HEIGHT 8
+#define DIA_WIDTH 3
+#define DIA_HEIGHT 9
+#define LEVER_BASE_WIDTH 4
+#define LEVER_BASE_HEIGHT 6
+#define LEVER_TOP_WIDTH 4
+#define LEVER_TOP_HEIGHT 7
+
+#define NUM_OF_WALLS 16
 
 struct {
 public:
-    uint16_t x = 0;
-    uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
-    uint16_t xOld = 0;
-    uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
+    uint16_t x = 13;
+    uint8_t y = 170;
+    uint16_t xOld = x;
+    uint8_t yOld = y;
     int8_t yVelocity = 0;
     bool jumping = false;
 } player1;
 
 struct {
 public:
-    uint16_t x = 0;
-    uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
-    uint16_t xOld = 0;
-    uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
+    uint16_t x = 13;
+    uint8_t y = 210;
+    uint16_t xOld = x;
+    uint8_t yOld = y;
 //    uint8_t animation
 } player2;
+
+struct Rect{
+    uint16_t x;
+    uint8_t y;
+    uint8_t w;
+    uint8_t h;
+};
+
+Rect walls[] = {
+    Rect{0, 0, 5, 240},
+    Rect{10, 0, 155, 10},
+    Rect{310, 10, 5, 230},
+    Rect{10, 230, 155, 10},
+    Rect{10, 40, 20, 40},
+    Rect{50, 70, 115, 10},
+    Rect{153, 50, 30, 20},
+    Rect{40, 110, 75, 10},
+    Rect{180, 120, 50, 10},
+    Rect{280, 120, 15, 20},
+    Rect{290, 140, 10, 10},
+    Rect{10, 150, 70, 10},
+    Rect{150, 150, 5, 30},
+    Rect{150, 180, 52, 10},
+    Rect{280, 210, 15, 20},
+    Rect{10, 190, 40, 10}
+};
 
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
@@ -79,8 +143,8 @@ uint16_t sendingData = 0;
 // The data bit to send;
 int8_t sendingBit = SENDINGBIT_START_VALUE;
 uint16_t onTime = 0;
-volatile unsigned long currentMs = 0;
-volatile unsigned char intCurrentMs = 0;
+volatile uint32_t currentMs = 0;
+volatile uint8_t intCurrentMs = 0;
 
 uint8_t msTime;
 uint16_t startTime;
@@ -88,7 +152,7 @@ uint8_t zeroTime;
 uint8_t oneTime;
 uint8_t offTime;
 
-unsigned long startMs = 0;
+uint32_t startMs = 0;
 bool startBitReceived = false;
 uint16_t receivedData = 0;
 uint8_t bitCounter = 0;
@@ -176,7 +240,10 @@ int main(void) {
     // Setup screen
     Wire.begin();
     setupSPI();
+
     sei();
+
+    // Start the screen and send startup commands
     START_UP();
 
 
@@ -187,7 +254,7 @@ int main(void) {
     }
 
     drawBackground();
-
+    drawInterectibles();
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
     while (1) {
@@ -242,7 +309,7 @@ void update() {
         return;
 
     // Check for movement to right (only move when not against the wall)
-    if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH * 2 < SCREEN_WIDTH)
+    if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
         player1.x += 2;
 
     // Check for movement to left (only move when not against the wall)
@@ -276,39 +343,38 @@ void draw() {
 
     clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
     drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
-
-    // drawSprite(100, 220, 3, 9, DiaRed);
-    // drawSpriteMirror(104, 220, 3, 9, DiaRed);
-
-    drawSprite(100, 220, 4, 5, Button);
-    drawSpriteMirror(105, 220, 4, 5, Button);
-
 }
 
-void clearSprite(uint16_t x, uint8_t y, uint16_t xOud, uint8_t yOud, uint16_t w, uint8_t h, uint8_t *Sprite)
+void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, uint8_t h, uint8_t *Sprite)
 {
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
         if (PixGroup % w == 0 && PixGroup != 0)
         {
-            xOud -= w * 2;
-            yOud++;
+            xOld -= w * 2;
+            yOld++;
         }
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
-            uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+            uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), 0);
 
-            if (color != 255 && !(xOud >= x && xOud <= x + w * 2 - 1 && yOud >= y && yOud <= y + h - 1))
+            if (color != 255 && !pointInRect(xOld, yOld, x, y, w, h))
             {
-                drawPixel(xOud, yOud, getColor((Background[xOud % (BG_SPRITE_WIDTH * 2) / 2 + yOud % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+                uint8_t idx = ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4), 0));
             }
 
-            xOud++;
+            xOld++;
         }
     }
 }
 
-void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite) {
+bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t w, uint8_t h)
+{
+    return pointX >= x && pointX <= x + w * 2 - 1 && pointY >= y && pointY <= y + h - 1;
+}
+
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite, uint8_t ver) {
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
         if (PixGroup % w == 0 && PixGroup != 0)
@@ -318,22 +384,33 @@ void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite) {
         }
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
-            uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
-            drawPixel(x, y, (color == 255) ? getColor((Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)) : color);
+            uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
+
+            if (color == 255)
+            {
+                uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                color = getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4), ver);
+            }
+
+            drawPixel(x, y, color);
 
             x++;
         }
     }
 }
 
-void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite){
-    uint8_t Mirr = w;
-    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite, uint8_t ver){
+    uint8_t Mirr = w-1;
+    for (uint16_t PixGroup = 0; PixGroup <= w * h; PixGroup++)
     {
+        if(PixGroup == 1){
+            Mirr++;
+        }
+        
         for (int8_t Pixel = 1; Pixel >= 0; Pixel--)
         {
-            uint16_t color = getColor(((Sprite[Mirr] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
-            drawPixel(x, y, (color == 255) ? getColor((Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)) : color);
+            uint16_t color = getColor(((Sprite[Mirr] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
+            drawPixel(x, y, (color == 255) ? getColor((Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4), ver) : color);
 
             x++;
         }
@@ -348,19 +425,105 @@ void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Spri
 }
 
 void drawBackground() {
-    uint16_t x = 0;
-    uint8_t y = 0;
-    for (uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++) {
-        drawSprite(x, y, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT, Background);
-        if (x >= SCREEN_WIDTH - BG_SPRITE_WIDTH * 2) {
-            x = 0;
-            y += BG_SPRITE_HEIGHT;
-        } else
-            x += BG_SPRITE_WIDTH * 2;
+    for (uint8_t y = 0; y < 24; y++)
+    {
+        if (y % 2 == 0)
+            for (uint8_t x = 0; x < 16; x++)
+                drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
+        else
+            for (uint8_t x = 0; x < 17; x++)
+                drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH - BG_SPRITE_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
     }
 }
 
-uint16_t getColor(uint8_t Color) {
+void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+    {
+        if (PixGroup % w == 0 && PixGroup != 0)
+        {
+            x -= w * 2;
+            y++;
+        }
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
+        {
+            uint16_t color = getColor(((Background[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), 0);
+
+            for (uint8_t i = 0; i < NUM_OF_WALLS; i++)
+            {
+                Rect &r = walls[i];
+                if (pointInRect(x, y, r.x, r.y, r.w, r.h))
+                {
+                    color = (color == BACKGROUND_DARK) ? FOREGROUND_DARK : FOREGROUND_LIGHT;
+                    break;
+                }
+            }
+
+            drawPixel(x, y, color);
+
+            x++;
+        }
+    }
+}
+
+void drawInterectibles(){
+    drawSprite(210, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+    drawSpriteMirror(210 + BUTTON_WIDTH*2-2, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);                 //Button 1
+    drawSprite(230, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+    drawSpriteMirror(230 + BUTTON_WIDTH*2-2, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);                  //Button 2
+
+    drawSprite(150, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue);
+    drawSpriteMirror(150 + WATER_WIDTH*2-2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue);                 //water
+    drawSprite(215, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1);
+    drawSpriteMirror(215 + WATER_WIDTH*2-2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1);                 //lava
+    drawSprite(189, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 2);
+    drawSpriteMirror(189 + WATER_WIDTH*2-2, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 2);                 //shrek-cum
+    
+    drawSprite(55, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,2);
+    drawSpriteMirror(55 + DOOR_WIDTH*2-2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,2);                     //DoorTop left
+    drawSprite(55, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);
+    drawSpriteMirror(55 + DOOR_WIDTH*2-2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);         //DoorFrame left
+    drawSprite(55, 40 + DOOR_HEIGHT*2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);
+    drawSpriteMirror(55 + DOOR_WIDTH*2-2, 40 + DOOR_HEIGHT*2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);       //DoorFrame left
+
+    drawSprite(80, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,2);
+    drawSpriteMirror(80 + DOOR_WIDTH*2-2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,2);                     //DoorTop right
+    drawSprite(80, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);
+    drawSpriteMirror(80 + DOOR_WIDTH*2-2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);         //DoorFrame right
+    drawSprite(80, 40 + DOOR_HEIGHT*2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);
+    drawSpriteMirror(80 + DOOR_WIDTH*2-2, 40 + DOOR_HEIGHT*2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);       //DoorFrame right
+    
+    drawSprite(61, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue);
+    drawSpriteMirror(61 + SIGN_WIDTH*2-2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue);                       //Blue sign
+    drawSprite(86, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);
+    drawSpriteMirror(86 + SIGN_WIDTH*2-2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);                        //Red sign
+
+    drawSprite(280, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge);
+    drawSprite(280 + PLATFORM_WIDTH*2, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle);
+    drawSpriteMirror(280 + PLATFORM_WIDTH*4-2, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge);      //Platform 1
+
+    drawSprite(10, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge,1);
+    drawSprite(10 + PLATFORM_WIDTH*2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle,1);
+    drawSpriteMirror(10 + PLATFORM_WIDTH*4-2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge,1);
+
+    drawSprite(12, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
+    drawSpriteMirror(12 + DIA_WIDTH *2-2, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
+
+    drawSprite(164, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
+    drawSpriteMirror(164 + DIA_WIDTH *2-2, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
+
+    drawSprite(26, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);
+    drawSpriteMirror(26 + DIA_WIDTH *2-2, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);
+
+    drawSprite(229, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);
+    drawSpriteMirror(229 + DIA_WIDTH *2-2, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);
+
+    drawSprite(86, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase,1);
+    drawSpriteMirror(86 + LEVER_BASE_WIDTH*2-2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase,1);
+
+    drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop,1);
+}
+
+uint16_t getColor(uint8_t Color, uint8_t ver) {
     switch (Color) {
         case 0:             //0000
             return BLACK;
@@ -375,16 +538,33 @@ uint16_t getColor(uint8_t Color) {
             return PLAYER_YELLOW;
 
         case 4:             //0100
-            return PLAYER_DARK_BLUE;
+            if(ver == 0){
+                return PLAYER_DARK_BLUE;
+            }else if(ver == 1){
+                return PLAYER_RED;
+            }else{
+                return INTER_BROWN;
+            }
 
         case 5:             //0101
-            return PLAYER_BLUE;
+            if(ver == 0){
+                return PLAYER_BLUE;
+            }else if(ver == 1){
+                return PLAYER_ORANGE;
+            }else{
+                return SWAMP_GREEN;
+            }
 
         case 6:             //0110
-            return PLAYER_LIGHT_BLUE;
+            if(ver == 0){
+                return PLAYER_LIGHT_BLUE;
+            }else if(ver == 1){
+                return PLAYER_YELLOW;
+            }else{
+                return SWAMP_GREEN;
+            }
 
         case 7:             //0111
-            return SWAMP_GREEN;
 
         case 8:             //1000
             return INTER_BROWN;
@@ -393,20 +573,19 @@ uint16_t getColor(uint8_t Color) {
             return INTER_GOLD;
 
         case 10:            //1010
-            return INTER_PURPLE;
+            if(ver == 0){
+                return INTER_PURPLE;
+            }else{
+                return INTER_YELLOW;
+            }
 
         case 11:            //1011
-            return INTER_YELLOW;
 
         case 12:            //1100
-            //if background
             return BACKGROUND_LIGHT;
-            //else return FOREGROUND_LIGHT;
 
         case 13:            //1101
-            //if background
             return BACKGROUND_DARK;
-            //else return FOREGROUND_DARK;
 
         case 14:            //1110
             return 0xFFFF;  //white

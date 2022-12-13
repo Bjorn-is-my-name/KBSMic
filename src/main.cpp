@@ -358,10 +358,11 @@ void update() {
         return;
     }
 
+    // Check for movement to right
     if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
         player1.x += MOVEMENT_SPEED;
 
-        // Check for movement to left (only move when not against the wall)
+    // Check for movement to left
     else if (state.joy_x_axis < 100 && player1.x > 0)
         player1.x -= MOVEMENT_SPEED;
 

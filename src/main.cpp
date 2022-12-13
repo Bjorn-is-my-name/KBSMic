@@ -2,18 +2,20 @@
 #include <avr/interrupt.h>
 #include <Wire.h>
 #include "LCD.cpp"
-#include "Nunchuk.cpp"
-
 #include "Player1.c"
 #include "Player2.c"
 #include "Background.c"
-#include "DiaRed.c"
+#include "Nunchuk.cpp"
 
 void init_timer0();
 
 void setFreq(uint8_t);
 
-void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t, const uint8_t *Sprite);
+void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
+
+void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
+
+bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
 
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
 
@@ -33,8 +35,9 @@ void draw();
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
-#define PLAYER_WIDTH 8      //player width is 16        half of player width because program runs faster when not needing to devide
-#define PLAYER_HEIGHT 20    //player height is 20
+#define PLAYER_WIDTH 8
+#define PLAYER_ACTUAL_WIDTH 16
+#define PLAYER_HEIGHT 20
 
 #define SENDINGDATA_LEN 9
 #define SENDINGBIT_START_VALUE (- 2)
@@ -46,31 +49,60 @@ void draw();
 #define ONE_MIN 1
 #define ONE_MAX 4
 
-#define INITIAL_Y_VEL 10
-#define FRAME_TIME 32 //(1000/30FPS)-1 == 32
+#define INITIAL_Y_VEL 8
+#define FRAME_TIME 32 //(1000/30FPS)-1 = 32
 
 #define BG_SPRITE_AMOUNT 192
 #define BG_SPRITE_WIDTH 10
-#define BG_SPRITE_HEIGHT 20
+#define BG_SPRITE_ACTUAL_WIDTH 20
+#define BG_SPRITE_HEIGHT 10
+
+#define NUM_OF_WALLS 16
 
 struct {
 public:
-    uint16_t x = 0;
-    uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
-    uint16_t xOld = 0;
-    uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
+    uint16_t x = 13;
+    uint8_t y = 170;
+    uint16_t xOld = x;
+    uint8_t yOld = y;
     int8_t yVelocity = 0;
     bool jumping = false;
 } player1;
 
 struct {
 public:
-    uint16_t x = 0;
-    uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
-    uint16_t xOld = 0;
-    uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
+    uint16_t x = 13;
+    uint8_t y = 210;
+    uint16_t xOld = x;
+    uint8_t yOld = y;
 //    uint8_t animation
 } player2;
+
+struct Rect {
+    uint16_t x;
+    uint8_t y;
+    uint8_t w;
+    uint8_t h;
+};
+
+Rect walls[] = {
+        Rect{0, 0, 5, 240},
+        Rect{10, 0, 155, 10},
+        Rect{310, 10, 5, 230},
+        Rect{10, 230, 155, 10},
+        Rect{10, 40, 20, 40},
+        Rect{50, 70, 115, 10},
+        Rect{153, 50, 30, 20},
+        Rect{40, 110, 75, 10},
+        Rect{180, 120, 50, 10},
+        Rect{280, 120, 15, 20},
+        Rect{290, 140, 10, 10},
+        Rect{10, 150, 70, 10},
+        Rect{150, 150, 5, 30},
+        Rect{150, 180, 52, 10},
+        Rect{280, 210, 15, 20},
+        Rect{10, 190, 40, 10}
+};
 
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
@@ -79,8 +111,8 @@ uint16_t sendingData = 0;
 // The data bit to send;
 int8_t sendingBit = SENDINGBIT_START_VALUE;
 uint16_t onTime = 0;
-volatile unsigned long currentMs = 0;
-volatile unsigned char intCurrentMs = 0;
+volatile uint32_t currentMs = 0;
+volatile uint8_t intCurrentMs = 0;
 
 uint8_t msTime;
 uint16_t startTime;
@@ -88,7 +120,7 @@ uint8_t zeroTime;
 uint8_t oneTime;
 uint8_t offTime;
 
-unsigned long startMs = 0;
+uint32_t startMs = 0;
 bool startBitReceived = false;
 uint16_t receivedData = 0;
 uint8_t bitCounter = 0;
@@ -100,17 +132,17 @@ ISR(PCINT2_vect) {
     if (isDataBit) {
         uint8_t difference = currentMs - startMs; // Calculate the length to determin the value
 
-        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if it's a start bit
+        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if its a start bit
         {
             startBitReceived = true;
             bitCounter = 0;
         }
 
-        if (startBitReceived) // If the start bit has been sent, check what the data is
+        if (startBitReceived) // If the start bit has been send, check what the data is
         {
-            if (difference < ZERO_MAX) // Check if it's a zero
+            if (difference < ZERO_MAX) // Check if its a zero
                 receivedData &= ~(1 << bitCounter++);
-            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if it's a one
+            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if its a one
                 receivedData |= (1 << bitCounter++);
 
             if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
@@ -176,7 +208,10 @@ int main(void) {
     // Setup screen
     Wire.begin();
     setupSPI();
+
     sei();
+
+    // Start the screen and send startup commands
     START_UP();
 
 
@@ -187,7 +222,6 @@ int main(void) {
     }
 
     drawBackground();
-    drawSprite(100, 100, 3, 9, DiaRed);
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
     while (true) {
@@ -198,7 +232,6 @@ int main(void) {
             frameCounter++;
         }
     }
-    return (0);
 }
 
 void init_timer0() {
@@ -242,7 +275,7 @@ void update() {
         return;
 
     // Check for movement to right (only move when not against the wall)
-    if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH * 2 < SCREEN_WIDTH)
+    if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
         player1.x += 2;
 
         // Check for movement to left (only move when not against the wall)
@@ -278,27 +311,32 @@ void draw() {
     drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
 }
 
-void clearSprite(uint16_t x, uint8_t y, uint16_t xOud, uint8_t yOud, uint16_t w, uint8_t h, const uint8_t *Sprite) {
+void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, uint8_t h, const uint8_t *Sprite) {
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++) {
         if (PixGroup % w == 0 && PixGroup != 0) {
-            xOud -= w * 2;
-            yOud++;
+            xOld -= w * 2;
+            yOld++;
         }
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
-            if (color != 255 && !(xOud >= x && xOud <= x + w * 2 - 1 && yOud >= y && yOud <= y + h - 1)) {
-                drawPixel(xOud, yOud, getColor(
-                        (Background[xOud % (BG_SPRITE_WIDTH * 2) / 2 + yOud % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] &
-                         ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+            if (color != 255 && !pointInRect(xOld, yOld, x, y, w, h)) {
+                uint8_t idx =
+                        ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 +
+                        yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
             }
 
-            xOud++;
+            xOld++;
         }
     }
 }
 
-void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t *Sprite) {
+bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
+    return pointX >= x && pointX <= x + w * 2 - 1 && pointY >= y && pointY <= y + h - 1;
+}
+
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite) {
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++) {
         if (PixGroup % w == 0 && PixGroup != 0) {
             x -= w * 2;
@@ -306,9 +344,14 @@ void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const u
         }
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
-            drawPixel(x, y, (color == 255) ? getColor(
-                    (Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] &
-                     ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)) : color);
+
+            if (color == 255) {
+                uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 +
+                              y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                color = getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4));
+            }
+
+            drawPixel(x, y, color);
 
             x++;
         }
@@ -316,15 +359,37 @@ void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const u
 }
 
 void drawBackground() {
-    uint16_t x = 0;
-    uint8_t y = 0;
-    for (uint8_t i = 0; i < BG_SPRITE_AMOUNT; i++) {
-        drawSprite(x, y, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT, Background);
-        if (x >= SCREEN_WIDTH - BG_SPRITE_WIDTH * 2) {
-            x = 0;
-            y += BG_SPRITE_HEIGHT;
-        } else
-            x += BG_SPRITE_WIDTH * 2;
+    for (uint8_t y = 0; y < 24; y++) {
+        if (y % 2 == 0)
+            for (uint8_t x = 0; x < 16; x++)
+                drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
+        else
+            for (uint8_t x = 0; x < 17; x++)
+                drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH - BG_SPRITE_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH,
+                                   BG_SPRITE_HEIGHT);
+    }
+}
+
+void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++) {
+        if (PixGroup % w == 0 && PixGroup != 0) {
+            x -= w * 2;
+            y++;
+        }
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
+            uint16_t color = getColor(((Background[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+
+            for (auto &r: walls) {
+                if (pointInRect(x, y, r.x, r.y, r.w, r.h)) {
+                    color = (color == BACKGROUND_DARK) ? FOREGROUND_DARK : FOREGROUND_LIGHT;
+                    break;
+                }
+            }
+
+            drawPixel(x, y, color);
+
+            x++;
+        }
     }
 }
 
@@ -369,12 +434,12 @@ uint16_t getColor(uint8_t Color) {
         case 12:            //1100
             //if background
             return BACKGROUND_LIGHT;
-            //else return FOREGROUND_DARK;
+            //else return FOREGROUND_LIGHT;
 
         case 13:            //1101
             //if background
             return BACKGROUND_DARK;
-            //else return FOREGROUND_LIGHT;
+            //else return FOREGROUND_DARK;
 
         case 14:            //1110
             return 0xFFFF;  //white

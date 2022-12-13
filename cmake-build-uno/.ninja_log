@@ -1,10 +1,8 @@
 # ninja log v5
-1	2102	0	CMakeFiles/Production	d99f53f2f0e126b2
-2	368	6921247401429215	build.ninja	db9e8402c5a57b03
-1	2928	0	CMakeFiles/Debug	eb42534a060928fd
-0	6335	0	CMakeFiles/Production	6c49129361be9946
-0	6335	0	C:/Users/Frank Rietman/Documents/KBSMIC/cmake-build-uno/CMakeFiles/Production	6c49129361be9946
-1	3905	0	CMakeFiles/Production	6c49129361be9946
-1	3905	0	C:/Users/Frank Rietman/Documents/KBSMIC/cmake-build-uno/CMakeFiles/Production	6c49129361be9946
 0	6215	0	CMakeFiles/Production	6c49129361be9946
-0	6215	0	C:/Users/Frank Rietman/Documents/KBSMIC/cmake-build-uno/CMakeFiles/Production	6c49129361be9946
+2	368	6926237651229376	build.ninja	db9e8402c5a57b03
+1	2928	0	CMakeFiles/Debug	eb42534a060928fd
+1	14061	0	CMakeFiles/Production	d99f53f2f0e126b2
+1	14061	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+1	6021	0	CMakeFiles/Production	d99f53f2f0e126b2
+1	6021	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2

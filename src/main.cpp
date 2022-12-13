@@ -116,6 +116,12 @@ struct Rect{
     uint8_t w;
     uint8_t h;
 };
+struct Collect{
+    uint16_t x;
+    uint8_t y;
+    uint8_t w;
+    uint8_t h;
+};
 
 Rect walls[] = {
     Rect{0, 0, 5, 240},
@@ -134,6 +140,13 @@ Rect walls[] = {
     Rect{150, 180, 52, 10},
     Rect{280, 210, 15, 20},
     Rect{10, 190, 40, 10}
+};
+
+Collect Dias[] = {
+    Collect{12, 12, DIA_WIDTH*2, DIA_HEIGHT},
+    Collect{164, 216, DIA_WIDTH*2, DIA_HEIGHT},
+    Collect{26, 12, DIA_WIDTH*2, DIA_HEIGHT},
+    Collect{229, 216, DIA_WIDTH*2, DIA_HEIGHT}
 };
 
 // Check to see if the current bit is done sending
@@ -503,24 +516,24 @@ void drawInterectibles(){
 
     drawSprite(10, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge,1);
     drawSprite(10 + PLATFORM_WIDTH*2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle,1);
-    drawSpriteMirror(10 + PLATFORM_WIDTH*4-2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge,1);
+    drawSpriteMirror(10 + PLATFORM_WIDTH*4-2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge,1);    //Platform 2
 
     drawSprite(12, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
-    drawSpriteMirror(12 + DIA_WIDTH *2-2, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
+    drawSpriteMirror(12 + DIA_WIDTH *2-2, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);                          //Dia Blue 1
 
     drawSprite(164, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
-    drawSpriteMirror(164 + DIA_WIDTH *2-2, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
+    drawSpriteMirror(164 + DIA_WIDTH *2-2, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);                        //DiaBlue 2
 
     drawSprite(26, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);
-    drawSpriteMirror(26 + DIA_WIDTH *2-2, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);
+    drawSpriteMirror(26 + DIA_WIDTH *2-2, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);                         //DiaRed 1
 
     drawSprite(229, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);
-    drawSpriteMirror(229 + DIA_WIDTH *2-2, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);
+    drawSpriteMirror(229 + DIA_WIDTH *2-2, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed,1);                       //DiaRed 2
 
     drawSprite(86, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase,1);
-    drawSpriteMirror(86 + LEVER_BASE_WIDTH*2-2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase,1);
+    drawSpriteMirror(86 + LEVER_BASE_WIDTH*2-2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase,1); //LeverBase
 
-    drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop,1);
+    drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop,1);                                 //LeverTop
 }
 
 uint16_t getColor(uint8_t Color, uint8_t ver) {

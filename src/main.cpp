@@ -9,6 +9,8 @@
 
 void init_timer0();
 
+void updateCollision();
+
 void setFreq(uint8_t);
 
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
@@ -49,7 +51,7 @@ void draw();
 #define ONE_MIN 1
 #define ONE_MAX 4
 
-#define INITIAL_Y_VEL 8
+#define INITIAL_Y_VEL 10
 #define FRAME_TIME 32 //(1000/30FPS)-1 = 32
 
 #define BG_SPRITE_AMOUNT 192
@@ -57,7 +59,7 @@ void draw();
 #define BG_SPRITE_ACTUAL_WIDTH 20
 #define BG_SPRITE_HEIGHT 10
 
-#define NUM_OF_WALLS 16
+#define GRAVITY 1
 
 struct {
 public:
@@ -81,8 +83,8 @@ public:
 struct Rect {
     uint16_t x;
     uint8_t y;
-    uint8_t w;
-    uint8_t h;
+    uint8_t width;
+    uint8_t height;
 };
 
 Rect walls[] = {
@@ -125,6 +127,11 @@ bool startBitReceived = false;
 uint16_t receivedData = 0;
 uint8_t bitCounter = 0;
 bool isDataBit = false;
+
+enum gameState {
+    MENU, GAME, LEVELSELECT
+};
+gameState currentGameState = GAME;
 
 ISR(PCINT2_vect) {
     isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)
@@ -221,15 +228,21 @@ int main(void) {
         fillRect(0, 0, 320, 240, PLAYER_RED);
     }
 
+
     drawBackground();
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
     while (true) {
-        if (intCurrentMs > FRAME_TIME) { //30 FPS
+        if (intCurrentMs > FRAME_TIME) {
+            //30 FPS
             intCurrentMs = 0;
-            update();
-            draw();
             frameCounter++;
+            if (currentGameState == GAME) {
+                //Game code
+                update();
+                draw();
+
+            }
         }
     }
 }
@@ -265,41 +278,71 @@ void setFreq(uint8_t freq) {
     }
 }
 
-
 void update() {
     player1.xOld = player1.x;
     player1.yOld = player1.y;
+    player1.y += player1.yVelocity;
 
-    // Get the nunchuck input data
-    if (!getState(NUNCHUK_ADDRESS))
-        return;
-
-    // Check for movement to right (only move when not against the wall)
-    if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
-        player1.x += 2;
-
-        // Check for movement to left (only move when not against the wall)
-    else if (state.joy_x_axis < 100 && player1.x > 0)
-        player1.x -= 2;
-
-    // If jumping, lower the velocity until it hits the max (negative) velocity
-    if (player1.jumping) {
-        player1.y -= player1.yVelocity;
-
-        if (player1.yVelocity > -INITIAL_Y_VEL)
-            player1.yVelocity--;
-    }
-
-    // If the player is back on the ground, stop jumping
-    if (player1.y == SCREEN_HEIGHT - PLAYER_HEIGHT) {
-        player1.jumping = false;
+    //Checks if the player is not already at the bottom of the screen.
+    if (player1.y + PLAYER_HEIGHT + player1.yVelocity <= SCREEN_HEIGHT) {
+        player1.yVelocity += GRAVITY;
+    } else {
         player1.yVelocity = 0;
+        player1.jumping = false;
     }
+    // Get the nunchuk input data
+    if (!getState(NUNCHUK_ADDRESS)) {
+        return;
+    }
+    updateCollision();
 
-    // Set the player to jump when the nunchuck movement is high enough and not jumping already
-    if (state.accel_z_axis < 0xFF && !player1.jumping) {
+    //Jumping and falling mechanics
+    if (state.c_button == 1 && !player1.jumping) {
         player1.jumping = true;
-        player1.yVelocity = INITIAL_Y_VEL;
+        player1.yVelocity -= INITIAL_Y_VEL;
+    }
+}
+
+void updateCollision() {
+    for (auto &wall: walls) {
+        // Check for movement to right (only move when not against the wall)
+        if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
+            player1.x += 2;
+
+            // Check for movement to left (only move when not against the wall)
+        else if (state.joy_x_axis < 100 && player1.x > 0)
+            player1.x -= 2;
+
+
+        //Top collision detection.
+        if (player1.y + PLAYER_HEIGHT <= wall.y && player1.y + PLAYER_HEIGHT + player1.yVelocity >= wall.y &&
+            player1.x + PLAYER_ACTUAL_WIDTH >= wall.x && player1.x <= wall.x + wall.width) {
+            player1.yVelocity = 0;
+            player1.jumping = false;
+            player1.y = wall.y-PLAYER_HEIGHT;
+        }
+
+        //Bottom collision detection.
+        if (player1.y <= wall.y + wall.height && player1.x + PLAYER_ACTUAL_WIDTH >= wall.x &&
+            player1.x <= wall.x + wall.width) {
+            player1.yVelocity = 1;
+            player1.y = wall.y + wall.height;
+        }
+
+        if (wall.y + wall.height > player1.y) //Checking if player is not underneath the wall.
+        {
+            //Right collision detection.
+            if (player1.x + PLAYER_ACTUAL_WIDTH >= wall.x && player1.y + PLAYER_HEIGHT > wall.y &&
+                player1.x <= wall.x + wall.width / 2) {
+                player1.x = wall.x - PLAYER_ACTUAL_WIDTH;
+            }
+
+            //Left collision detection.
+            if (player1.x <= wall.x + wall.width && player1.y + PLAYER_HEIGHT > wall.y &&
+                player1.x >= wall.x + wall.width / 2) {
+                player1.x = wall.x + wall.width;
+            }
+        }
     }
 }
 
@@ -326,7 +369,6 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
                         yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
                 drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
             }
-
             xOld++;
         }
     }
@@ -380,7 +422,7 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
             uint16_t color = getColor(((Background[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
             for (auto &r: walls) {
-                if (pointInRect(x, y, r.x, r.y, r.w, r.h)) {
+                if (pointInRect(x, y, r.x, r.y, r.width, r.height)) {
                     color = (color == BACKGROUND_DARK) ? FOREGROUND_DARK : FOREGROUND_LIGHT;
                     break;
                 }

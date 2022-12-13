@@ -144,6 +144,7 @@ ISR(PCINT2_vect) {
             if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
             {
                 startBitReceived = false;
+                player2.xOld = player2.x;
                 player2.x = receivedData;
             }
         }

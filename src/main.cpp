@@ -9,8 +9,6 @@
 
 void init_timer0();
 
-void checkPlayerCollision();
-
 void CheckWallCollision();
 
 void setFreq(uint8_t);
@@ -43,7 +41,7 @@ void draw();
 #define PLAYER_ACTUAL_WIDTH 16
 #define PLAYER_HEIGHT 20
 
-#define SENDINGDATA_LEN 9
+#define SENDINGDATA_LEN 16 // bits - 1
 #define SENDINGBIT_START_VALUE (- 2)
 
 #define STARTBIT_VALUE (-1)
@@ -111,7 +109,7 @@ Rect walls[] = {
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
 // Data to send over IR
-uint16_t sendingData = 0;
+uint32_t sendingData = 0;
 // The data bit to send;
 int8_t sendingBit = SENDINGBIT_START_VALUE;
 uint16_t onTime = 0;
@@ -126,7 +124,7 @@ uint8_t offTime;
 
 uint32_t startMs = 0;
 bool startBitReceived = false;
-uint16_t receivedData = 0;
+uint32_t receivedData = 0;
 uint8_t bitCounter = 0;
 bool isDataBit = false;
 
@@ -145,6 +143,7 @@ ISR(PCINT2_vect) {
         {
             startBitReceived = true;
             bitCounter = 0;
+            receivedData = 0;
         }
 
         if (startBitReceived) // If the start bit has been send, check what the data is
@@ -157,7 +156,12 @@ ISR(PCINT2_vect) {
             if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
             {
                 startBitReceived = false;
-                player2.x = receivedData;
+                player2.xOld = player2.x;
+                player2.x = receivedData & 0x1FF;
+                receivedData >>= 9;
+                player2.yOld = player2.y;
+                player2.y = (receivedData & 0xFF);
+
             }
         }
     }
@@ -189,11 +193,12 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
                 else                                                                 // Send data
                     onTime = ((sendingData >> sendingBit) & 1) ? oneTime
                                                                : zeroTime; // Set the time corresponding to the bit
-
-                TCCR0A &= ~(1 << COM0A1); // Enabe TC0
+                TCCR0A &= ~(1 << COM0A1); // Enable TC0
             } else {
                 sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
-                sendingData = player1.x;
+                sendingData = player1.y;
+                sendingData <<= 9;
+                sendingData |= player1.x;
             }
         }
 
@@ -222,8 +227,6 @@ int main(void) {
 
     // Start the screen and send startup commands
     START_UP();
-
-
 
     // Check nunckuk connection
     while (!startNunchuk(NUNCHUK_ADDRESS)) {
@@ -315,7 +318,7 @@ void update() {
 
 void CheckWallCollision() {
     for (auto &wall: walls) {
-        // Check if the player is colliding with the wall using the wall.x and wall.y and wall.width and wall.height
+        // Check if the player is colliding with the wall.
         if (player1.x + PLAYER_ACTUAL_WIDTH > wall.x && player1.x < wall.x + (wall.width * 2) &&
             player1.y + PLAYER_HEIGHT > wall.y && player1.y < wall.y + wall.height) {
             // Check if the player is colliding with the wall from the top

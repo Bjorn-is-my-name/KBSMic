@@ -97,7 +97,8 @@ void draw();
 #define LEVER_TOP_WIDTH 4
 #define LEVER_TOP_HEIGHT 7
 
-struct {
+struct
+{
 public:
     uint16_t x = 13;
     uint8_t y = 170;
@@ -107,7 +108,8 @@ public:
     bool jumping = false;
 } player1;
 
-struct {
+struct
+{
 public:
     uint16_t x = 13;
     uint8_t y = 210;
@@ -116,14 +118,16 @@ public:
 //    uint8_t animation
 } player2;
 
-struct Rect {
+struct Rect
+{
     uint16_t x;
     uint8_t y;
     uint8_t width;
     uint8_t height;
 };
 
-struct Interactables {
+struct Interactables
+{
     uint16_t x;
     uint8_t y;
     uint8_t w;
@@ -179,15 +183,18 @@ uint32_t receivedData = 0;
 uint8_t bitCounter = 0;
 bool isDataBit = false;
 
-enum gameState {
+enum gameState
+{
     MENU, GAME, LEVELSELECT
 };
 gameState currentGameState = GAME;
 
-ISR(PCINT2_vect) {
+ISR(PCINT2_vect)
+{
     isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)
 
-    if (isDataBit) {
+    if (isDataBit)
+    {
         uint8_t difference = currentMs - startMs; // Calculate the length to determin the value
 
         if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if its a start bit
@@ -212,6 +219,7 @@ ISR(PCINT2_vect) {
                 receivedData >>= 9;
                 player2.yOld = player2.y;
                 player2.y = (receivedData & 0xFF);
+                Serial.println(player2.y);
 
             }
         }
@@ -225,27 +233,31 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
     static uint16_t counter = 0;
     static uint8_t msCounter = 0;
 
-    if (++msCounter > msTime) {
+    if (++msCounter > msTime)
+    {
         currentMs++;
         intCurrentMs++;
         msCounter = 0;
     }
 
-    if (++counter > onTime) {
+    if (++counter > onTime)
+    {
         if (dataIsSend) // If the bit is done sending, wait before sending the next bit
         {
             onTime = offTime;        // Time after which to continue to the next bit
             TCCR0A |= (1 << COM0A1); // Disable TC0
         } else // If the waiting time is passed, send the next bit
         {
-            if (sendingBit++ < SENDINGDATA_LEN) {
+            if (sendingBit++ < SENDINGDATA_LEN)
+            {
                 if (sendingBit == STARTBIT_VALUE) // Send start bit
                     onTime = startTime;
                 else                                                                 // Send data
                     onTime = ((sendingData >> sendingBit) & 1) ? oneTime
                                                                : zeroTime; // Set the time corresponding to the bit
                 TCCR0A &= ~(1 << COM0A1); // Enable TC0
-            } else {
+            } else
+            {
                 sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
                 sendingData = player1.y;
                 sendingData <<= 9;
@@ -258,7 +270,8 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
     }
 }
 
-int main(void) {
+int main(void)
+{
     // Setup IR sending
     DDRD |= (1 << DDD6);
     init_timer0();
@@ -280,21 +293,27 @@ int main(void) {
     START_UP();
 
     // Check nunckuk connection
-    while (!startNunchuk(NUNCHUK_ADDRESS)) {
+    while (!startNunchuk(NUNCHUK_ADDRESS))
+    {
         fillRect(0, 0, 320, 240, PLAYER_RED);
     }
 
+
+    Serial.begin(9600);
 
     drawBackground();
     drawInteractables();
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
-    while (true) {
-        if (intCurrentMs > FRAME_TIME) {
+    while (true)
+    {
+        if (intCurrentMs > FRAME_TIME)
+        {
             //30 FPS
             intCurrentMs = 0;
             frameCounter++;
-            if (currentGameState == GAME) {
+            if (currentGameState == GAME)
+            {
                 //Game code
                 update();
                 draw();
@@ -304,7 +323,8 @@ int main(void) {
     }
 }
 
-void init_timer0() {
+void init_timer0()
+{
     /*
     Fast-PWM mode (TOP = OCRA) -> WGM0[2:0] = 0b111
     Set on compare match and clear on bottom (effectively pulling OC0A low) -> COM0A[1:0] = 0b11
@@ -317,16 +337,19 @@ void init_timer0() {
     TIMSK0 |= (1 << OCIE0A);
 }
 
-void setFreq(uint8_t freq) {
+void setFreq(uint8_t freq)
+{
     OCR0A = freq;
 
-    if (freq == IR_38KHZ) {
+    if (freq == IR_38KHZ)
+    {
         msTime = 37;
         startTime = 189;
         zeroTime = 37;
         oneTime = 113;
         offTime = 37;
-    } else {
+    } else
+    {
         msTime = 55;
         startTime = 279;
         zeroTime = 55;
@@ -335,20 +358,24 @@ void setFreq(uint8_t freq) {
     }
 }
 
-void update() {
+void update()
+{
     player1.xOld = player1.x;
     player1.yOld = player1.y;
     player1.y += player1.yVelocity;
 
     //Checks if the player is not already at the bottom of the screen.
-    if (player1.y + PLAYER_HEIGHT + player1.yVelocity <= SCREEN_HEIGHT) {
+    if (player1.y + PLAYER_HEIGHT + player1.yVelocity <= SCREEN_HEIGHT)
+    {
         player1.yVelocity += GRAVITY;
-    } else {
+    } else
+    {
         player1.yVelocity = 0;
         player1.jumping = false;
     }
     // Get the nunchuk input data
-    if (!getState(NUNCHUK_ADDRESS)) {
+    if (!getState(NUNCHUK_ADDRESS))
+    {
         return;
     }
 
@@ -362,31 +389,39 @@ void update() {
     CheckWallCollision();
 
     //Jumping and falling mechanics
-    if (state.c_button == 1 && !player1.jumping) {
+    if (state.c_button == 1 && !player1.jumping)
+    {
         player1.jumping = true;
         player1.yVelocity -= INITIAL_Y_VEL;
     }
 }
 
-void CheckWallCollision() {
-    for (auto &wall: walls) {
+void CheckWallCollision()
+{
+    for (auto &wall: walls)
+    {
         // Check if the player is colliding with the wall.
         if (player1.x + PLAYER_ACTUAL_WIDTH > wall.x && player1.x < wall.x + (wall.width * 2) &&
-            player1.y + PLAYER_HEIGHT > wall.y && player1.y < wall.y + wall.height) {
+            player1.y + PLAYER_HEIGHT > wall.y && player1.y < wall.y + wall.height)
+        {
             // Check if the player is colliding with the wall from the top
-            if (player1.yOld + PLAYER_HEIGHT <= wall.y) {
+            if (player1.yOld + PLAYER_HEIGHT <= wall.y)
+            {
                 player1.y = wall.y - PLAYER_HEIGHT;
                 player1.yVelocity = 0;
                 player1.jumping = false;
             } else if (player1.yOld >=
-                       wall.y + wall.height) { // Check if the player is colliding with the wall from the bottom
+                       wall.y + wall.height)
+            { // Check if the player is colliding with the wall from the bottom
                 player1.y = wall.y + wall.height;
                 player1.yVelocity = 0;
             } else if (player1.xOld + PLAYER_ACTUAL_WIDTH <=
-                       wall.x) { // Check if the player is colliding with the wall from the left
+                       wall.x)
+            { // Check if the player is colliding with the wall from the left
                 player1.x = wall.x - PLAYER_ACTUAL_WIDTH;
             } else if (player1.xOld >=
-                       wall.x + (wall.width * 2)) { // Check if the player is colliding with the wall from the right
+                       wall.x + (wall.width * 2))
+            { // Check if the player is colliding with the wall from the right
                 player1.x = wall.x + (wall.width * 2);
             }
         }
@@ -394,8 +429,8 @@ void CheckWallCollision() {
 }
 
 
-
-void draw() {
+void draw()
+{
     clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
     drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
 
@@ -403,16 +438,21 @@ void draw() {
     drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
 }
 
-void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, uint8_t h, const uint8_t *Sprite) {
-    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++) {
-        if (PixGroup % w == 0 && PixGroup != 0) {
+void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, uint8_t h, const uint8_t *Sprite)
+{
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+    {
+        if (PixGroup % w == 0 && PixGroup != 0)
+        {
             xOld -= w * 2;
             yOld++;
         }
-        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
+        {
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
-            if (color != 255 && !pointInRect(xOld, yOld, x, y, w, h)) {
+            if (color != 255 && !pointInRect(xOld, yOld, x, y, w, h))
+            {
                 uint8_t idx =
                         ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 +
                         yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
@@ -423,20 +463,26 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
     }
 }
 
-bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
+bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t w, uint8_t h)
+{
     return pointX >= x && pointX <= x + w * 2 - 1 && pointY >= y && pointY <= y + h - 1;
 }
 
-void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver) {
-    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++) {
-        if (PixGroup % w == 0 && PixGroup != 0) {
+void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver)
+{
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+    {
+        if (PixGroup % w == 0 && PixGroup != 0)
+        {
             x -= w * 2;
             y++;
         }
-        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
+        {
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
 
-            if (color == 255) {
+            if (color == 255)
+            {
                 uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 +
                               y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
                 color = getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4), ver);
@@ -449,8 +495,10 @@ void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Spri
     }
 }
 
-void drawBackground() {
-    for (uint8_t y = 0; y < 24; y++) {
+void drawBackground()
+{
+    for (uint8_t y = 0; y < 24; y++)
+    {
         if (y % 2 == 0)
             for (uint8_t x = 0; x < 16; x++)
                 drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
@@ -461,14 +509,18 @@ void drawBackground() {
     }
 }
 
-void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite, uint8_t ver) {
+void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite, uint8_t ver)
+{
     uint8_t Mirr = w - 1;
-    for (uint16_t PixGroup = 0; PixGroup <= w * h; PixGroup++) {
-        if (PixGroup == 1) {
+    for (uint16_t PixGroup = 0; PixGroup <= w * h; PixGroup++)
+    {
+        if (PixGroup == 1)
+        {
             Mirr++;
         }
 
-        for (int8_t Pixel = 1; Pixel >= 0; Pixel--) {
+        for (int8_t Pixel = 1; Pixel >= 0; Pixel--)
+        {
             uint16_t color = getColor(((Sprite[Mirr] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
             drawPixel(x, y, (color == 255) ? getColor(
                     (Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] &
@@ -476,7 +528,8 @@ void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Spri
 
             x++;
         }
-        if (PixGroup % w == 0 && PixGroup != 0) {
+        if (PixGroup % w == 0 && PixGroup != 0)
+        {
             x -= w * 2;
             y++;
             Mirr += w * 2;
@@ -485,17 +538,23 @@ void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Spri
     }
 }
 
-void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
-    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++) {
-        if (PixGroup % w == 0 && PixGroup != 0) {
+void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
+{
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+    {
+        if (PixGroup % w == 0 && PixGroup != 0)
+        {
             x -= w * 2;
             y++;
         }
-        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
+        {
             uint16_t color = getColor(((Background[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
-            for (auto &r: walls) {
-                if (pointInRect(x, y, r.x, r.y, r.width, r.height)) {
+            for (auto &r: walls)
+            {
+                if (pointInRect(x, y, r.x, r.y, r.width, r.height))
+                {
                     color = (color == BACKGROUND_DARK) ? FOREGROUND_DARK : FOREGROUND_LIGHT;
                     break;
                 }
@@ -508,7 +567,8 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
     }
 }
 
-void drawInteractables() {
+void drawInteractables()
+{
     drawSprite(210, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
     drawSpriteMirror(210 + BUTTON_WIDTH * 2 - 2, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);                 //Button 1
     drawSprite(230, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
@@ -574,8 +634,10 @@ void drawInteractables() {
     drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, 1);                                 //LeverTop
 }
 
-uint16_t getColor(uint8_t Color, uint8_t ver) {
-    switch (Color) {
+uint16_t getColor(uint8_t Color, uint8_t ver)
+{
+    switch (Color)
+    {
         case 0:             //0000
             return BLACK;
 
@@ -589,29 +651,38 @@ uint16_t getColor(uint8_t Color, uint8_t ver) {
             return PLAYER_YELLOW;
 
         case 4:             //0100
-            if (ver == 0) {
+            if (ver == 0)
+            {
                 return PLAYER_DARK_BLUE;
-            } else if (ver == 1) {
+            } else if (ver == 1)
+            {
                 return PLAYER_RED;
-            } else {
+            } else
+            {
                 return INTER_BROWN;
             }
 
         case 5:             //0101
-            if (ver == 0) {
+            if (ver == 0)
+            {
                 return PLAYER_BLUE;
-            } else if (ver == 1) {
+            } else if (ver == 1)
+            {
                 return PLAYER_ORANGE;
-            } else {
+            } else
+            {
                 return SWAMP_GREEN;
             }
 
         case 6:             //0110
-            if (ver == 0) {
+            if (ver == 0)
+            {
                 return PLAYER_LIGHT_BLUE;
-            } else if (ver == 1) {
+            } else if (ver == 1)
+            {
                 return PLAYER_YELLOW;
-            } else {
+            } else
+            {
                 return SWAMP_GREEN;
             }
 
@@ -624,9 +695,11 @@ uint16_t getColor(uint8_t Color, uint8_t ver) {
             return INTER_GOLD;
 
         case 10:            //1010
-            if (ver == 0) {
+            if (ver == 0)
+            {
                 return INTER_PURPLE;
-            } else {
+            } else
+            {
                 return INTER_YELLOW;
             }
 

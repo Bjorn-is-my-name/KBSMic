@@ -5,6 +5,8 @@
 #include "Player1.c"
 #include "Player2.c"
 
+#include "EEPROM.c"
+
 #include "Button.c"
 #include "WaterBlue.c"
 #include "DoorCorner.c"
@@ -23,7 +25,7 @@
 
 void init_timer0();
 
-void CheckWallCollision();
+void checkWallCollision();
 
 void setFreq(uint8_t);
 
@@ -219,12 +221,9 @@ ISR(PCINT2_vect)
                 receivedData >>= 9;
                 player2.yOld = player2.y;
                 player2.y = (receivedData & 0xFF);
-                Serial.println(player2.y);
-
             }
         }
     }
-
     startMs = currentMs; // Save the time from startup to now
 }
 
@@ -290,7 +289,7 @@ int main(void)
     sei();
 
     // Start the screen and send startup commands
-    START_UP();
+    init_LCD();
 
     // Check nunckuk connection
     while (!startNunchuk(NUNCHUK_ADDRESS))
@@ -298,8 +297,6 @@ int main(void)
         fillRect(0, 0, 320, 240, PLAYER_RED);
     }
 
-
-    Serial.begin(9600);
 
     drawBackground();
     drawInteractables();
@@ -317,7 +314,6 @@ int main(void)
                 //Game code
                 update();
                 draw();
-
             }
         }
     }
@@ -386,7 +382,7 @@ void update()
     else if (state.joy_x_axis < 100 && player1.x > 0)
         player1.x -= 2;
 
-    CheckWallCollision();
+    checkWallCollision();
 
     //Jumping and falling mechanics
     if (state.c_button == 1 && !player1.jumping)
@@ -396,13 +392,12 @@ void update()
     }
 }
 
-void CheckWallCollision()
+void checkWallCollision()
 {
     for (auto &wall: walls)
     {
         // Check if the player is colliding with the wall.
-        if (player1.x + PLAYER_ACTUAL_WIDTH > wall.x && player1.x < wall.x + (wall.width * 2) &&
-            player1.y + PLAYER_HEIGHT > wall.y && player1.y < wall.y + wall.height)
+        if (player1.x + PLAYER_ACTUAL_WIDTH > wall.x && player1.x < wall.x + (wall.width * 2) && player1.y + PLAYER_HEIGHT > wall.y && player1.y < wall.y + wall.height)
         {
             // Check if the player is colliding with the wall from the top
             if (player1.yOld + PLAYER_HEIGHT <= wall.y)
@@ -410,24 +405,20 @@ void CheckWallCollision()
                 player1.y = wall.y - PLAYER_HEIGHT;
                 player1.yVelocity = 0;
                 player1.jumping = false;
-            } else if (player1.yOld >=
-                       wall.y + wall.height)
+            } else if (player1.yOld >= wall.y + wall.height)
             { // Check if the player is colliding with the wall from the bottom
                 player1.y = wall.y + wall.height;
                 player1.yVelocity = 0;
-            } else if (player1.xOld + PLAYER_ACTUAL_WIDTH <=
-                       wall.x)
+            } else if (player1.xOld + PLAYER_ACTUAL_WIDTH <= wall.x)
             { // Check if the player is colliding with the wall from the left
                 player1.x = wall.x - PLAYER_ACTUAL_WIDTH;
-            } else if (player1.xOld >=
-                       wall.x + (wall.width * 2))
+            } else if (player1.xOld >= wall.x + (wall.width * 2))
             { // Check if the player is colliding with the wall from the right
                 player1.x = wall.x + (wall.width * 2);
             }
         }
     }
 }
-
 
 void draw()
 {
@@ -702,7 +693,6 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
             {
                 return INTER_YELLOW;
             }
-
         case 11:            //1011
 
         case 12:            //1100

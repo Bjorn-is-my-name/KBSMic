@@ -59,7 +59,7 @@ void SPI_WRITE_COMMAND(uint8_t);
 
 void SEND_COMMAND_WITH_ARGUMENTS(uint8_t, uint8_t *, uint8_t);
 
-void START_UP();
+void init_LCD();
 
 void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color);
 
@@ -182,7 +182,7 @@ void SEND_COMMAND_WITH_ARGUMENTS(uint8_t cmd, uint8_t *args, uint8_t len) {
     SPI_CS_HIGH();
 }
 
-void START_UP() {
+void init_LCD() {
     SPI_CS_LOW();
     SPI_WRITE_COMMAND(SOFTWARE_RESET);
     SPI_CS_HIGH();

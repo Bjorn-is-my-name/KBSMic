@@ -1,0 +1,381 @@
+Index: src/main.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#include <avr/io.h>\r\n#include <avr/interrupt.h>\r\n#include <Wire.h>\r\n#include \"LCD.cpp\"\r\n#include \"Player1.c\"\r\n#include \"Player2.c\"\r\n#include \"Background.c\"\r\n#include \"Nunchuk.cpp\"\r\n\r\n\r\nvoid init_timer0();\r\n\r\nvoid setFreq(uint8_t);\r\n\r\nvoid drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);\r\n\r\nvoid drawBackground();\r\n\r\nvoid drawBackground_jan();\r\n\r\n\r\nvoid buffer(uint16_t, uint8_t, uint16_t *, uint16_t *);\r\n\r\nuint16_t getColor(uint8_t);\r\n\r\nvoid update();\r\n\r\nvoid draw();\r\n\r\n\r\n#define NUNCHUK_ADDRESS 0x52\r\n\r\n#define IR_38KHZ 52\r\n#define IR_56KHZ 35\r\n\r\n#define SCREEN_WIDTH 320\r\n#define SCREEN_HEIGHT 240\r\n\r\n#define PLAYER_WIDTH 16\r\n#define PLAYER_HEIGHT 20\r\n\r\n#define SENDINGDATA_LEN 9\r\n#define SENDINGBIT_START_VALUE (- 2)\r\n\r\n#define STARTBIT_VALUE (-1)\r\n#define STARTBIT_MIN 3\r\n#define STARTBIT_MAX 6\r\n\r\n#define ZERO_MAX 2\r\n#define ONE_MIN 1\r\n#define ONE_MAX 4\r\n\r\n#define INITIAL_Y_VEL 10\r\n#define FRAME_TIME 32 //(1000/30FPS)-1 == 32\r\n\r\n#define BG_SPRITE_AMOUNT 192\r\n#define BG_SPRITE_SIZE 20\r\n\r\nstruct {\r\npublic:\r\n    uint16_t x = 0;\r\n    uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;\r\n    uint16_t xOld = 0;\r\n    uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;\r\n    int8_t yVelocity = 0;\r\n    bool jumping = false;\r\n} player1;\r\n\r\nstruct {\r\npublic:\r\n    uint16_t x = 0;\r\n    uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;\r\n    uint16_t xOld = 0;\r\n    uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;\r\n//    uint8_t animation = 0;\r\n} player2;\r\n\r\n// Check to see if the current bit is done sending\r\nbool dataIsSend = false;\r\n// Data to send over IR\r\nuint16_t sendingData = 0;\r\n// The data bit to send;\r\nint8_t sendingBit = SENDINGBIT_START_VALUE;\r\nuint16_t onTime = 0;\r\nvolatile unsigned long currentMs = 0;\r\nvolatile unsigned char intCurrentMs = 0;\r\n\r\nuint8_t msTime;\r\nuint16_t startTime;\r\nuint8_t zeroTime;\r\nuint8_t oneTime;\r\nuint8_t offTime;\r\n\r\nunsigned long startMs = 0;\r\nbool startBitReceived = false;\r\nuint16_t receivedData = 0;\r\nuint8_t bitCounter = 0;\r\nbool isDataBit = false;\r\n\r\nISR(PCINT2_vect) {\r\n    isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)\r\n\r\n    if (isDataBit) {\r\n        uint8_t difference = currentMs - startMs; // Calculate the length to determine the value\r\n\r\n        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if it's a start bit\r\n        {\r\n            startBitReceived = true;\r\n            bitCounter = 0;\r\n        }\r\n\r\n        if (startBitReceived) // If the start bit has been sent, check what the data is\r\n        {\r\n            if (difference < ZERO_MAX) // Check if it's a zero\r\n                receivedData &= ~(1 << bitCounter++);\r\n            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if it's a one\r\n                receivedData |= (1 << bitCounter++);\r\n\r\n            if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable\r\n            {\r\n                startBitReceived = false;\r\n                player2.x = receivedData;\r\n            }\r\n        }\r\n    }\r\n\r\n    startMs = currentMs; // Save the time from startup to now\r\n}\r\n\r\nISR(TIMER0_COMPA_vect) // Toggle IR light\r\n{\r\n    static uint16_t counter = 0;\r\n    static uint8_t msCounter = 0;\r\n\r\n    if (++msCounter > msTime) {\r\n        currentMs++;\r\n        intCurrentMs++;\r\n        msCounter = 0;\r\n    }\r\n\r\n    if (++counter > onTime) {\r\n        if (dataIsSend) // If the bit is done sending, wait before sending the next bit\r\n        {\r\n            onTime = offTime;        // Time after which to continue to the next bit\r\n            TCCR0A |= (1 << COM0A1); // Disable TC0\r\n        } else // If the waiting time is passed, send the next bit\r\n        {\r\n            if (sendingBit++ < SENDINGDATA_LEN) {\r\n                if (sendingBit == STARTBIT_VALUE) // Send start bit\r\n                    onTime = startTime;\r\n                else                                                                 // Send data\r\n                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime\r\n                                                               : zeroTime; // Set the time corresponding to the bit\r\n\r\n                TCCR0A &= ~(1 << COM0A1); // Enable TC0\r\n            } else {\r\n                sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run\r\n                sendingData = player1.x;\r\n            }\r\n        }\r\n\r\n        dataIsSend = !dataIsSend; // Flip between sending a bit and waiting\r\n        counter = 0;\r\n    }\r\n}\r\n\r\nint main(void) {\r\n    // Setup IR sending\r\n    DDRD |= (1 << DDD6);\r\n    init_timer0();\r\n\r\n    // Setup IR receiving\r\n    PORTD |= (1 << PORTD2); //pull up\r\n    PCICR |= (1 << PCIE2);\r\n    PCMSK2 |= (1 << PCINT18);\r\n\r\n    setFreq(IR_38KHZ);\r\n\r\n    // Setup screen\r\n    Wire.begin();\r\n    setupSPI();\r\n    sei();\r\n    START_UP();\r\n\r\n    // Check nunchuk connection\r\n    while (!startNunchuk(NUNCHUK_ADDRESS)) {\r\n        fillRect(0, 0, 320, 240, ILI9341_RED);\r\n    }\r\n\r\n    //Draws the background \uD83D\uDE2E\r\n    drawBackground();\r\n    volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen\r\n    while (true) {\r\n        if (intCurrentMs > FRAME_TIME) { //30 FPS\r\n            intCurrentMs = 0;\r\n            update();\r\n            draw();\r\n            frameCounter++;\r\n        }\r\n    }\r\n    return (0);\r\n}\r\n\r\nvoid init_timer0() {\r\n    /*\r\n    Fast-PWM mode (TOP = OCRA) -> WGM0[2:0] = 0b111\r\n    Set on compare match and clear on bottom (effectively pulling OC0A low) -> COM0A[1:0] = 0b11\r\n    Prescale /8 -> CS0[2:0] = 0b010\r\n    */\r\n    TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);\r\n    TCCR0B |= (1 << WGM02) | (1 << CS01);\r\n\r\n    // Enable interrupts on compare match\r\n    TIMSK0 |= (1 << OCIE0A);\r\n}\r\n\r\nvoid setFreq(uint8_t freq) {\r\n    OCR0A = freq;\r\n\r\n    if (freq == IR_38KHZ) {\r\n        msTime = 37;\r\n        startTime = 189;\r\n        zeroTime = 37;\r\n        oneTime = 113;\r\n        offTime = 37;\r\n    } else {\r\n        msTime = 55;\r\n        startTime = 279;\r\n        zeroTime = 55;\r\n        oneTime = 167;\r\n        offTime = 55;\r\n    }\r\n}\r\n\r\n\r\nvoid update() {\r\n    player1.xOld = player1.x;\r\n    player1.yOld = player1.y;\r\n\r\n    // Get the nunchuk input data\r\n    if (!getState(NUNCHUK_ADDRESS))\r\n        return;\r\n\r\n    // Check for movement to right (only move when not against the wall)\r\n    if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH < SCREEN_WIDTH)\r\n        player1.x += 2;\r\n\r\n        // Check for movement to left (only move when not against the wall)\r\n    else if (state.joy_x_axis < 100 && player1.x > 0)\r\n        player1.x -= 2;\r\n\r\n    // If jumping, lower the velocity until it hits the max (negative) velocity\r\n    if (player1.jumping) {\r\n        player1.y -= player1.yVelocity;\r\n\r\n        if (player1.yVelocity > -INITIAL_Y_VEL)\r\n            player1.yVelocity--;\r\n    }\r\n\r\n    // If the player is back on the ground, stop jumping\r\n    if (player1.y == SCREEN_HEIGHT - PLAYER_HEIGHT) {\r\n        player1.jumping = false;\r\n        player1.yVelocity = 0;\r\n    }\r\n\r\n    // Set the player to jump when the nunchuk movement is high enough and not jumping already\r\n    if (state.accel_z_axis < 0xFF && !player1.jumping) {\r\n        player1.jumping = true;\r\n        player1.yVelocity = INITIAL_Y_VEL;\r\n    }\r\n}\r\n\r\nvoid draw() {\r\n    drawSprite(player1.x, player1.y, 16, 20, Player1);\r\n    drawSprite(player2.x, player2.y, 16, 20, Player2);\r\n}\r\n\r\nvoid drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t *Sprite) {\r\n    for (uint16_t PixGroup = 0; PixGroup < (w / 2) * h; PixGroup++) {\r\n        if (PixGroup % (w / 2) == 0 && PixGroup != 0) {\r\n            x -= w;\r\n            y++;\r\n        }\r\n        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {\r\n            if (Pixel == 0) {\r\n                if (getColor((Sprite[PixGroup] & 0xF0) >> 4) != 255) {\r\n                    drawPixel(x, y, getColor((Sprite[PixGroup] & 0xF0) >> 4));\r\n                }\r\n            } else {\r\n                if (getColor((Sprite[PixGroup] & 0x0F)) != 255) {\r\n                    drawPixel(x, y, getColor(Sprite[PixGroup] & 0x0F));\r\n                }\r\n            }\r\n            x++;\r\n        }\r\n    }\r\n}\r\n\r\nvoid drawBackground() {\r\n    for (uint8_t x = 0; x < 12; x++) {\r\n        for (int y = 0; y < 16; ++y) {\r\n            drawSprite(y * BG_SPRITE_SIZE, x * BG_SPRITE_SIZE, BG_SPRITE_SIZE, BG_SPRITE_SIZE, Background);\r\n        }\r\n    }\r\n}\r\n\r\nvoid buffer(/*OldPos, NewPos, UsedSprite*/) {\r\n    //fix dan jan ❤️\r\n}\r\n\r\nuint16_t getColor(uint8_t Color) {\r\n    switch (Color) {\r\n        case 0:\r\n            return ILI9341_RED;\r\n        case 1:\r\n            return ILI9341_BLACK;\r\n        case 2:\r\n            return ILI9341_GREEN;\r\n        case 3:\r\n            return ILI9341_OLIVE;\r\n        case 4:\r\n            return ILI9341_ORANGE;\r\n        case 5:\r\n            return ILI9341_YELLOW;\r\n        case 6:\r\n            return ILI9341_LIGHTGREY;\r\n        case 7:\r\n            return ILI9341_DARKGREY;\r\n        case 8:\r\n            return ILI9341_BLUE;\r\n        case 9:\r\n            return ILI9341_CYAN;\r\n        case 10:\r\n            return ILI9341_WHITE;\r\n        case 11:\r\n            return ILI9341_BACKGROUND_DARK;\r\n        case 12:\r\n            return ILI9341_BACKGROUND_LIGHT;\r\n        case 13:\r\n            // return ILI9341_---;\r\n            return 255;\r\n        case 14:\r\n            // return ILI9341_---;\r\n            return 255;\r\n        case 15:\r\n            return 255;\r\n        default:\r\n            return 255;\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main.cpp b/src/main.cpp
+--- a/src/main.cpp	
++++ b/src/main.cpp	
+@@ -7,26 +7,19 @@
+ #include "Background.c"
+ #include "Nunchuk.cpp"
+ 
+-
+ void init_timer0();
+-
+ void setFreq(uint8_t);
+ 
+-void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
+-
++void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *Sprite);
++void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *);
+ void drawBackground();
+-
+-void drawBackground_jan();
+-
+-
+-void buffer(uint16_t, uint8_t, uint16_t *, uint16_t *);
+-
+ uint16_t getColor(uint8_t);
+ 
+ void update();
+-
+ void draw();
+ 
++#define TFT_CS 10
++#define TFT_DC 9
+ 
+ #define NUNCHUK_ADDRESS 0x52
+ 
+@@ -36,25 +29,27 @@
+ #define SCREEN_WIDTH 320
+ #define SCREEN_HEIGHT 240
+ 
+-#define PLAYER_WIDTH 16
++#define PLAYER_WIDTH 8
++#define PLAYER_ACTUAL_WIDTH 16
+ #define PLAYER_HEIGHT 20
+ 
+ #define SENDINGDATA_LEN 9
+-#define SENDINGBIT_START_VALUE (- 2)
++#define SENDINGBIT_START_VALUE - 2
+ 
+-#define STARTBIT_VALUE (-1)
++#define STARTBIT_VALUE -1
+ #define STARTBIT_MIN 3
+ #define STARTBIT_MAX 6
+-
+ #define ZERO_MAX 2
+ #define ONE_MIN 1
+ #define ONE_MAX 4
+ 
+-#define INITIAL_Y_VEL 10
+-#define FRAME_TIME 32 //(1000/30FPS)-1 == 32
++#define INITIAL_Y_VEL 8
++#define FRAME_TIME 32 //(1000/30FPS)-1 = 32
+ 
+ #define BG_SPRITE_AMOUNT 192
+-#define BG_SPRITE_SIZE 20
++#define BG_SPRITE_WIDTH 10
++#define BG_SPRITE_ACTUAL_WIDTH 20
++#define BG_SPRITE_HEIGHT 20
+ 
+ struct {
+ public:
+@@ -72,7 +67,7 @@
+     uint8_t y = SCREEN_HEIGHT - PLAYER_HEIGHT;
+     uint16_t xOld = 0;
+     uint8_t yOld = SCREEN_HEIGHT - PLAYER_HEIGHT;
+-//    uint8_t animation = 0;
++//    uint8_t animation
+ } player2;
+ 
+ // Check to see if the current bit is done sending
+@@ -82,8 +77,8 @@
+ // The data bit to send;
+ int8_t sendingBit = SENDINGBIT_START_VALUE;
+ uint16_t onTime = 0;
+-volatile unsigned long currentMs = 0;
+-volatile unsigned char intCurrentMs = 0;
++volatile uint32_t currentMs = 0;
++volatile uint8_t intCurrentMs = 0;
+ 
+ uint8_t msTime;
+ uint16_t startTime;
+@@ -91,7 +86,7 @@
+ uint8_t oneTime;
+ uint8_t offTime;
+ 
+-unsigned long startMs = 0;
++uint32_t startMs = 0;
+ bool startBitReceived = false;
+ uint16_t receivedData = 0;
+ uint8_t bitCounter = 0;
+@@ -101,19 +96,19 @@
+     isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)
+ 
+     if (isDataBit) {
+-        uint8_t difference = currentMs - startMs; // Calculate the length to determine the value
++        uint8_t difference = currentMs - startMs; // Calculate the length to determin the value
+ 
+-        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if it's a start bit
++        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX) // Check if its a start bit
+         {
+             startBitReceived = true;
+             bitCounter = 0;
+         }
+ 
+-        if (startBitReceived) // If the start bit has been sent, check what the data is
++        if (startBitReceived) // If the start bit has been send, check what the data is
+         {
+-            if (difference < ZERO_MAX) // Check if it's a zero
++            if (difference < ZERO_MAX) // Check if its a zero
+                 receivedData &= ~(1 << bitCounter++);
+-            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if it's a one
++            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if its a one
+                 receivedData |= (1 << bitCounter++);
+ 
+             if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
+@@ -152,7 +147,7 @@
+                     onTime = ((sendingData >> sendingBit) & 1) ? oneTime
+                                                                : zeroTime; // Set the time corresponding to the bit
+ 
+-                TCCR0A &= ~(1 << COM0A1); // Enable TC0
++                TCCR0A &= ~(1 << COM0A1); // Enabe TC0
+             } else {
+                 sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
+                 sendingData = player1.x;
+@@ -169,7 +164,7 @@
+     DDRD |= (1 << DDD6);
+     init_timer0();
+ 
+-    // Setup IR receiving
++    // Setup IR recieving
+     PORTD |= (1 << PORTD2); //pull up
+     PCICR |= (1 << PCIE2);
+     PCMSK2 |= (1 << PCINT18);
+@@ -179,18 +174,23 @@
+     // Setup screen
+     Wire.begin();
+     setupSPI();
++
+     sei();
++
++    // Start the screen and send startup commands
+     START_UP();
+ 
+-    // Check nunchuk connection
++
++
++    // Check nunckuk connection
+     while (!startNunchuk(NUNCHUK_ADDRESS)) {
+         fillRect(0, 0, 320, 240, ILI9341_RED);
+     }
+ 
+-    //Draws the background 😮
+     drawBackground();
+     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
+-    while (true) {
++
++    while (1) {
+         if (intCurrentMs > FRAME_TIME) { //30 FPS
+             intCurrentMs = 0;
+             update();
+@@ -210,7 +210,7 @@
+     TCCR0A |= (1 << COM0A0) | (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
+     TCCR0B |= (1 << WGM02) | (1 << CS01);
+ 
+-    // Enable interrupts on compare match
++    // Enable interupts on compare match
+     TIMSK0 |= (1 << OCIE0A);
+ }
+ 
+@@ -237,12 +237,12 @@
+     player1.xOld = player1.x;
+     player1.yOld = player1.y;
+ 
+-    // Get the nunchuk input data
++    // Get the nunchuck input data
+     if (!getState(NUNCHUK_ADDRESS))
+         return;
+ 
+     // Check for movement to right (only move when not against the wall)
+-    if (state.joy_x_axis > 140 && player1.x + PLAYER_WIDTH < SCREEN_WIDTH)
++    if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
+         player1.x += 2;
+ 
+         // Check for movement to left (only move when not against the wall)
+@@ -263,7 +263,7 @@
+         player1.yVelocity = 0;
+     }
+ 
+-    // Set the player to jump when the nunchuk movement is high enough and not jumping already
++    // Set the player to jump when the nunchuck movement is high enough and not jumping already
+     if (state.accel_z_axis < 0xFF && !player1.jumping) {
+         player1.jumping = true;
+         player1.yVelocity = INITIAL_Y_VEL;
+@@ -271,42 +271,61 @@
+ }
+ 
+ void draw() {
+-    drawSprite(player1.x, player1.y, 16, 20, Player1);
+-    drawSprite(player2.x, player2.y, 16, 20, Player2);
++    clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
++    drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
++
++    clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
++    drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+ }
+ 
+-void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, const uint8_t *Sprite) {
+-    for (uint16_t PixGroup = 0; PixGroup < (w / 2) * h; PixGroup++) {
+-        if (PixGroup % (w / 2) == 0 && PixGroup != 0) {
+-            x -= w;
++void clearSprite(uint16_t x, uint8_t y, uint16_t xOud, uint8_t yOud, uint8_t w, uint8_t h, uint8_t *Sprite)
++{
++    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
++    {
++        if (PixGroup % w == 0 && PixGroup != 0)
++        {
++            xOud -= w * 2;
++            yOud++;
++        }
++        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
++        {
++            uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
++
++            if (color != 255 && !(xOud >= x && xOud <= x + w * 2 - 1 && yOud >= y && yOud <= y + h - 1))
++            {
++                drawPixel(xOud, yOud, getColor((Background[xOud % BG_SPRITE_ACTUAL_WIDTH / 2 + yOud % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
++            }
++
++            xOud++;
++        }
++    }
++}
++
++void drawSprite(uint16_t x, uint8_t y, const uint8_t w, const uint8_t h, uint8_t *Sprite) {
++    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
++    {
++        if (PixGroup % w == 0 && PixGroup != 0)
++        {
++            x -= w * 2;
+             y++;
+         }
+-        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
+-            if (Pixel == 0) {
+-                if (getColor((Sprite[PixGroup] & 0xF0) >> 4) != 255) {
+-                    drawPixel(x, y, getColor((Sprite[PixGroup] & 0xF0) >> 4));
+-                }
+-            } else {
+-                if (getColor((Sprite[PixGroup] & 0x0F)) != 255) {
+-                    drawPixel(x, y, getColor(Sprite[PixGroup] & 0x0F));
+-                }
+-            }
++        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
++        {
++            uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
++            drawPixel(x, y, (color == 255) ? getColor((Background[x % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)) : color);
++
+             x++;
+         }
+     }
+ }
+ 
+ void drawBackground() {
+-    for (uint8_t x = 0; x < 12; x++) {
+-        for (int y = 0; y < 16; ++y) {
+-            drawSprite(y * BG_SPRITE_SIZE, x * BG_SPRITE_SIZE, BG_SPRITE_SIZE, BG_SPRITE_SIZE, Background);
++    for (uint8_t y = 0; y < 12; y++) {
++        for (uint8_t x = 0; x < 16; x++) {
++            drawSprite(x * BG_SPRITE_ACTUAL_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT, Background);
+         }
+     }
+ }
+-
+-void buffer(/*OldPos, NewPos, UsedSprite*/) {
+-    //fix dan jan ❤️
+-}
+ 
+ uint16_t getColor(uint8_t Color) {
+     switch (Color) {
+Index: include/optimized_wire.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/include/optimized_wire.cpp b/include/optimized_wire.cpp
+new file mode 100644
+--- /dev/null	
++++ b/include/optimized_wire.cpp	
+@@ -0,0 +1,37 @@
++void begin(void)
++{
++    rxBufferIndex = 0;
++    rxBufferLength = 0;
++
++    txBufferIndex = 0;
++    txBufferLength = 0;
++
++    twi_init();
++    twi_attachSlaveTxEvent(onRequestService); // default callback must exist
++    twi_attachSlaveRxEvent(onReceiveService); // default callback must exist
++}
++
++void twi_init(void)
++{
++    // initialize state
++    twi_state = TWI_READY;
++    twi_sendStop = true;		// default value
++    twi_inRepStart = false;
++
++    // activate internal pullups for twi.
++    digitalWrite(SDA, 1);
++    digitalWrite(SCL, 1);
++
++    // initialize twi prescaler and bit rate
++    cbi(TWSR, TWPS0);
++    cbi(TWSR, TWPS1);
++    TWBR = ((F_CPU / TWI_FREQ) - 16) / 2;
++
++    /* twi bit rate formula from atmega128 manual pg 204
++    SCL Frequency = CPU Clock Frequency / (16 + (2 * TWBR))
++    note: TWBR should be 10 or higher for master mode
++    It is 72 for a 16mhz Wiring board with 100kHz TWI */
++
++    // enable twi module, acks, and twi interrupt
++    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
++}
+\ No newline at end of file
+Index: cmake-build-uno/.ninja_log
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># ninja log v5\r\n0\t5990\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n2\t368\t6921085977359129\tbuild.ninja\tdb9e8402c5a57b03\r\n1\t2928\t0\tCMakeFiles/Debug\teb42534a060928fd\r\n0\t5990\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2928\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Debug\teb42534a060928fd\r\n1\t4593\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t4593\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t3328\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t3328\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t4486\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t4486\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t3642\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t3642\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t4275\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t4275\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t3078\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t3078\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t1814\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t1814\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2528\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2528\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2496\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2496\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2268\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2268\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2577\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2577\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2552\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2552\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2318\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2318\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2091\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2091\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2029\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2029\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2017\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2017\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2048\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2048\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2815\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2815\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2672\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2672\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2697\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2697\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2115\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2115\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t1842\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t1842\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t1462\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t1462\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2648\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2648\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2858\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2858\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2832\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2832\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2963\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2963\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2831\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n0\t2831\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2102\t0\tCMakeFiles/Production\td99f53f2f0e126b2\r\n1\t2102\t0\tC:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production\td99f53f2f0e126b2\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/cmake-build-uno/.ninja_log b/cmake-build-uno/.ninja_log
+--- a/cmake-build-uno/.ninja_log	
++++ b/cmake-build-uno/.ninja_log	
+@@ -62,3 +62,13 @@
+ 0	2831	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+ 1	2102	0	CMakeFiles/Production	d99f53f2f0e126b2
+ 1	2102	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
++0	4343	0	CMakeFiles/Production	d99f53f2f0e126b2
++0	4343	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
++1	2340	0	CMakeFiles/Production	d99f53f2f0e126b2
++1	2340	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
++0	3229	0	CMakeFiles/Production	d99f53f2f0e126b2
++0	3229	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
++0	1986	0	CMakeFiles/Production	d99f53f2f0e126b2
++0	1986	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
++1	3889	0	CMakeFiles/Production	d99f53f2f0e126b2
++1	3889	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+Index: cmake-build-uno/Testing/Temporary/LastTest.log
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>Start testing: Dec 07 12:19 West-Europa (standaardtijd)\r\n----------------------------------------------------------\r\nEnd testing: Dec 07 12:19 West-Europa (standaardtijd)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/cmake-build-uno/Testing/Temporary/LastTest.log b/cmake-build-uno/Testing/Temporary/LastTest.log
+--- a/cmake-build-uno/Testing/Temporary/LastTest.log	
++++ b/cmake-build-uno/Testing/Temporary/LastTest.log	
+@@ -1,3 +1,3 @@
+-Start testing: Dec 07 12:19 West-Europa (standaardtijd)
++Start testing: Dec 13 09:32 West-Europa (standaardtijd)
+ ----------------------------------------------------------
+-End testing: Dec 07 12:19 West-Europa (standaardtijd)
++End testing: Dec 13 09:32 West-Europa (standaardtijd)

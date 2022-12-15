@@ -1,0 +1,13 @@
+Index: .pio/build/project.checksum
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>49bff35fb08eef5a40666ac5d04678e4988091d1
+===================================================================
+diff --git a/.pio/build/project.checksum b/.pio/build/project.checksum
+--- a/.pio/build/project.checksum	
++++ b/.pio/build/project.checksum	
+@@ -1,1 +1,1 @@
+-49bff35fb08eef5a40666ac5d04678e4988091d1
+\ No newline at end of file
++6f0fb934a27974b983e1e6c1b70233fd3368137f
+\ No newline at end of file

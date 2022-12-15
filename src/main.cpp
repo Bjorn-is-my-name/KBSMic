@@ -1,7 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
-
 #include "LCD.cpp"
 #include "Player1.c"
 #include "Player2.c"
@@ -34,11 +33,11 @@ void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const u
 
 bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
 
-bool rectangleCollision(uint16_t, uint8_t, Rect);
+bool rectangleCollision(uint16_t playerX, uint8_t playerY, Rect wall)
 
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
 
-void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
+void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
 
 void drawBackground();
 
@@ -472,7 +471,7 @@ bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t
 
 bool rectangleCollision(uint16_t playerX, uint8_t playerY, Rect wall)
 {
-    return playerX + PLAYER_ACTUAL_WIDTH > wall.x && playerX < wall.x + (wall.width * 2) && playerY + PLAYER_HEIGHT > wall.y && playerY < wall.y + wall.height;
+    playerX + PLAYER_ACTUAL_WIDTH > wall.x && playerX < wall.x + (wall.width * 2) && playerY + PLAYER_HEIGHT > wall.y && playerY < wall.y + wall.height
 }
 
 void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver)

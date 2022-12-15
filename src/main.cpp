@@ -442,6 +442,65 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
     }
 }
 
+void drawInteractables()
+{
+    drawSprite(210, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+    drawSpriteMirror(210 + BUTTON_WIDTH * 2, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 1
+    drawSprite(230, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+    drawSpriteMirror(230 + BUTTON_WIDTH * 2, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 2
+
+    drawSprite(150, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue);
+    drawSpriteMirror(150 + WATER_WIDTH * 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue); // water
+    drawSprite(215, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1);
+    drawSpriteMirror(215 + WATER_WIDTH * 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1); // lava
+    drawSprite(189, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 2);
+    drawSpriteMirror(189 + WATER_WIDTH * 2, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 2); // shrek-cum
+
+    drawSprite(55, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
+    drawSpriteMirror(55 + DOOR_WIDTH * 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2); // DoorTop left
+    drawSprite(55, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
+    drawSpriteMirror(55 + DOOR_WIDTH * 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2); // DoorFrame left
+    drawSprite(55, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
+    drawSpriteMirror(55 + DOOR_WIDTH * 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2); // DoorFrame left
+
+    drawSprite(80, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
+    drawSpriteMirror(80 + DOOR_WIDTH * 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2); // DoorTop right
+    drawSprite(80, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
+    drawSpriteMirror(80 + DOOR_WIDTH * 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2); // DoorFrame right
+    drawSprite(80, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
+    drawSpriteMirror(80 + DOOR_WIDTH * 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2); // DoorFrame right
+
+    drawSprite(61, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue);
+    drawSpriteMirror(61 + SIGN_WIDTH * 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue); // Blue sign
+    drawSprite(86, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);
+    drawSpriteMirror(86 + SIGN_WIDTH * 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed); // Red sign
+
+    drawSprite(280, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge);
+    drawSprite(280 + PLATFORM_WIDTH * 2, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle);
+    drawSpriteMirror(280 + PLATFORM_WIDTH * 4, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge); // Platform 1
+
+    drawSprite(10, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, 1);
+    drawSprite(10 + PLATFORM_WIDTH * 2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, 1);
+    drawSpriteMirror(10 + PLATFORM_WIDTH * 4, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, 1); // Platform 2
+
+    drawSprite(12, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
+    drawSpriteMirror(12 + DIA_WIDTH * 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue); // Dia Blue 1
+
+    drawSprite(164, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
+    drawSpriteMirror(164 + DIA_WIDTH * 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue); // DiaBlue 2
+
+    drawSprite(26, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);
+    drawSpriteMirror(26 + DIA_WIDTH * 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1); // DiaRed 1
+
+    drawSprite(229, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);
+    drawSpriteMirror(229 + DIA_WIDTH * 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1); // DiaRed 2
+
+    drawSprite(86, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1);
+    drawSpriteMirror(86 + LEVER_BASE_WIDTH * 2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1); // LeverBase
+
+    drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, 1); // LeverTop
+}
+
 uint16_t getColor(uint8_t Color) {
     switch (Color) {
         case 0:             //0000

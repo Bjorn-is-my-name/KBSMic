@@ -6,6 +6,8 @@
 #include "Player2.c"
 
 #include "EEPROM.c"
+#include "Adafruit_STMPE610.h"
+#include "Adafruit_STMPE610.cpp"
 
 #include "Button.c"
 #include "WaterBlue.c"
@@ -37,7 +39,7 @@ bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
 
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
 
-void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
+void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
 
 void drawBackground();
 
@@ -163,6 +165,9 @@ Interactables Interactable[] = {
 };
 
 
+Adafruit_STMPE610 touch = Adafruit_STMPE610(8);
+
+
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
 // Data to send over IR
@@ -189,7 +194,7 @@ enum gameState
 {
     MENU, GAME, LEVELSELECT
 };
-gameState currentGameState = GAME;
+gameState currentGameState = MENU;
 
 ISR(PCINT2_vect)
 {
@@ -291,15 +296,45 @@ int main(void)
     // Start the screen and send startup commands
     init_LCD();
 
+
+    //Start touch
+//    if (!touch.begin())
+//    {
+//        fillRect(0, 0, 320, 240, PLAYER_LIGHT_BLUE);
+//        while (true)
+//        {
+//            Serial.println("hahah broekoe");
+//        }
+//    }
     // Check nunckuk connection
     while (!startNunchuk(NUNCHUK_ADDRESS))
     {
-        fillRect(0, 0, 320, 240, PLAYER_RED);
+        drawString("Nunchuk", 60, 80, 5, PLAYER_RED);
+        drawString("not", 60, 120, 5, PLAYER_RED);
+        drawString("found", 60, 160, 5, PLAYER_RED);
+
+        drawString("Nunchuk", 60, 80, 5, PLAYER_YELLOW);
+        drawString("not", 60, 120, 5, PLAYER_YELLOW);
+        drawString("found", 60, 160, 5, PLAYER_YELLOW);
     }
 
+    if (currentGameState == GAME)
+    {
+        drawBackground();
+        drawInteractables();
+    }
 
-    drawBackground();
-    drawInteractables();
+    if (currentGameState == MENU)
+    {
+        fillRect(0, 0, 320, 240, 0x0);
+        drawBorder(120, 60, 90, 50, 5, 0xFFFF);
+        drawString("Play", 120, 60, 4, PLAYER_RED);
+        drawString("Settings", 80, 140, 4, PLAYER_RED);
+
+        drawBackground();
+        drawInteractables();
+    }
+
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
 
     while (true)
@@ -312,6 +347,13 @@ int main(void)
             if (currentGameState == GAME)
             {
                 //Game code
+                update();
+                draw();
+            }
+            if (currentGameState == MENU)
+            {
+                //Menu code
+
                 update();
                 draw();
             }
@@ -500,7 +542,7 @@ void drawBackground()
     }
 }
 
-void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite, uint8_t ver)
+void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver)
 {
     uint8_t Mirr = w - 1;
     for (uint16_t PixGroup = 0; PixGroup <= w * h; PixGroup++)

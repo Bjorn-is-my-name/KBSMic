@@ -19,7 +19,7 @@ char btoa[] = {'0', '1', '2', '3', '4', '5', '6', '7',
 
 struct ncState {
     uint8_t joy_x_axis;
-//    uint8_t joy_y_axis;
+    uint8_t joy_y_axis;
 //    uint16_t accel_x_axis;
 //    uint16_t accel_y_axis;
     uint16_t accel_z_axis;
@@ -63,7 +63,7 @@ bool getState(uint8_t address) {
 
     // set parameters
     state.joy_x_axis = nunchuck_buffer[0];
-//    state.joy_y_axis = nunchuck_buffer[1];
+    state.joy_y_axis = nunchuck_buffer[1];
 //    state.accel_x_axis = (nunchuck_buffer[2] << 2) | ((nunchuck_buffer[5] & 0x0C) >> 2);
 //    state.accel_y_axis = (nunchuck_buffer[3] << 2) | ((nunchuck_buffer[5] & 0x30) >> 4);
     state.accel_z_axis = (nunchuck_buffer[4] << 2) | ((nunchuck_buffer[5] & 0xC0) >> 6);

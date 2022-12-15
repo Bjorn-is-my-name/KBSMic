@@ -1,43 +1,21 @@
 # ninja log v5
-0	3279	0	CMakeFiles/Production	d99f53f2f0e126b2
+0	2205	0	CMakeFiles/Production	d99f53f2f0e126b2
 2	368	6926237651229376	build.ninja	db9e8402c5a57b03
 1	2928	0	CMakeFiles/Debug	eb42534a060928fd
-0	3279	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	2138	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	2138	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-1	1515	0	CMakeFiles/Production	d99f53f2f0e126b2
-1	1515	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-1	2017	0	CMakeFiles/Production	d99f53f2f0e126b2
-1	2017	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-1	3035	0	CMakeFiles/Production	d99f53f2f0e126b2
-1	3035	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-1	2375	0	CMakeFiles/Production	d99f53f2f0e126b2
-1	2375	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	2048	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	2048	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	4988	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	4988	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	1526	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	1526	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	1575	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	1575	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	1495	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	1495	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-1	3728	0	CMakeFiles/Production	d99f53f2f0e126b2
-1	3728	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-2	1916	0	CMakeFiles/Production	d99f53f2f0e126b2
-2	1916	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	5580	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	5580	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	2633	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	2633	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-1	4735	0	CMakeFiles/Production	d99f53f2f0e126b2
-1	4735	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	2013	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	2013	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	2815	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	2815	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-1	2059	0	CMakeFiles/Production	d99f53f2f0e126b2
-1	2059	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
-0	1383	0	CMakeFiles/Production	d99f53f2f0e126b2
-0	1383	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+0	2205	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+1	2198	0	CMakeFiles/Production	d99f53f2f0e126b2
+1	2198	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+1	2276	0	CMakeFiles/Production	d99f53f2f0e126b2
+1	2276	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+0	2180	0	CMakeFiles/Production	d99f53f2f0e126b2
+0	2180	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+1	1491	0	CMakeFiles/Production	d99f53f2f0e126b2
+1	1491	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+1	2086	0	CMakeFiles/Production	d99f53f2f0e126b2
+1	2086	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+0	2178	0	CMakeFiles/Production	d99f53f2f0e126b2
+0	2178	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+0	2173	0	CMakeFiles/Production	d99f53f2f0e126b2
+0	2173	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2
+0	2194	0	CMakeFiles/Production	d99f53f2f0e126b2
+0	2194	0	C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/cmake-build-uno/CMakeFiles/Production	d99f53f2f0e126b2

@@ -21,6 +21,43 @@
 #include "Background.c"
 #include "Nunchuk.cpp"
 
+struct
+{
+public:
+    uint16_t x = 14;
+    uint8_t y = 170;
+    uint16_t xOld = x;
+    uint8_t yOld = y;
+    int8_t yVelocity = 0;
+    bool jumping = false;
+} player1;
+
+struct
+{
+public:
+    uint16_t x = 13;
+    uint8_t y = 210;
+    uint16_t xOld = x;
+    uint8_t yOld = y;
+    // uint8_t animation
+} player2;
+
+struct Rect
+{
+    uint16_t x;
+    uint8_t y;
+    uint8_t width;
+    uint8_t height;
+};
+
+struct Collect
+{
+    uint16_t x;
+    uint8_t y;
+    uint8_t w;
+    uint8_t h;
+};
+
 void initTimer0();
 
 void checkWallCollision();
@@ -33,11 +70,11 @@ void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const u
 
 bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
 
-bool rectangleCollision(uint16_t playerX, uint8_t playerY, Rect wall)
+bool rectangleCollision(uint16_t playerX, uint8_t playerY, Rect wall);
 
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
 
-void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
+void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
 
 void drawBackground();
 
@@ -99,43 +136,6 @@ void draw();
 #define LEVER_TOP_WIDTH 4
 #define LEVER_TOP_HEIGHT 7
 
-struct
-{
-public:
-    uint16_t x = 14;
-    uint8_t y = 170;
-    uint16_t xOld = x;
-    uint8_t yOld = y;
-    int8_t yVelocity = 0;
-    bool jumping = false;
-} player1;
-
-struct
-{
-public:
-    uint16_t x = 13;
-    uint8_t y = 210;
-    uint16_t xOld = x;
-    uint8_t yOld = y;
-    // uint8_t animation
-} player2;
-
-struct Rect
-{
-    uint16_t x;
-    uint8_t y;
-    uint8_t width;
-    uint8_t height;
-};
-
-struct Collect
-{
-    uint16_t x;
-    uint8_t y;
-    uint8_t w;
-    uint8_t h;
-};
-
 Rect walls[] = {
     Rect{0, 0, 5, 240},
     Rect{10, 0, 155, 10},
@@ -190,7 +190,7 @@ enum gameState
     MENU,
     GAME,
     LEVELSELECT
-} currentGameState = GAME;
+} currentGameState;
 
 ISR(PCINT2_vect)
 {
@@ -285,7 +285,7 @@ int main(void)
 {
     // Setup IR sending
     DDRD |= (1 << DDD6);
-    init_timer0();
+    initTimer0();
 
     // Setup IR recieving
     PORTD |= (1 << PORTD2); // pull up
@@ -293,6 +293,7 @@ int main(void)
     PCMSK2 |= (1 << PCINT18);
 
     setFreq(IR_38KHZ);
+    currentGameState = GAME;
 
     // Setup screen
     Wire.begin();
@@ -471,7 +472,7 @@ bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t
 
 bool rectangleCollision(uint16_t playerX, uint8_t playerY, Rect wall)
 {
-    playerX + PLAYER_ACTUAL_WIDTH > wall.x && playerX < wall.x + (wall.width * 2) && playerY + PLAYER_HEIGHT > wall.y && playerY < wall.y + wall.height
+    return playerX + PLAYER_ACTUAL_WIDTH > wall.x && playerX < wall.x + (wall.width * 2) && playerY + PLAYER_HEIGHT > wall.y && playerY < wall.y + wall.height;
 }
 
 void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver)

@@ -5,6 +5,7 @@
 #include "Player1.c"
 #include "Player2.c"
 
+
 #include "EEPROM.c"
 #include "Adafruit_STMPE610.h"
 #include "Adafruit_STMPE610.cpp"
@@ -30,6 +31,12 @@ void init_timer0();
 void checkWallCollision();
 
 void setFreq(uint8_t);
+
+void checkGameState();
+
+void drawMenu();
+
+void drawSettings();
 
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
 
@@ -101,6 +108,13 @@ void draw();
 #define LEVER_TOP_WIDTH 4
 #define LEVER_TOP_HEIGHT 7
 
+#define PLAY_BUTTON_MIN_X 1384
+#define PLAY_BUTTON_MAX_X 2707
+
+#define PLAY_BUTTON_MIN_Y 700
+#define PLAY_BUTTON_MAX_Y 1270
+
+
 struct
 {
 public:
@@ -164,7 +178,6 @@ Interactables Interactable[] = {
         Interactables{229, 216, DIA_WIDTH * 2, DIA_HEIGHT}
 };
 
-
 Adafruit_STMPE610 touch = Adafruit_STMPE610(8);
 
 
@@ -192,9 +205,10 @@ bool isDataBit = false;
 
 enum gameState
 {
-    MENU, GAME, LEVELSELECT
+    MENU, GAME, LEVELSELECT, SETTINGS, PAUSE, GAMEOVER
 };
 gameState currentGameState = MENU;
+gameState oldGameState = GAME;
 
 ISR(PCINT2_vect)
 {
@@ -274,9 +288,13 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
     }
 }
 
+long map(long x, long in_min, long in_max, long out_min, long out_max)
+{
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 int main(void)
 {
-    // Setup IR sending
     DDRD |= (1 << DDD6);
     init_timer0();
 
@@ -297,15 +315,12 @@ int main(void)
     init_LCD();
 
 
+
+
     //Start touch
-//    if (!touch.begin())
-//    {
-//        fillRect(0, 0, 320, 240, PLAYER_LIGHT_BLUE);
-//        while (true)
-//        {
-//            Serial.println("hahah broekoe");
-//        }
-//    }
+//    touchBegin();
+    touch.begin();
+    // Setup IR sending
     // Check nunckuk connection
     while (!startNunchuk(NUNCHUK_ADDRESS))
     {
@@ -318,32 +333,25 @@ int main(void)
         drawString("found", 60, 160, 5, PLAYER_YELLOW);
     }
 
-    if (currentGameState == GAME)
-    {
-        drawBackground();
-        drawInteractables();
-    }
-
-    if (currentGameState == MENU)
-    {
-        fillRect(0, 0, 320, 240, 0x0);
-        drawBorder(120, 60, 90, 50, 5, 0xFFFF);
-        drawString("Play", 120, 60, 4, PLAYER_RED);
-        drawString("Settings", 80, 140, 4, PLAYER_RED);
-
-        drawBackground();
-        drawInteractables();
-    }
-
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
-
+    Serial.begin(9600);
     while (true)
     {
         if (intCurrentMs > FRAME_TIME)
         {
+            Serial.println("xmin");
+            Serial.println(map(65, 0, 320, 150, 3800));
+            Serial.println("xmax");
+            Serial.println(map((65+212), 0, 320, 150, 3800));
+            Serial.println("ymin");
+            Serial.println(map(130, 240, 0, 130, 4000));
+            Serial.println("ymax");
+            Serial.println(map((130+50), 240, 0, 130, 4000));
+
             //30 FPS
             intCurrentMs = 0;
             frameCounter++;
+            checkGameState();
             if (currentGameState == GAME)
             {
                 //Game code
@@ -353,9 +361,33 @@ int main(void)
             if (currentGameState == MENU)
             {
                 //Menu code
+                if (touch.touched())
+                {
+                    uint16_t x, y;
+                    uint8_t z;
+                    while (!touch.bufferEmpty())
+                    {
+//                        Serial.print(touch.bufferSize());
+                        touch.readData(&y, &x, &z); //reversed order because of screen rotation
+                        /*Serial.print("->(");
+                        Serial.print(x);
+                        Serial.print(", ");
+                        Serial.print(y);
+                        Serial.print(", ");
+                        Serial.print(z);
+                        Serial.println(")");*/
+                    }
+                    if (x > 1404 && x <2727 && y >2378 && y <3193) //check if you pressed play button
+                    {
+                        currentGameState = GAME;
+                    }
+                    else if(x > 891 && x <3309 && y > 1903 && y < 1097) //check if you pressed settings button
+                    {
+                        currentGameState = SETTINGS;
+                    }
 
-                update();
-                draw();
+
+                }
             }
         }
     }
@@ -394,6 +426,39 @@ void setFreq(uint8_t freq)
         oneTime = 167;
         offTime = 55;
     }
+}
+
+void checkGameState()
+{
+    if (currentGameState == GAME && oldGameState != GAME)
+    {
+        oldGameState = GAME;
+        drawBackground();
+        drawInteractables();
+    }
+    if (currentGameState == MENU && oldGameState != MENU)
+    {
+        oldGameState = MENU;
+        drawMenu();
+    }
+    if(currentGameState == SETTINGS && oldGameState != SETTINGS)
+    {
+        oldGameState = SETTINGS;
+        drawSettings();
+    }
+}
+
+
+void drawMenu(){
+    fillRect(0, 0, 320, 240, 0x0);
+    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); //Play button
+    drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); //Settings button
+    drawString("Play", 120, 60, 4, PLAYER_RED);
+    drawString("Settings", 75, 140, 4, PLAYER_RED);
+}
+
+void drawSettings(){
+    drawString("drol", 100, 60, 4, PLAYER_RED);
 }
 
 void update()

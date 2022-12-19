@@ -26,14 +26,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="EEPROM.read() en EEPROM.write()">
-      <change afterPath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/Adafruit_STMPE610.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/font.c" afterDir="false" />
+    <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="pruttel poep">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-uno/.ninja_log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/.ninja_log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-uno/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/Testing/Temporary/LastTest.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/LCD.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LCD.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Nunchuk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/Nunchuk.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/Player1.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/Player1.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
@@ -90,28 +88,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/include&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;serialmonitor.settings&quot;,
-    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "last_opened_file_path": "C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/include",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "serialMonitor.commands": "wtst",
+    "settings.editor.selected.configurable": "serialmonitor.settings",
+    "structure.view.defaults.are.configured": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Frank\OneDrive - Windesheim Office365\jaar 2\Microcontrollers\KBSMic\include" />
@@ -187,7 +186,8 @@
       <workItem from="1671014212342" duration="3217000" />
       <workItem from="1671102130478" duration="3920000" />
       <workItem from="1671106141530" duration="5277000" />
-      <workItem from="1671111484810" duration="2717000" />
+      <workItem from="1671111484810" duration="2925000" />
+      <workItem from="1671444597433" duration="16971000" />
     </task>
     <task id="LOCAL-00001" summary="update to most recent version">
       <created>1670243123875</created>
@@ -336,7 +336,21 @@
       <option name="project" value="LOCAL" />
       <updated>1671103749266</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="pruttel poep">
+      <created>1671114425861</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1671114425861</updated>
+    </task>
+    <task id="LOCAL-00023" summary="pruttel poep">
+      <created>1671114434724</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1671114434724</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -375,7 +389,8 @@
     <MESSAGE value="kleine veranderd" />
     <MESSAGE value="poep haakjes" />
     <MESSAGE value="EEPROM.read() en EEPROM.write()" />
-    <option name="LAST_COMMIT_MESSAGE" value="EEPROM.read() en EEPROM.write()" />
+    <MESSAGE value="pruttel poep" />
+    <option name="LAST_COMMIT_MESSAGE" value="pruttel poep" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

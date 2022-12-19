@@ -23,7 +23,7 @@ struct ncState {
 //    uint16_t accel_x_axis;
 //    uint16_t accel_y_axis;
     uint16_t accel_z_axis;
-//    uint8_t z_button;
+   uint8_t z_button;
    uint8_t c_button;
 } state;
 
@@ -68,7 +68,7 @@ bool getState(uint8_t address) {
 //    state.accel_y_axis = (nunchuck_buffer[3] << 2) | ((nunchuck_buffer[5] & 0x30) >> 4);
     state.accel_z_axis = (nunchuck_buffer[4] << 2) | ((nunchuck_buffer[5] & 0xC0) >> 6);
     /* 0 = pressed */
-//    state.z_button = !(nunchuck_buffer[5] & 0x01);
+   state.z_button = !(nunchuck_buffer[5] & 0x01);
    state.c_button = !((nunchuck_buffer[5] & 0x02) >> 1);
 
     return (true);

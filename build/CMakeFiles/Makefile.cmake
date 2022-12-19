@@ -7,7 +7,10 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
+<<<<<<< Updated upstream
   "C:/Users/Jan/Arduino/etc/toolchain-avr.cmake"
+=======
+>>>>>>> Stashed changes
   "../CMakeLists.txt"
   "../CMakeListsPrivate.txt"
   "CMakeFiles/3.23.2/CMakeCCompiler.cmake"

@@ -137,12 +137,20 @@ CMakeFiles/Debug.dir/clean:
 CMakeFiles/Z_DUMMY_TARGET.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/build
+<<<<<<< Updated upstream
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target Z_DUMMY_TARGET"
+=======
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles --progress-num=1,2 "Built target Z_DUMMY_TARGET"
+>>>>>>> Stashed changes
 .PHONY : CMakeFiles/Z_DUMMY_TARGET.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/Z_DUMMY_TARGET.dir/rule: cmake_check_build_system
+<<<<<<< Updated upstream
 	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles 6
+=======
+	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles 2
+>>>>>>> Stashed changes
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Z_DUMMY_TARGET.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles 0
 .PHONY : CMakeFiles/Z_DUMMY_TARGET.dir/rule

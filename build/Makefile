@@ -155,6 +155,7 @@ Z_DUMMY_TARGET/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/build
 .PHONY : Z_DUMMY_TARGET/fast
 
+<<<<<<< Updated upstream
 lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.obj: lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.obj
 .PHONY : lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.obj
 
@@ -251,6 +252,8 @@ lib/nunchuk/src/Nunchuk.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Z_DUMMY_TARGET.dir/build.make CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/src/Nunchuk.cpp.s
 .PHONY : lib/nunchuk/src/Nunchuk.cpp.s
 
+=======
+>>>>>>> Stashed changes
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
@@ -286,6 +289,7 @@ help:
 	@echo "... Debug"
 	@echo "... Production"
 	@echo "... Z_DUMMY_TARGET"
+<<<<<<< Updated upstream
 	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.obj"
 	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.i"
 	@echo "... lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.s"
@@ -298,6 +302,8 @@ help:
 	@echo "... lib/nunchuk/src/Nunchuk.obj"
 	@echo "... lib/nunchuk/src/Nunchuk.i"
 	@echo "... lib/nunchuk/src/Nunchuk.s"
+=======
+>>>>>>> Stashed changes
 	@echo "... src/main.obj"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -8,10 +8,13 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+<<<<<<< Updated upstream
   "C:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c" "CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.obj" "gcc" "CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.c.obj.d"
   "C:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp" "CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.obj" "gcc" "CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/build/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.cpp.obj.d"
   "C:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/examples/src/nunchuk.cpp" "CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/examples/src/nunchuk.cpp.obj" "gcc" "CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/examples/src/nunchuk.cpp.obj.d"
   "C:/Users/Jan/Projects/MIC/GIT/lib/nunchuk/src/Nunchuk.cpp" "CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/src/Nunchuk.cpp.obj" "gcc" "CMakeFiles/Z_DUMMY_TARGET.dir/lib/nunchuk/src/Nunchuk.cpp.obj.d"
+=======
+>>>>>>> Stashed changes
   "C:/Users/Jan/Projects/MIC/GIT/src/main.cpp" "CMakeFiles/Z_DUMMY_TARGET.dir/src/main.cpp.obj" "gcc" "CMakeFiles/Z_DUMMY_TARGET.dir/src/main.cpp.obj.d"
   )
 

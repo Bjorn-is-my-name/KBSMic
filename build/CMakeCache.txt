@@ -14,6 +14,8 @@
 # EXTERNAL cache entries
 ########################
 
+:UNINITIALIZED=======
+
 //Value Computed by CMake
 Bitches_BINARY_DIR:STATIC=C:/Users/Jan/Projects/MIC/GIT/build
 
@@ -25,6 +27,9 @@ Bitches_SOURCE_DIR:STATIC=C:/Users/Jan/Projects/MIC/GIT
 
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=C:/msys64/mingw64/bin/avr-addr2line.exe
+
+//Path to a program.
+CMAKE_AR:FILEPATH=C:/msys64/mingw64/bin/avr-ar.exe
 
 //No help, variable specified on the command line.
 CMAKE_BUILD_TYPE:STRING=Debug
@@ -108,8 +113,10 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 //No help, variable specified on the command line.
 CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE
 
-//Install path prefix, prepended onto install directories.
-CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/Bitches
+CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/KBSMic
+
+//Path to a program.
+CMAKE_LINKER:FILEPATH=C:/msys64/mingw64/bin/avr-ld.exe
 
 //Path to a program.
 CMAKE_MAKE_PROGRAM:FILEPATH=C:/msys64/usr/bin/make.exe
@@ -137,6 +144,12 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 //Path to a program.
 CMAKE_NM:FILEPATH=C:/msys64/mingw64/bin/avr-nm.exe
 
+//Path to a program.
+CMAKE_OBJCOPY:FILEPATH=C:/msys64/mingw64/bin/avr-objcopy.exe
+
+//Path to a program.
+CMAKE_OBJDUMP:FILEPATH=C:/msys64/mingw64/bin/avr-objdump.exe
+
 //Value Computed by CMake
 CMAKE_PROJECT_DESCRIPTION:STATIC=
 
@@ -145,6 +158,9 @@ CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
 CMAKE_PROJECT_NAME:STATIC=GIT
+
+//Path to a program.
+CMAKE_RANLIB:FILEPATH=C:/msys64/mingw64/bin/avr-ranlib.exe
 
 //Path to a program.
 CMAKE_READELF:FILEPATH=C:/msys64/mingw64/bin/avr-readelf.exe
@@ -196,6 +212,9 @@ CMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=
 // during RELWITHDEBINFO builds.
 CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
+//Path to a program.
+CMAKE_STRIP:FILEPATH=C:/msys64/mingw64/bin/avr-strip.exe
+
 //The CMake toolchain file
 CMAKE_TOOLCHAIN_FILE:FILEPATH=C:/Users/Jan/Arduino/etc/toolchain-avr.cmake
 
@@ -214,6 +233,14 @@ GIT_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 GIT_SOURCE_DIR:STATIC=C:/Users/Jan/Projects/MIC/GIT
 
+KBSMic_BINARY_DIR:STATIC=C:/Users/Jan/Projects/MIC/GIT/build
+
+//Value Computed by CMake
+KBSMic_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+KBSMic_SOURCE_DIR:STATIC=C:/Users/Jan/Projects/MIC/GIT
+
 
 ########################
 # INTERNAL cache entries
@@ -221,6 +248,8 @@ GIT_SOURCE_DIR:STATIC=C:/Users/Jan/Projects/MIC/GIT
 
 //ADVANCED property for variable: CMAKE_ADDR2LINE
 CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_AR
+CMAKE_AR-ADVANCED:INTERNAL=1
 //This is the directory where this CMakeCache.txt was created
 CMAKE_CACHEFILE_DIR:INTERNAL=c:/Users/Jan/Projects/MIC/GIT/build
 //Major version of cmake used to create the current loaded cache
@@ -298,6 +327,8 @@ CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=C:/Users/Jan/Projects/MIC/GIT
+//ADVANCED property for variable: CMAKE_LINKER
+CMAKE_LINKER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MAKE_PROGRAM
 CMAKE_MAKE_PROGRAM-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS
@@ -314,8 +345,14 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
 CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+//ADVANCED property for variable: CMAKE_OBJCOPY
+CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_OBJDUMP
+CMAKE_OBJDUMP-ADVANCED:INTERNAL=1
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_RANLIB
+CMAKE_RANLIB-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_READELF
 CMAKE_READELF-ADVANCED:INTERNAL=1
 //Path to CMake installation.
@@ -344,6 +381,8 @@ CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_STATIC_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO
 CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_STRIP
+CMAKE_STRIP-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 

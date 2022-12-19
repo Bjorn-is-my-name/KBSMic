@@ -2,7 +2,11 @@
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+<<<<<<< Updated upstream
   set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Bitches")
+=======
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/KBSMic")
+>>>>>>> Stashed changes
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,7 +38,11 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
+<<<<<<< Updated upstream
   set(CMAKE_OBJDUMP "avr-objdump")
+=======
+  set(CMAKE_OBJDUMP "C:/msys64/mingw64/bin/avr-objdump.exe")
+>>>>>>> Stashed changes
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)

@@ -1,8 +1,16 @@
+<<<<<<< Updated upstream
 The target system is: Generic - 1 - avr
 The host system is: Windows - 10.0.22000 - AMD64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
 Compiler: C:/msys64/mingw64/bin/avr-gcc.exe 
 Build flags: -std=gnu11
+=======
+The target system is: Generic -  - 
+The host system is: Windows - 10.0.22621 - AMD64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: C:/msys64/mingw64/bin/avr-gcc.exe 
+Build flags: 
+>>>>>>> Stashed changes
 Id flags:  
 
 The output was:
@@ -15,7 +23,11 @@ The C compiler identification is GNU, found in "C:/Users/Jan/Projects/MIC/GIT/bu
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: C:/msys64/mingw64/bin/avr-g++.exe 
+<<<<<<< Updated upstream
 Build flags: -std=gnu++11;-fpermissive;-fno-exceptions;-fno-threadsafe-statics;-Wno-error=narrowing
+=======
+Build flags: 
+>>>>>>> Stashed changes
 Id flags:  
 
 The output was:
@@ -29,20 +41,35 @@ The CXX compiler identification is GNU, found in "C:/Users/Jan/Projects/MIC/GIT/
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp
 
+<<<<<<< Updated upstream
 Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_95637/fast && /usr/bin/make  -f CMakeFiles/cmTC_95637.dir/build.make CMakeFiles/cmTC_95637.dir/build
 make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
 Building C object CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj
 C:/msys64/mingw64/bin/avr-gcc.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu11    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c
 Using built-in specs.
 Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-atmega328p
+=======
+Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_bc781/fast && /usr/bin/make  -f CMakeFiles/cmTC_bc781.dir/build.make CMakeFiles/cmTC_bc781.dir/build
+make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj
+C:/msys64/mingw64/bin/avr-gcc.exe   -v -o CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c
+Using built-in specs.
+Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-avr2
+>>>>>>> Stashed changes
 COLLECT_GCC=C:\msys64\mingw64\bin\avr-gcc.exe
 Target: avr
 Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c,c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard
 Thread model: single
 gcc version 8.4.0 (GCC) 
+<<<<<<< Updated upstream
 COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
  c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.d -MQ CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCCompilerABI.c -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj -g -Os -std=gnu11 -version -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o C:\Users\Jan\AppData\Local\Temp\ccRNAleC.s
 GNU C11 (GCC) version 8.4.0 (avr)
+=======
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-avr2'
+ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1.exe -quiet -v -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c -mn-flash=6 -mskip-bug -quiet -dumpbase CMakeCCompilerABI.c -auxbase-strip CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj -version -o C:\Users\Jan\AppData\Local\Temp\ccmJuDIE.s
+GNU C17 (GCC) version 8.4.0 (avr)
+>>>>>>> Stashed changes
 	compiled by GNU C version 10.2.0, GMP version 6.2.0, MPFR version 4.1.0, MPC version 1.2.0, isl version isl-0.22.1-GMP
 
 warning: GMP header version 6.2.0 differs from library version 6.2.1.
@@ -58,12 +85,17 @@ ignoring duplicate directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/
  c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/include-fixed
  c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include
 End of search list.
+<<<<<<< Updated upstream
 GNU C11 (GCC) version 8.4.0 (avr)
+=======
+GNU C17 (GCC) version 8.4.0 (avr)
+>>>>>>> Stashed changes
 	compiled by GNU C version 10.2.0, GMP version 6.2.0, MPFR version 4.1.0, MPC version 1.2.0, isl version isl-0.22.1-GMP
 
 warning: GMP header version 6.2.0 differs from library version 6.2.1.
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: 66fefac0013e8c54e2faf5de6048cf57
+<<<<<<< Updated upstream
 COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
  c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj C:\Users\Jan\AppData\Local\Temp\ccRNAleC.s
 COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../libexec/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/
@@ -74,6 +106,28 @@ C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_95637.dir/cmake_clean_target.
 C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_95637.dir/link.txt --verbose=1
 avr-gcc-ar qc libcmTC_95637.a CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj
 avr-gcc-ranlib libcmTC_95637.a
+=======
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-avr2'
+ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr2 -mgcc-isr -o CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj C:\Users\Jan\AppData\Local\Temp\ccmJuDIE.s
+COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../libexec/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/
+LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../lib/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-avr2'
+Linking C executable cmTC_bc781
+C:/msys64/mingw64/bin/avr-gcc.exe  -v "CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj"  -o cmTC_bc781 
+Using built-in specs.
+Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-avr2
+COLLECT_GCC=C:\msys64\mingw64\bin\avr-gcc.exe
+COLLECT_LTO_WRAPPER=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe
+Target: avr
+Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c,c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard
+Thread model: single
+gcc version 8.4.0 (GCC) 
+COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../libexec/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/
+LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../lib/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_bc781' '-specs=device-specs/specs-avr2'
+ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/collect2.exe -plugin c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/liblto_plugin-0.dll -plugin-opt=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jan\AppData\Local\Temp\ccuLnMPR.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lc -o cmTC_bc781 -Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0 -Lc:/msys64/mingw64/bin/../lib/gcc -Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj --start-group -lgcc -lm -lc --end-group
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_bc781' '-specs=device-specs/specs-avr2'
+>>>>>>> Stashed changes
 make[1]: Leaving directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
 
 
@@ -95,20 +149,35 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(avr-ld\.exe|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp]
   ignore line: []
+<<<<<<< Updated upstream
   ignore line: [Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_95637/fast && /usr/bin/make  -f CMakeFiles/cmTC_95637.dir/build.make CMakeFiles/cmTC_95637.dir/build]
   ignore line: [make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp']
   ignore line: [Building C object CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj]
   ignore line: [C:/msys64/mingw64/bin/avr-gcc.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu11    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c]
   ignore line: [Using built-in specs.]
   ignore line: [Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-atmega328p]
+=======
+  ignore line: [Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_bc781/fast && /usr/bin/make  -f CMakeFiles/cmTC_bc781.dir/build.make CMakeFiles/cmTC_bc781.dir/build]
+  ignore line: [make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj]
+  ignore line: [C:/msys64/mingw64/bin/avr-gcc.exe   -v -o CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c]
+  ignore line: [Using built-in specs.]
+  ignore line: [Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-avr2]
+>>>>>>> Stashed changes
   ignore line: [COLLECT_GCC=C:\msys64\mingw64\bin\avr-gcc.exe]
   ignore line: [Target: avr]
   ignore line: [Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard]
   ignore line: [Thread model: single]
   ignore line: [gcc version 8.4.0 (GCC) ]
+<<<<<<< Updated upstream
   ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
   ignore line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.d -MQ CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCCompilerABI.c -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj -g -Os -std=gnu11 -version -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o C:\Users\Jan\AppData\Local\Temp\ccRNAleC.s]
   ignore line: [GNU C11 (GCC) version 8.4.0 (avr)]
+=======
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-avr2']
+  ignore line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1.exe -quiet -v -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ C:/msys64/mingw64/share/cmake/Modules/CMakeCCompilerABI.c -mn-flash=6 -mskip-bug -quiet -dumpbase CMakeCCompilerABI.c -auxbase-strip CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj -version -o C:\Users\Jan\AppData\Local\Temp\ccmJuDIE.s]
+  ignore line: [GNU C17 (GCC) version 8.4.0 (avr)]
+>>>>>>> Stashed changes
   ignore line: [	compiled by GNU C version 10.2.0  GMP version 6.2.0  MPFR version 4.1.0  MPC version 1.2.0  isl version isl-0.22.1-GMP]
   ignore line: []
   ignore line: [warning: GMP header version 6.2.0 differs from library version 6.2.1.]
@@ -124,12 +193,17 @@ Parsed C implicit link information from above output:
   ignore line: [ c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/include-fixed]
   ignore line: [ c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include]
   ignore line: [End of search list.]
+<<<<<<< Updated upstream
   ignore line: [GNU C11 (GCC) version 8.4.0 (avr)]
+=======
+  ignore line: [GNU C17 (GCC) version 8.4.0 (avr)]
+>>>>>>> Stashed changes
   ignore line: [	compiled by GNU C version 10.2.0  GMP version 6.2.0  MPFR version 4.1.0  MPC version 1.2.0  isl version isl-0.22.1-GMP]
   ignore line: []
   ignore line: [warning: GMP header version 6.2.0 differs from library version 6.2.1.]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: 66fefac0013e8c54e2faf5de6048cf57]
+<<<<<<< Updated upstream
   ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu11' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
   ignore line: [ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_95637.dir/CMakeCCompilerABI.c.obj C:\Users\Jan\AppData\Local\Temp\ccRNAleC.s]
   ignore line: [COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/]
@@ -152,36 +226,113 @@ Parsed C implicit link information from above output:
   implicit libs: []
   implicit objs: []
   implicit dirs: []
+=======
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-avr2']
+  ignore line: [ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr2 -mgcc-isr -o CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj C:\Users\Jan\AppData\Local\Temp\ccmJuDIE.s]
+  ignore line: [COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/]
+  ignore line: [c:/msys64/mingw64/bin/../libexec/gcc/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/]
+  ignore line: [LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj' '-c' '-specs=device-specs/specs-avr2']
+  ignore line: [Linking C executable cmTC_bc781]
+  ignore line: [C:/msys64/mingw64/bin/avr-gcc.exe  -v "CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj"  -o cmTC_bc781 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-avr2]
+  ignore line: [COLLECT_GCC=C:\msys64\mingw64\bin\avr-gcc.exe]
+  ignore line: [COLLECT_LTO_WRAPPER=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe]
+  ignore line: [Target: avr]
+  ignore line: [Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard]
+  ignore line: [Thread model: single]
+  ignore line: [gcc version 8.4.0 (GCC) ]
+  ignore line: [COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/]
+  ignore line: [c:/msys64/mingw64/bin/../libexec/gcc/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/]
+  ignore line: [LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_bc781' '-specs=device-specs/specs-avr2']
+  link line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/collect2.exe -plugin c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/liblto_plugin-0.dll -plugin-opt=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jan\AppData\Local\Temp\ccuLnMPR.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lc -o cmTC_bc781 -Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0 -Lc:/msys64/mingw64/bin/../lib/gcc -Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj --start-group -lgcc -lm -lc --end-group]
+    arg [c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/collect2.exe] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/liblto_plugin-0.dll] ==> ignore
+    arg [-plugin-opt=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe] ==> ignore
+    arg [-plugin-opt=-fresolution=C:\Users\Jan\AppData\Local\Temp\ccuLnMPR.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lm] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_bc781] ==> ignore
+    arg [-Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0] ==> dir [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0]
+    arg [-Lc:/msys64/mingw64/bin/../lib/gcc] ==> dir [c:/msys64/mingw64/bin/../lib/gcc]
+    arg [-Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib] ==> dir [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib]
+    arg [CMakeFiles/cmTC_bc781.dir/CMakeCCompilerABI.c.obj] ==> ignore
+    arg [--start-group] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lm] ==> lib [m]
+    arg [-lc] ==> lib [c]
+    arg [--end-group] ==> ignore
+  collapse library dir [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0] ==> [C:/msys64/mingw64/lib/gcc/avr/8.4.0]
+  collapse library dir [c:/msys64/mingw64/bin/../lib/gcc] ==> [C:/msys64/mingw64/lib/gcc]
+  collapse library dir [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib] ==> [C:/msys64/mingw64/avr/lib]
+  implicit libs: [gcc;m;c]
+  implicit objs: []
+  implicit dirs: [C:/msys64/mingw64/lib/gcc/avr/8.4.0;C:/msys64/mingw64/lib/gcc;C:/msys64/mingw64/avr/lib]
+>>>>>>> Stashed changes
   implicit fwks: []
 
 
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp
 
+<<<<<<< Updated upstream
 Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_37e5e/fast && /usr/bin/make  -f CMakeFiles/cmTC_37e5e.dir/build.make CMakeFiles/cmTC_37e5e.dir/build
 make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
 Building CXX object CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj
 C:/msys64/mingw64/bin/avr-g++.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu++11 -fpermissive -fno-exceptions -fno-threadsafe-statics -Wno-error=narrowing    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp
 Using built-in specs.
 Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-atmega328p
+=======
+Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_6ea36/fast && /usr/bin/make  -f CMakeFiles/cmTC_6ea36.dir/build.make CMakeFiles/cmTC_6ea36.dir/build
+make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj
+C:/msys64/mingw64/bin/avr-g++.exe   -v -o CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-avr2
+>>>>>>> Stashed changes
 COLLECT_GCC=C:\msys64\mingw64\bin\avr-g++.exe
 Target: avr
 Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c,c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard
 Thread model: single
 gcc version 8.4.0 (GCC) 
+<<<<<<< Updated upstream
 COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
  c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1plus.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.d -MQ CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCXXCompilerABI.cpp -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj -g -Os -Wno-error=narrowing -std=gnu++11 -version -fpermissive -fno-exceptions -fno-threadsafe-statics -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -mn-flash=1 -mno-skip-bug -fno-rtti -fno-enforce-eh-specs -fno-exceptions -o C:\Users\Jan\AppData\Local\Temp\ccoG0jEG.s
 GNU C++11 (GCC) version 8.4.0 (avr)
+=======
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-avr2'
+ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1plus.exe -quiet -v -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp -mn-flash=6 -mskip-bug -quiet -dumpbase CMakeCXXCompilerABI.cpp -auxbase-strip CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj -version -mn-flash=6 -mskip-bug -fno-rtti -fno-enforce-eh-specs -fno-exceptions -o C:\Users\Jan\AppData\Local\Temp\ccAeEpD9.s
+GNU C++14 (GCC) version 8.4.0 (avr)
+>>>>>>> Stashed changes
 	compiled by GNU C version 10.2.0, GMP version 6.2.0, MPFR version 4.1.0, MPC version 1.2.0, isl version isl-0.22.1-GMP
 
 warning: GMP header version 6.2.0 differs from library version 6.2.1.
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0"
+<<<<<<< Updated upstream
 ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/avr/avr5"
 ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/backward"
 ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/sys-include"
 ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0"
 ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/avr/avr5"
+=======
+ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/avr"
+ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/backward"
+ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/sys-include"
+ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0"
+ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/avr"
+>>>>>>> Stashed changes
 ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/backward"
 ignoring duplicate directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/include"
 ignoring duplicate directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/include-fixed"
@@ -193,12 +344,17 @@ ignoring duplicate directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/
  c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/include-fixed
  c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include
 End of search list.
+<<<<<<< Updated upstream
 GNU C++11 (GCC) version 8.4.0 (avr)
+=======
+GNU C++14 (GCC) version 8.4.0 (avr)
+>>>>>>> Stashed changes
 	compiled by GNU C version 10.2.0, GMP version 6.2.0, MPFR version 4.1.0, MPC version 1.2.0, isl version isl-0.22.1-GMP
 
 warning: GMP header version 6.2.0 differs from library version 6.2.1.
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: 420cd9c59657d9fe27ec680077c650d4
+<<<<<<< Updated upstream
 COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5'
  c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\Jan\AppData\Local\Temp\ccoG0jEG.s
 COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../libexec/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/
@@ -209,6 +365,28 @@ C:/msys64/mingw64/bin/cmake.exe -P CMakeFiles/cmTC_37e5e.dir/cmake_clean_target.
 C:/msys64/mingw64/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_37e5e.dir/link.txt --verbose=1
 avr-gcc-ar qc libcmTC_37e5e.a CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj
 avr-gcc-ranlib libcmTC_37e5e.a
+=======
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-avr2'
+ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr2 -mgcc-isr -o CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\Jan\AppData\Local\Temp\ccAeEpD9.s
+COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../libexec/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/
+LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../lib/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-avr2'
+Linking CXX executable cmTC_6ea36
+C:/msys64/mingw64/bin/avr-g++.exe  -v "CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj"  -o cmTC_6ea36 
+Using built-in specs.
+Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-avr2
+COLLECT_GCC=C:\msys64\mingw64\bin\avr-g++.exe
+COLLECT_LTO_WRAPPER=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe
+Target: avr
+Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c,c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard
+Thread model: single
+gcc version 8.4.0 (GCC) 
+COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../libexec/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/
+LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/;c:/msys64/mingw64/bin/../lib/gcc/;c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_6ea36' '-specs=device-specs/specs-avr2'
+ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/collect2.exe -plugin c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/liblto_plugin-0.dll -plugin-opt=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jan\AppData\Local\Temp\ccvVZ4Zd.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lc -o cmTC_6ea36 -Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0 -Lc:/msys64/mingw64/bin/../lib/gcc -Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj -lgcc -lm --start-group -lgcc -lm -lc --end-group
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_6ea36' '-specs=device-specs/specs-avr2'
+>>>>>>> Stashed changes
 make[1]: Leaving directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp'
 
 
@@ -230,30 +408,53 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(avr-ld\.exe|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp]
   ignore line: []
+<<<<<<< Updated upstream
   ignore line: [Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_37e5e/fast && /usr/bin/make  -f CMakeFiles/cmTC_37e5e.dir/build.make CMakeFiles/cmTC_37e5e.dir/build]
   ignore line: [make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp']
   ignore line: [Building CXX object CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj]
   ignore line: [C:/msys64/mingw64/bin/avr-g++.exe -DARDUINO=101 -DBAUD=9600 -DF_CPU=16000000UL  -std=gnu++11 -fpermissive -fno-exceptions -fno-threadsafe-statics -Wno-error=narrowing    -v -mmcu=atmega328p -MMD -Os -g -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -o CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
   ignore line: [Using built-in specs.]
   ignore line: [Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-atmega328p]
+=======
+  ignore line: [Run Build Command(s):C:/msys64/usr/bin/make.exe -f Makefile cmTC_6ea36/fast && /usr/bin/make  -f CMakeFiles/cmTC_6ea36.dir/build.make CMakeFiles/cmTC_6ea36.dir/build]
+  ignore line: [make[1]: Entering directory '/c/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj]
+  ignore line: [C:/msys64/mingw64/bin/avr-g++.exe   -v -o CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj -c C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Using built-in specs.]
+  ignore line: [Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-avr2]
+>>>>>>> Stashed changes
   ignore line: [COLLECT_GCC=C:\msys64\mingw64\bin\avr-g++.exe]
   ignore line: [Target: avr]
   ignore line: [Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard]
   ignore line: [Thread model: single]
   ignore line: [gcc version 8.4.0 (GCC) ]
+<<<<<<< Updated upstream
   ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
   ignore line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1plus.exe -quiet -v -imultilib avr5 -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ -MMD CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.d -MQ CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj -D__AVR_ATmega328P__ -D__AVR_DEVICE_NAME__=atmega328p -D ARDUINO=101 -D BAUD=9600 -D F_CPU=16000000UL C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp -mn-flash=1 -mno-skip-bug -quiet -dumpbase CMakeCXXCompilerABI.cpp -mmcu=avr5 -auxbase-strip CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj -g -Os -Wno-error=narrowing -std=gnu++11 -version -fpermissive -fno-exceptions -fno-threadsafe-statics -ffunction-sections -fdata-sections -flto -fno-fat-lto-objects -mn-flash=1 -mno-skip-bug -fno-rtti -fno-enforce-eh-specs -fno-exceptions -o C:\Users\Jan\AppData\Local\Temp\ccoG0jEG.s]
   ignore line: [GNU C++11 (GCC) version 8.4.0 (avr)]
+=======
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-avr2']
+  ignore line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/cc1plus.exe -quiet -v -iprefix c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/ C:/msys64/mingw64/share/cmake/Modules/CMakeCXXCompilerABI.cpp -mn-flash=6 -mskip-bug -quiet -dumpbase CMakeCXXCompilerABI.cpp -auxbase-strip CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj -version -mn-flash=6 -mskip-bug -fno-rtti -fno-enforce-eh-specs -fno-exceptions -o C:\Users\Jan\AppData\Local\Temp\ccAeEpD9.s]
+  ignore line: [GNU C++14 (GCC) version 8.4.0 (avr)]
+>>>>>>> Stashed changes
   ignore line: [	compiled by GNU C version 10.2.0  GMP version 6.2.0  MPFR version 4.1.0  MPC version 1.2.0  isl version isl-0.22.1-GMP]
   ignore line: []
   ignore line: [warning: GMP header version 6.2.0 differs from library version 6.2.1.]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0"]
+<<<<<<< Updated upstream
   ignore line: [ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/avr/avr5"]
   ignore line: [ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/backward"]
   ignore line: [ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/sys-include"]
   ignore line: [ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0"]
   ignore line: [ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/avr/avr5"]
+=======
+  ignore line: [ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/avr"]
+  ignore line: [ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/backward"]
+  ignore line: [ignoring nonexistent directory "c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/sys-include"]
+  ignore line: [ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0"]
+  ignore line: [ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/avr"]
+>>>>>>> Stashed changes
   ignore line: [ignoring nonexistent directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/../../../../avr/include/c++/8.4.0/backward"]
   ignore line: [ignoring duplicate directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/include"]
   ignore line: [ignoring duplicate directory "c:/msys64/mingw64/lib/gcc/../../lib/gcc/avr/8.4.0/include-fixed"]
@@ -265,12 +466,17 @@ Parsed CXX implicit link information from above output:
   ignore line: [ c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/include-fixed]
   ignore line: [ c:\msys64\mingw64\bin\../lib/gcc/avr/8.4.0/../../../../avr/include]
   ignore line: [End of search list.]
+<<<<<<< Updated upstream
   ignore line: [GNU C++11 (GCC) version 8.4.0 (avr)]
+=======
+  ignore line: [GNU C++14 (GCC) version 8.4.0 (avr)]
+>>>>>>> Stashed changes
   ignore line: [	compiled by GNU C version 10.2.0  GMP version 6.2.0  MPFR version 4.1.0  MPC version 1.2.0  isl version isl-0.22.1-GMP]
   ignore line: []
   ignore line: [warning: GMP header version 6.2.0 differs from library version 6.2.1.]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: 420cd9c59657d9fe27ec680077c650d4]
+<<<<<<< Updated upstream
   ignore line: [COLLECT_GCC_OPTIONS='-D' 'ARDUINO=101' '-D' 'BAUD=9600' '-D' 'F_CPU=16000000UL' '-std=gnu++11' '-fpermissive' '-fno-exceptions' '-fno-threadsafe-statics' '-Wno-error=narrowing' '-v'  '-MMD' '-Os' '-g' '-ffunction-sections' '-fdata-sections' '-flto' '-fno-fat-lto-objects' '-o' 'CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-atmega328p' '-mmcu=avr5']
   ignore line: [ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr5 -mgcc-isr -mno-skip-bug -o CMakeFiles/cmTC_37e5e.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\Jan\AppData\Local\Temp\ccoG0jEG.s]
   ignore line: [COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/]
@@ -293,6 +499,62 @@ Parsed CXX implicit link information from above output:
   implicit libs: []
   implicit objs: []
   implicit dirs: []
+=======
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-avr2']
+  ignore line: [ c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/as.exe -mmcu=avr2 -mgcc-isr -o CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\Jan\AppData\Local\Temp\ccAeEpD9.s]
+  ignore line: [COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/]
+  ignore line: [c:/msys64/mingw64/bin/../libexec/gcc/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/]
+  ignore line: [LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-specs=device-specs/specs-avr2']
+  ignore line: [Linking CXX executable cmTC_6ea36]
+  ignore line: [C:/msys64/mingw64/bin/avr-g++.exe  -v "CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj"  -o cmTC_6ea36 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [Reading specs from c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/device-specs/specs-avr2]
+  ignore line: [COLLECT_GCC=C:\msys64\mingw64\bin\avr-g++.exe]
+  ignore line: [COLLECT_LTO_WRAPPER=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe]
+  ignore line: [Target: avr]
+  ignore line: [Configured with: ../configure --build=x86_64-w64-mingw32 --prefix=/mingw64 --target=avr --enable-languages=c c++ --disable-nls --disable-libssp --disable-shared --disable-threads --disable-libgomp --disable-libada --with-dwarf2 --enable-mingw-wildcard]
+  ignore line: [Thread model: single]
+  ignore line: [gcc version 8.4.0 (GCC) ]
+  ignore line: [COMPILER_PATH=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/]
+  ignore line: [c:/msys64/mingw64/bin/../libexec/gcc/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/bin/]
+  ignore line: [LIBRARY_PATH=c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/]
+  ignore line: [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_6ea36' '-specs=device-specs/specs-avr2']
+  link line: [ c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/collect2.exe -plugin c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/liblto_plugin-0.dll -plugin-opt=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\Users\Jan\AppData\Local\Temp\ccvVZ4Zd.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lc -o cmTC_6ea36 -Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0 -Lc:/msys64/mingw64/bin/../lib/gcc -Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj -lgcc -lm --start-group -lgcc -lm -lc --end-group]
+    arg [c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/collect2.exe] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/liblto_plugin-0.dll] ==> ignore
+    arg [-plugin-opt=c:/msys64/mingw64/bin/../libexec/gcc/avr/8.4.0/lto-wrapper.exe] ==> ignore
+    arg [-plugin-opt=-fresolution=C:\Users\Jan\AppData\Local\Temp\ccvVZ4Zd.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lm] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_6ea36] ==> ignore
+    arg [-Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0] ==> dir [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0]
+    arg [-Lc:/msys64/mingw64/bin/../lib/gcc] ==> dir [c:/msys64/mingw64/bin/../lib/gcc]
+    arg [-Lc:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib] ==> dir [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib]
+    arg [CMakeFiles/cmTC_6ea36.dir/CMakeCXXCompilerABI.cpp.obj] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lm] ==> lib [m]
+    arg [--start-group] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lm] ==> lib [m]
+    arg [-lc] ==> lib [c]
+    arg [--end-group] ==> ignore
+  collapse library dir [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0] ==> [C:/msys64/mingw64/lib/gcc/avr/8.4.0]
+  collapse library dir [c:/msys64/mingw64/bin/../lib/gcc] ==> [C:/msys64/mingw64/lib/gcc]
+  collapse library dir [c:/msys64/mingw64/bin/../lib/gcc/avr/8.4.0/../../../../avr/lib] ==> [C:/msys64/mingw64/avr/lib]
+  implicit libs: [gcc;m;gcc;m;c]
+  implicit objs: []
+  implicit dirs: [C:/msys64/mingw64/lib/gcc/avr/8.4.0;C:/msys64/mingw64/lib/gcc;C:/msys64/mingw64/avr/lib]
+>>>>>>> Stashed changes
   implicit fwks: []
 
 

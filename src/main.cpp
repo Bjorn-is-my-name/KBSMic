@@ -22,30 +22,17 @@
 #include "Nunchuk.cpp"
 
 void init_timer0();
-
 void CheckWallCollision();
-
 void setFreq(uint8_t);
-
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
-
 void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
-
 bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
-
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
-
 void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
-
 void drawBackground();
-
 void drawInteractables();
-
-
 uint16_t getColor(uint8_t, uint8_t ver = 0);
-
 void update();
-
 void draw();
 void(* resetFunc) (void) = 0;
 
@@ -62,7 +49,7 @@ void(* resetFunc) (void) = 0;
 #define PLAYER_HEIGHT 20
 
 #define SENDINGDATA_LEN 16 // bits - 1
-#define SENDINGBIT_START_VALUE (- 2)
+#define SENDINGBIT_START_VALUE (-2)
 
 #define STARTBIT_VALUE (-1)
 #define STARTBIT_MIN 3
@@ -115,7 +102,7 @@ public:
     uint8_t y = 210;
     uint16_t xOld = x;
     uint8_t yOld = y;
-//    uint8_t animation
+    //    uint8_t animation
 } player2;
 
 struct Rect {
@@ -133,34 +120,29 @@ struct Collect {
 };
 
 Rect walls[] = {
-        Rect{0, 0, 5, 240},
-        Rect{10, 0, 155, 10},
-        Rect{310, 10, 5, 230},
-        Rect{10, 230, 155, 10},
-        Rect{10, 40, 20, 40},
-        Rect{50, 70, 115, 10},
-        Rect{153, 50, 30, 20},
-        Rect{40, 110, 75, 10},
-        Rect{180, 120, 50, 10},
-        Rect{280, 120, 15, 20},
-        Rect{290, 140, 10, 10},
-        Rect{10, 150, 70, 10},
-        Rect{150, 150, 5, 30},
-        Rect{150, 180, 52, 10},
-        Rect{280, 210, 15, 20},
-        Rect{10, 190, 40, 10}
+    Rect{0, 0, 5, 240},
+    Rect{10, 0, 155, 10},
+    Rect{310, 10, 5, 230},
+    Rect{10, 230, 155, 10},
+    Rect{10, 40, 20, 40},
+    Rect{50, 70, 115, 10},
+    Rect{153, 50, 30, 20},
+    Rect{40, 110, 75, 10},
+    Rect{180, 120, 50, 10},
+    Rect{280, 120, 15, 20},
+    Rect{290, 140, 10, 10},
+    Rect{10, 150, 70, 10},
+    Rect{150, 150, 5, 30},
+    Rect{150, 180, 52, 10},
+    Rect{280, 210, 15, 20},
+    Rect{10, 190, 40, 10}};
+
+Interactables Interactable[] = {
+        Interactables{12, 12, DIA_WIDTH * 2, DIA_HEIGHT},
+        Interactables{164, 216, DIA_WIDTH * 2, DIA_HEIGHT},
+        Interactables{26, 12, DIA_WIDTH * 2, DIA_HEIGHT},
+        Interactables{229, 216, DIA_WIDTH * 2, DIA_HEIGHT}
 };
-
-Collect Dias[] = {
-        Collect{12, 12, DIA_WIDTH * 2, DIA_HEIGHT},
-        Collect{164, 216, DIA_WIDTH * 2, DIA_HEIGHT},
-        Collect{26, 12, DIA_WIDTH * 2, DIA_HEIGHT},
-        Collect{229, 216, DIA_WIDTH * 2, DIA_HEIGHT}
-};
-
-Rect Door1 = {55, 40, DOOR_WIDTH*4, DOOR_HEIGHT*3};
-Rect Door2 = {80, 40, DOOR_WIDTH*4, DOOR_HEIGHT*3};
-
 
 
 // Check to see if the current bit is done sending
@@ -185,7 +167,8 @@ uint32_t receivedData = 0;
 uint8_t bitCounter = 0;
 bool isDataBit = false;
 
-enum gameState {
+enum gameState
+{
     MENU, GAME, LEVELSELECT
 };
 gameState currentGameState = GAME;
@@ -218,6 +201,7 @@ ISR(PCINT2_vect) {
                 receivedData >>= 9;
                 player2.yOld = player2.y;
                 player2.y = (receivedData & 0xFF);
+                Serial.println(player2.y);
 
             }
         }
@@ -242,16 +226,18 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
         {
             onTime = offTime;        // Time after which to continue to the next bit
             TCCR0A |= (1 << COM0A1); // Disable TC0
-        } else // If the waiting time is passed, send the next bit
+        }
+        else // If the waiting time is passed, send the next bit
         {
             if (sendingBit++ < SENDINGDATA_LEN) {
                 if (sendingBit == STARTBIT_VALUE) // Send start bit
                     onTime = startTime;
-                else                                                                 // Send data
+                else // Send data
                     onTime = ((sendingData >> sendingBit) & 1) ? oneTime
                                                                : zeroTime; // Set the time corresponding to the bit
                 TCCR0A &= ~(1 << COM0A1); // Enable TC0
-            } else {
+            } else
+            {
                 sendingBit = SENDINGBIT_START_VALUE; // Once all bits are send, reset for next run
                 sendingData = player1.y;
                 sendingData <<= 9;
@@ -270,7 +256,7 @@ int main(void) {
     init_timer0();
 
     // Setup IR recieving
-    PORTD |= (1 << PORTD2); //pull up
+    PORTD |= (1 << PORTD2); // pull up
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
 
@@ -291,20 +277,24 @@ int main(void) {
     }
 
 
+    Serial.begin(9600);
+
     drawBackground();
     drawInteractables();
-    volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
+    volatile int frameCounter = 0; // #TODO reset deze ergens en hem verplaatsen
 
-    while (true) {
-        if (intCurrentMs > FRAME_TIME) {
+    while (true)
+    {
+        if (intCurrentMs > FRAME_TIME)
+        {
             //30 FPS
             intCurrentMs = 0;
             frameCounter++;
-            if (currentGameState == GAME) {
+            if (currentGameState == GAME)
+            {
                 //Game code
                 update();
                 draw();
-
             }
         }
     }
@@ -332,7 +322,8 @@ void setFreq(uint8_t freq) {
         zeroTime = 37;
         oneTime = 113;
         offTime = 37;
-    } else {
+    } else
+    {
         msTime = 55;
         startTime = 279;
         zeroTime = 55;
@@ -347,9 +338,11 @@ void update() {
     player1.y += player1.yVelocity;
 
     //Checks if the player is not already at the bottom of the screen.
-    if (player1.y + PLAYER_HEIGHT + player1.yVelocity <= SCREEN_HEIGHT) {
+    if (player1.y + PLAYER_HEIGHT + player1.yVelocity <= SCREEN_HEIGHT)
+    {
         player1.yVelocity += GRAVITY;
-    } else {
+    } else
+    {
         player1.yVelocity = 0;
         player1.jumping = false;
     }
@@ -362,7 +355,7 @@ void update() {
     if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
         player1.x += MOVEMENT_SPEED;
 
-    // Check for movement to left
+        // Check for movement to left (only move when not against the wall)
     else if (state.joy_x_axis < 100 && player1.x > 0)
         player1.x -= MOVEMENT_SPEED;
 
@@ -375,14 +368,17 @@ void update() {
     ) {resetFunc();}
 
     //Jumping and falling mechanics
-    if (state.c_button == 1 && !player1.jumping) {
+    if (state.c_button == 1 && !player1.jumping)
+    {
         player1.jumping = true;
         player1.yVelocity -= INITIAL_Y_VEL;
     }
 }
 
-void CheckWallCollision() {
-    for (auto &wall: walls) {
+void CheckWallCollision()
+{
+    for (auto &wall: walls)
+    {
         // Check if the player is colliding with the wall.
         if (player1.x + PLAYER_ACTUAL_WIDTH > wall.x && player1.x < wall.x + (wall.width * 2) &&
             player1.y + PLAYER_HEIGHT > wall.y && player1.y < wall.y + wall.height) {
@@ -392,21 +388,26 @@ void CheckWallCollision() {
                 player1.yVelocity = 0;
                 player1.jumping = false;
             } else if (player1.yOld >=
-                       wall.y + wall.height) { // Check if the player is colliding with the wall from the bottom
+                       wall.y + wall.height)
+            { // Check if the player is colliding with the wall from the bottom
                 player1.y = wall.y + wall.height;
                 player1.yVelocity = 0;
             } else if (player1.xOld + PLAYER_ACTUAL_WIDTH <=
-                       wall.x) { // Check if the player is colliding with the wall from the left
+                       wall.x)
+            { // Check if the player is colliding with the wall from the left
                 player1.x = wall.x - PLAYER_ACTUAL_WIDTH;
             } else if (player1.xOld >=
-                       wall.x + (wall.width * 2)) { // Check if the player is colliding with the wall from the right
+                       wall.x + (wall.width * 2))
+            { // Check if the player is colliding with the wall from the right
                 player1.x = wall.x + (wall.width * 2);
             }
         }
     }
 }
 
-void draw() {
+
+void draw()
+{
     clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
     drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
 
@@ -425,8 +426,8 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
 
             if (color != 255 && !pointInRect(xOld, yOld, x, y, w, h)) {
                 uint8_t idx =
-                        ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 +
-                        yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                    ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 +
+                    yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
                 drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
             }
             xOld++;
@@ -481,9 +482,7 @@ void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Spri
 
         for (int8_t Pixel = 1; Pixel >= 0; Pixel--) {
             uint16_t color = getColor(((Sprite[Mirr] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
-            drawPixel(x, y, (color == 255) ? getColor(
-                    (Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] &
-                     ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4), ver) : color);
+            drawPixel(x, y, (color == 255) ? getColor((Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4), ver) : color);
 
             x++;
         }
@@ -505,8 +504,10 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++) {
             uint16_t color = getColor(((Background[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
-            for (auto &r: walls) {
-                if (pointInRect(x, y, r.x, r.y, r.width, r.height)) {
+            for (auto &r: walls)
+            {
+                if (pointInRect(x, y, r.x, r.y, r.width, r.height))
+                {
                     color = (color == BACKGROUND_DARK) ? FOREGROUND_DARK : FOREGROUND_LIGHT;
                     break;
                 }
@@ -521,133 +522,152 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h) {
 
 void drawInteractables() {
     drawSprite(210, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-    drawSpriteMirror(210 + BUTTON_WIDTH * 2 - 2, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);                 //Button 1
+    drawSpriteMirror(210 + BUTTON_WIDTH * 2 - 2, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 1
     drawSprite(230, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-    drawSpriteMirror(230 + BUTTON_WIDTH * 2 - 2, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);                  //Button 2
+    drawSpriteMirror(230 + BUTTON_WIDTH * 2 - 2, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 2
 
     drawSprite(150, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue);
-    drawSpriteMirror(150 + WATER_WIDTH * 2 - 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue);                 //water
+    drawSpriteMirror(150 + WATER_WIDTH * 2 - 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue); // water
     drawSprite(215, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1);
-    drawSpriteMirror(215 + WATER_WIDTH * 2 - 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1);                 //lava
+    drawSpriteMirror(215 + WATER_WIDTH * 2 - 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1); // lava
     drawSprite(189, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 2);
-    drawSpriteMirror(189 + WATER_WIDTH * 2 - 2, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue,2);                 //shrek-cum
+    drawSpriteMirror(189 + WATER_WIDTH * 2 - 2, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue,
+                     2);                 //shrek-cum
 
     drawSprite(55, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,2);                     //DoorTop left
+    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,
+                     2);                     //DoorTop left
     drawSprite(55, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);         //DoorFrame left
+    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,
+                     2);         //DoorFrame left
     drawSprite(55, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);       //DoorFrame left
+    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,
+                     2);       //DoorFrame left
 
     drawSprite(80, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,2);                     //DoorTop right
+    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,
+                     2);                     //DoorTop right
     drawSprite(80, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);         //DoorFrame right
+    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,
+                     2);         //DoorFrame right
     drawSprite(80, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,2);       //DoorFrame right
+    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,
+                     2);       //DoorFrame right
 
     drawSprite(61, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue);
-    drawSpriteMirror(61 + SIGN_WIDTH * 2 - 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue);                       //Blue sign
+    drawSpriteMirror(61 + SIGN_WIDTH * 2 - 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue); // Blue sign
     drawSprite(86, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);
-    drawSpriteMirror(86 + SIGN_WIDTH * 2 - 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);                        //Red sign
+    drawSpriteMirror(86 + SIGN_WIDTH * 2 - 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed); // Red sign
 
     drawSprite(280, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge);
     drawSprite(280 + PLATFORM_WIDTH * 2, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle);
-    drawSpriteMirror(280 + PLATFORM_WIDTH * 4 - 2, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge);      //Platform 1
+    drawSpriteMirror(280 + PLATFORM_WIDTH * 4 - 2, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge); // Platform 1
 
     drawSprite(10, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, 1);
     drawSprite(10 + PLATFORM_WIDTH * 2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, 1);
-    drawSpriteMirror(10 + PLATFORM_WIDTH * 4 - 2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge,
-                     1);    //Platform 2
+    drawSpriteMirror(10 + PLATFORM_WIDTH * 4 - 2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, 1); // Platform 2
 
     drawSprite(12, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
-    drawSpriteMirror(12 + DIA_WIDTH * 2 - 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);                          //Dia Blue 1
+    drawSpriteMirror(12 + DIA_WIDTH * 2 - 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue); // Dia Blue 1
 
     drawSprite(164, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
-    drawSpriteMirror(164 + DIA_WIDTH * 2 - 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);                        //DiaBlue 2
+    drawSpriteMirror(164 + DIA_WIDTH * 2 - 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue); // DiaBlue 2
 
     drawSprite(26, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);
-    drawSpriteMirror(26 + DIA_WIDTH * 2 - 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);                         //DiaRed 1
+    drawSpriteMirror(26 + DIA_WIDTH * 2 - 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1); // DiaRed 1
 
     drawSprite(229, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);
-    drawSpriteMirror(229 + DIA_WIDTH * 2 - 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);                       //DiaRed 2
+    drawSpriteMirror(229 + DIA_WIDTH * 2 - 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1); // DiaRed 2
 
     drawSprite(86, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1);
-    drawSpriteMirror(86 + LEVER_BASE_WIDTH * 2 - 2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1); //LeverBase
+    drawSpriteMirror(86 + LEVER_BASE_WIDTH * 2 - 2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1); // LeverBase
 
-    drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, 1);                                 //LeverTop
+    drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, 1); // LeverTop
 }
 
-uint16_t getColor(uint8_t Color, uint8_t ver) {
-    switch (Color) {
+uint16_t getColor(uint8_t Color, uint8_t ver)
+{
+    switch (Color)
+    {
         case 0:             //0000
             return BLACK;
 
-        case 1:             //0001
-            return PLAYER_RED;
+    case 1: // 0001
+        return PLAYER_RED;
 
-        case 2:             //0010
-            return PLAYER_ORANGE;
+    case 2: // 0010
+        return PLAYER_ORANGE;
 
-        case 3:             //0011
-            return PLAYER_YELLOW;
+    case 3: // 0011
+        return PLAYER_YELLOW;
 
         case 4:             //0100
-            if (ver == 0) {
+            if (ver == 0)
+            {
                 return PLAYER_DARK_BLUE;
-            } else if (ver == 1) {
+            } else if (ver == 1)
+            {
                 return PLAYER_RED;
-            } else {
+            } else
+            {
                 return INTER_BROWN;
             }
 
         case 5:             //0101
-            if (ver == 0) {
+            if (ver == 0)
+            {
                 return PLAYER_BLUE;
-            } else if (ver == 1) {
+            } else if (ver == 1)
+            {
                 return PLAYER_ORANGE;
-            } else {
+            } else
+            {
                 return SWAMP_GREEN;
             }
 
         case 6:             //0110
-            if (ver == 0) {
+            if (ver == 0)
+            {
                 return PLAYER_LIGHT_BLUE;
-            } else if (ver == 1) {
+            } else if (ver == 1)
+            {
                 return PLAYER_YELLOW;
-            } else {
+            } else
+            {
                 return SWAMP_GREEN;
             }
 
-        case 7:             //0111
+    case 7: // 0111
 
-        case 8:             //1000
-            return INTER_BROWN;
+    case 8: // 1000
+        return INTER_BROWN;
 
-        case 9:             //1001
-            return INTER_GOLD;
+    case 9: // 1001
+        return INTER_GOLD;
 
         case 10:            //1010
-            if (ver == 0) {
+            if (ver == 0)
+            {
                 return INTER_PURPLE;
-            } else {
+            } else
+            {
                 return INTER_YELLOW;
             }
 
-        case 11:            //1011
+    case 11: // 1011
 
-        case 12:            //1100
-            return BACKGROUND_LIGHT;
+    case 12: // 1100
+        return BACKGROUND_LIGHT;
 
-        case 13:            //1101
-            return BACKGROUND_DARK;
+    case 13: // 1101
+        return BACKGROUND_DARK;
 
-        case 14:            //1110
-            return 0xFFFF;  //white
+    case 14:           // 1110
+        return 0xFFFF; // white
 
-        case 15:            //1111
-            return 255;
-        default:
-            return 255;
+    case 15: // 1111
+        return 255;
+    default:
+        return 255;
     }
 }

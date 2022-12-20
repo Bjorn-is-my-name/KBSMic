@@ -207,7 +207,7 @@ bool isDataBit = false;
 
 enum gameState
 {
-    MENU, GAME, LEVELSELECT, SETTINGS, PAUSE, GAMEOVER, PLAYERSELECTSCREEN;
+    MENU, GAME, LEVELSELECT, SETTINGS, PAUSE, GAMEOVER, PLAYERSELECTSCREEN
 };
 gameState currentGameState = MENU;
 gameState oldGameState = GAME;

@@ -38,6 +38,8 @@ void drawMenu();
 
 void drawSettings();
 
+void drawPlayerSelectScreen();
+
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
 
 void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
@@ -205,7 +207,7 @@ bool isDataBit = false;
 
 enum gameState
 {
-    MENU, GAME, LEVELSELECT, SETTINGS, PAUSE, GAMEOVER
+    MENU, GAME, LEVELSELECT, SETTINGS, PAUSE, GAMEOVER, PLAYERSELECTSCREEN;
 };
 gameState currentGameState = MENU;
 gameState oldGameState = GAME;
@@ -303,7 +305,7 @@ int main(void)
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
 
-    setFreq(IR_38KHZ);
+    setFreq(EEPROM_read(20));
 
     // Setup screen
     Wire.begin();
@@ -333,7 +335,12 @@ int main(void)
         drawString("found", 60, 160, 5, PLAYER_YELLOW);
     }
 
+
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
+
+    uint16_t x, y;
+    uint8_t z;
+
     Serial.begin(9600);
     while (true)
     {
@@ -342,11 +349,11 @@ int main(void)
             Serial.println("xmin");
             Serial.println(map(65, 0, 320, 150, 3800));
             Serial.println("xmax");
-            Serial.println(map((65+212), 0, 320, 150, 3800));
+            Serial.println(map((65 + 212), 0, 320, 150, 3800));
             Serial.println("ymin");
             Serial.println(map(130, 240, 0, 130, 4000));
             Serial.println("ymax");
-            Serial.println(map((130+50), 240, 0, 130, 4000));
+            Serial.println(map((130 + 50), 240, 0, 130, 4000));
 
             //30 FPS
             intCurrentMs = 0;
@@ -363,8 +370,6 @@ int main(void)
                 //Menu code
                 if (touch.touched())
                 {
-                    uint16_t x, y;
-                    uint8_t z;
                     while (!touch.bufferEmpty())
                     {
 //                        Serial.print(touch.bufferSize());
@@ -376,16 +381,35 @@ int main(void)
                         Serial.print(", ");
                         Serial.print(z);
                         Serial.println(")");*/
+                        if (x > 1404 && x < 2727 && y > 2378 && y < 3193) //check if you pressed play button
+                        {
+                            currentGameState = GAME;
+                        } else if (x > 891 && x < 3309 && y > 1903 && y < 1097) //check if you pressed settings button
+                        {
+                            currentGameState = SETTINGS;
+                        }
                     }
-                    if (x > 1404 && x <2727 && y >2378 && y <3193) //check if you pressed play button
+                }
+            }
+            if (currentGameState == PLAYERSELECTSCREEN)
+            {
+                if (touch.touched())
+                {
+                    while (!touch.bufferEmpty())
                     {
-                        currentGameState = GAME;
+                        touch.readData(&y, &x, &z); //reversed order because of screen rotation
+                        if (x > 1404 && x < 2727 && y > 2378 && y < 3193) //check if you pressed Player1 button #TODO coords fixen
+                        {
+                            EEPROM_write(20, 52);
+                            setFreq(52);
+                            currentGameState = SETTINGS;
+                        } else if (x > 891 && x < 3309 && y > 1903 && y < 1097) //check if you pressed Player2 button
+                        {
+                            EEPROM_write(20, 35);
+                            setFreq(35);
+                            currentGameState = SETTINGS;
+                        }
                     }
-                    else if(x > 891 && x <3309 && y > 1903 && y < 1097) //check if you pressed settings button
-                    {
-                        currentGameState = SETTINGS;
-                    }
-
 
                 }
             }
@@ -409,7 +433,7 @@ void init_timer0()
 
 void setFreq(uint8_t freq)
 {
-    OCR0A = freq;
+
 
     if (freq == IR_38KHZ)
     {
@@ -418,14 +442,20 @@ void setFreq(uint8_t freq)
         zeroTime = 37;
         oneTime = 113;
         offTime = 37;
-    } else
+    } else if (freq == IR_56KHZ)
     {
         msTime = 55;
         startTime = 279;
         zeroTime = 55;
         oneTime = 167;
         offTime = 55;
+    } else
+    {
+        currentGameState = PLAYERSELECTSCREEN;
+        return; //to avoid timer0 going crazy
     }
+
+    OCR0A = freq;
 }
 
 void checkGameState()
@@ -441,15 +471,29 @@ void checkGameState()
         oldGameState = MENU;
         drawMenu();
     }
-    if(currentGameState == SETTINGS && oldGameState != SETTINGS)
+    if (currentGameState == SETTINGS && oldGameState != SETTINGS)
     {
         oldGameState = SETTINGS;
         drawSettings();
     }
+    if (currentGameState == PLAYERSELECTSCREEN && oldGameState != PLAYERSELECTSCREEN)
+    {
+        oldGameState = PLAYERSELECTSCREEN;
+        drawPlayerSelectScreen();
+    }
+}
+
+void drawPlayerSelectScreen()
+{
+    fillRect(0, 0, 320, 240, 0x0);
+    drawString("Choose your player", 20, 10, 5, PLAYER_RED);
+    drawString("Player1(38KHZ)", 20, 200, 5, PLAYER_RED);
+    drawString("Player2(56KHZ)", 250, 200, 5, PLAYER_RED);
 }
 
 
-void drawMenu(){
+void drawMenu()
+{
     fillRect(0, 0, 320, 240, 0x0);
     drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); //Play button
     drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); //Settings button
@@ -457,7 +501,8 @@ void drawMenu(){
     drawString("Settings", 75, 140, 4, PLAYER_RED);
 }
 
-void drawSettings(){
+void drawSettings()
+{
     drawString("drol", 100, 60, 4, PLAYER_RED);
 }
 

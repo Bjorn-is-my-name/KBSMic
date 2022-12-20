@@ -27,12 +27,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="pruttel poep">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13-12-2022_09_33_[Changes]1/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13-12-2022_09_33__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13-12-2022_09_33__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_13-12-2022_09_33__Changes_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20-12-2022_16_37__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20-12-2022_16_37__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_7-12-2022_14_58__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_7-12-2022_14_58__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-uno/.ninja_log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/.ninja_log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-uno/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/CMakeCache.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/CMakeError.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/CMakeError.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/CMakeOutput.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/CMakeOutput.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/TargetDirectories.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/TargetDirectories.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/clion-environment.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/clion-environment.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/rules.ninja" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/CMakeFiles/rules.ninja" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-uno/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/Testing/Temporary/LastTest.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/LCD.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LCD.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Player1.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/Player1.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-uno/build.ninja" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/build.ninja" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-uno/cmake_install.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-uno/cmake_install.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -64,10 +74,13 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/.platformio/packages/framework-arduino-avr/cores/arduino/Arduino.h" root0="SKIP_INSPECTION" />
     <setting file="file://$USER_HOME$/.platformio/packages/framework-arduino-avr/cores/arduino/wiring.c" root0="SKIP_INSPECTION" />
     <setting file="file://$USER_HOME$/.platformio/packages/framework-arduino-avr/libraries/Wire/src/Wire.cpp" root0="SKIP_INSPECTION" />
     <setting file="file://$USER_HOME$/.platformio/packages/framework-arduino-avr/libraries/Wire/src/Wire.h" root0="SKIP_INSPECTION" />
     <setting file="file://$USER_HOME$/.platformio/packages/framework-arduino-avr/libraries/Wire/src/utility/twi.c" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.platformio/packages/toolchain-atmelavr/avr/include/avr/common.h" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.platformio/packages/toolchain-atmelavr/avr/include/avr/iom328p.h" root0="SKIP_INSPECTION" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -81,36 +94,36 @@
     <option name="minorVersion" value="2.4" />
   </component>
   <component name="ProjectId" id="2HfTTN7Fl4Y1I5D8QbqDu4gwYYO" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "last_opened_file_path": "C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/include",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "serialMonitor.commands": "wtst",
-    "settings.editor.selected.configurable": "serialmonitor.settings",
-    "structure.view.defaults.are.configured": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Frank/OneDrive - Windesheim Office365/jaar 2/Microcontrollers/KBSMic/include&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;serialMonitor.commands&quot;: &quot;wtst&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;serialmonitor.settings&quot;,
+    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Frank\OneDrive - Windesheim Office365\jaar 2\Microcontrollers\KBSMic\include" />
@@ -188,6 +201,7 @@
       <workItem from="1671106141530" duration="5277000" />
       <workItem from="1671111484810" duration="2925000" />
       <workItem from="1671444597433" duration="16971000" />
+      <workItem from="1671551052530" duration="2585000" />
     </task>
     <task id="LOCAL-00001" summary="update to most recent version">
       <created>1670243123875</created>

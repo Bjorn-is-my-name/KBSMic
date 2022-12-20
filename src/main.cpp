@@ -13,6 +13,8 @@ void checkWallCollision();
 void CheckPlatformCollision();
 void checkCollision(Rect &);
 bool rectangleCollision(uint16_t, uint8_t, Rect &);
+void checkButtons();
+void checkLevers();
 
 void setFreq(uint8_t);
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
@@ -26,6 +28,8 @@ uint16_t getColor(uint8_t, uint8_t ver = 0);
 void update();
 void draw();
 void clearPlat(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
+void drawPlat(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
+void drawLiquid(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
 
 struct
 {
@@ -56,83 +60,147 @@ struct Collect
     uint8_t h;
 };
 
-struct lever
-{
-    Rect bounds;
-    bool state;
-    bool standingOn;
-};
-
 struct Platform
 {
-    Rect bounds;
+    Rect *bounds;
     uint16_t minX;
     uint16_t maxX;
     uint8_t minY;
     uint8_t maxY;
     uint8_t version;
-    bool standingOn;
 
-    Platform(Rect Bounds, uint16_t MinX, uint16_t MaxX, uint8_t MinY, uint8_t MaxY, uint8_t Version = 0){
+    Platform(Rect *Bounds, uint16_t MinX, uint16_t MaxX, uint8_t MinY, uint8_t MaxY, uint8_t Version = 0)
+    {
         this->bounds = Bounds;
         this->minX = MinX;
         this->maxX = MaxX;
         this->minY = MinY;
         this->maxY = MaxY;
         this->version = Version;
-        this->standingOn = false;
+    }
+    void MoveMax()
+    {
+        if(maxX == minX){
+            MoveMaxY();
+        }else if(maxY == minY){
+            MoveMaxX();
+        }
+    }
+    void MoveMin()
+    {
+        if(maxX == minX){
+            MoveMinY();
+        }else if(maxY == minY){
+            MoveMinX();
+        }
+    }
+    void MoveMaxX()
+    {
+        if(bounds->x < maxX)
+        {
+            clearPlat(bounds->x+1, bounds->y, bounds->x, bounds->y, bounds->width, bounds->height);
+            bounds->x+=1;
+            draw();
+        }
+    }
+    void MoveMaxY()
+    {
+        if(bounds->y < maxY)
+        {
+            clearPlat(bounds->x, bounds->y+1, bounds->x, bounds->y, bounds->width, bounds->height);
+            bounds->y++;
+            draw();
+        }
+    }
+    void MoveMinX()
+    {
+        if(bounds->x > minX)
+        {
+            clearPlat(bounds->x-1, bounds->y, bounds->x, bounds->y, bounds->width, bounds->height);
+            bounds->x-=1;
+            draw();
+        }
+    }
+    void MoveMinY()
+    {
+        if(bounds->y > minY)
+        {
+            clearPlat(bounds->x, bounds->y-1, bounds->x, bounds->y, bounds->width, bounds->height);
+            bounds->y-=1;
+            draw();
+        }
+    }
+    bool isMax()
+    {
+        if((bounds->x == maxX && bounds->y == maxY) || (bounds->x == minX && bounds->y == minY))
+        {
+            return true;
+        }else
+        {
+            return false;
+        }
     }
 
-    void MoveMaxX(){
-        clearPlat(maxY, maxX, bounds.x, bounds.y, bounds.width, bounds.height);
-        bounds.x = maxX;
-        //draw sprite
-        drawSprite(bounds.x, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, version);
-        drawSprite(bounds.x + PLATFORM_WIDTH * 2, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, version);
-        drawSpriteMirror(bounds.x + PLATFORM_WIDTH * 4, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, version);
-    }
-    void MoveMaxY(){
-        clearPlat(maxY, maxX, bounds.x, bounds.y, bounds.width, bounds.height);
-        bounds.y = maxY;
-        //draw sprite
-        drawSprite(bounds.x, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, version);
-        drawSprite(bounds.x + PLATFORM_WIDTH * 2, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, version);
-        drawSpriteMirror(bounds.x + PLATFORM_WIDTH * 4, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, version);
-    }
-    void MoveMinX(){
-        clearPlat(maxY, maxX, bounds.x, bounds.y, bounds.width, bounds.height);
-        bounds.x = minX;
-        //draw sprite
-        drawSprite(bounds.x, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, version);
-        drawSprite(bounds.x + PLATFORM_WIDTH * 2, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, version);
-        drawSpriteMirror(bounds.x + PLATFORM_WIDTH * 4, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, version);
-    }
-    void MoveMinY(){
-        clearPlat(maxY, maxX, bounds.x, bounds.y, bounds.width, bounds.height);
-        bounds.y = minY;
-        drawSprite(bounds.x, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, version);
-        drawSprite(bounds.x + PLATFORM_WIDTH * 2, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, version);
-        drawSpriteMirror(bounds.x + PLATFORM_WIDTH * 4, bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, version);
+    void draw()
+    {
+        drawPlat(bounds->x, bounds->y, PLATFORM_WIDTH, PLATFORM_HEIGHT, version);
     }
 };
 
+struct lever
+{
+    Rect bounds;
+    bool state;
+    bool standingOn;
+    Platform plat;
+    void activate()
+    {
+        if(state)
+        {
+            //move platform
+            this->plat.MoveMax();
+        }else
+        {
+            //move platform back
+            this->plat.MoveMin();
+        }
+    }
+};
 
-Rect Door1 = {55, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};
-Rect Door2 = {80, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};
+struct button
+{
+    Rect bounds;
+    bool standingOn;
+    Platform *plat;
+    button *connectedButton;
 
-Rect Platform1Bounds = {280, 72, 15, 8};
-Rect Platform2Bounds = {10, 112, 15, 8};
+    void activate()
+    {
+        if(standingOn || connectedButton->standingOn)
+        {
+            //move platform
+            plat->MoveMax();
+        }else
+        {
+            //move platform back
+            plat->MoveMin();
+        }
+        if(!(plat->isMax()))
+        {
+            drawSprite((bounds).x - 3, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+            drawSpriteMirror((bounds).x - 3 + BUTTON_WIDTH * 2, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+        }
+        
+    }
 
-Platform Platform1 = {Platform1Bounds, 280, 280, 72, 112};
-Platform Platform2 = {Platform2Bounds, 10, 10, 112, 142, 1};
+    void setConnectedButton(button *btn)
+    {
+        this->connectedButton = btn;
+    }
+};
 
-Rect Button1 = {214, 118, 3, 2};
-Rect Button2 = {234, 68, 3, 2};
-
-Rect Lever1Bounds = {91, 148, 3, 2};
-lever Lever1 = {Lever1Bounds, false};
-
-Rect walls[] = {
+Rect walls[] = 
+{
     Rect{0, 0, 5, 240},
     Rect{10, 0, 155, 10},
     Rect{310, 10, 5, 230},
@@ -151,21 +219,49 @@ Rect walls[] = {
     Rect{10, 190, 40, 10}
 };
 
-Platform *platforms[] = {
+Rect Platform1Bounds = {280, 72, 15, 8};
+Rect Platform2Bounds = {10, 112, 15, 8};
+
+Platform Platform1 = {&Platform1Bounds, 280, 280, 72, 112};
+Platform Platform2 = {&Platform2Bounds, 10, 10, 112, 142, 1};
+
+Platform *platforms[] = 
+{
     &Platform1,
     &Platform2
 };
 
-lever levers[] = {
+Rect Lever1Bounds = {91, 148, 3, 2};
+
+lever Lever1 = {Lever1Bounds, false, false, Platform2};
+
+lever levers[] =
+{
     Lever1
 };
 
-Collect Dias[] = {
+Rect Button1Bounds = {214, 118, 3, 2};
+Rect Button2Bounds = {234, 68, 3, 2};
+
+button button1 = {Button1Bounds, false, &Platform1};
+button button2 = {Button2Bounds, false, &Platform1};
+
+button *buttons[] =
+{
+    &button1,
+    &button2
+};
+
+Collect Dias[] =
+{
     Collect{12, 12, DIA_WIDTH * 2, DIA_HEIGHT},
     Collect{164, 216, DIA_WIDTH * 2, DIA_HEIGHT},
     Collect{26, 12, DIA_WIDTH * 2, DIA_HEIGHT},
     Collect{229, 216, DIA_WIDTH * 2, DIA_HEIGHT}
 };
+
+Rect Door1 = {55, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};
+Rect Door2 = {80, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};
 
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
@@ -287,6 +383,10 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
 
 int main(void)
 {
+    // Connect buttons to eachother
+    button1.setConnectedButton(&button2);
+    button2.setConnectedButton(&button1);
+
     // Setup IR sending
     DDRD |= (1 << DDD6);
     initTimer0();
@@ -382,7 +482,8 @@ void update()
     player1.y += player1.yVelocity;
     player1.yVelocity += GRAVITY;
 
-    if(state.z_button == 1){
+    if(state.z_button == 1)
+    {
         player2.y++;
         player2.x = 229;
     }
@@ -407,39 +508,8 @@ void update()
     checkWallCollision();
     CheckPlatformCollision();
 
-    if( rectangleCollision(player1.x, player1.y, Button1) ||
-        rectangleCollision(player1.x, player1.y, Button2) ||
-        rectangleCollision(player2.x, player2.y, Button1) ||
-        rectangleCollision(player2.x, player2.y, Button2))
-    {
-        if(!Platform1.standingOn){
-            Platform1.MoveMaxY();
-            Platform1.standingOn = true;
-        }
-    }else if(Platform1.standingOn){
-        Platform1.MoveMinY();
-        Platform1.standingOn = false;
-    }else{
-        drawSprite(210, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-        drawSpriteMirror(210 + BUTTON_WIDTH * 2, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 1
-
-        drawSprite(230, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-        drawSpriteMirror(230 + BUTTON_WIDTH * 2, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 2
-    }
-
-        for(lever L : levers){
-            if(rectangleCollision(player1.x, player1.y, L.bounds) || rectangleCollision(player2.x, player2.y, L.bounds))
-            {
-                if(!L.standingOn)
-                {
-                    L.state != L.state;
-                    L.standingOn = true;
-                }
-            }else if(L.standingOn)
-            {
-                L.standingOn = false;
-            }
-        }
+    checkButtons();
+    checkLevers();
 
     // Jumping and falling mechanics
     if (state.c_button == 1 && !player1.jumping)
@@ -449,16 +519,47 @@ void update()
     }
 }
 
+void checkButtons()
+{
+    for(button *B : buttons)
+    {
+        if(rectangleCollision(player1.x, player1.y, B->bounds) || rectangleCollision(player2.x, player2.y, B->bounds))
+        {
+            B->standingOn = true;
+        }else
+        {
+            B->standingOn = false;
+        }
+        B->activate();
+    }
+}
+
+void checkLevers()
+{
+    for(lever L : levers)
+    {
+        if(rectangleCollision(player1.x, player1.y, L.bounds) || rectangleCollision(player2.x, player2.y, L.bounds))
+        {
+            if(!L.standingOn)
+            {
+                L.state =! L.state;
+                L.standingOn = true;
+            }
+        }else if(L.standingOn)
+        {
+            L.standingOn = false;
+        }
+    }
+}
+
 void CheckPlatformCollision(){
     for (auto &platform : platforms)
     {
-        checkCollision(platform->bounds);
-        if (rectangleCollision(player1.x, player1.y, platform->bounds))
+        if (rectangleCollision(player1.x, player1.y, *platform->bounds))
         {
-            drawSprite(platform->bounds.x, platform->bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, platform->version);
-            drawSprite(platform->bounds.x + PLATFORM_WIDTH * 2, platform->bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, platform->version);
-            drawSpriteMirror(platform->bounds.x + PLATFORM_WIDTH * 4, platform->bounds.y, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, platform->version);
+            drawPlat((*platform->bounds).x, (*platform->bounds).y, PLATFORM_WIDTH, PLATFORM_HEIGHT, platform->version);
         }
+        checkCollision(*platform->bounds);
     }
 
 }
@@ -471,7 +572,8 @@ void checkWallCollision()
     }
 }
 
-void checkCollision(Rect &bounds){
+void checkCollision(Rect &bounds)
+{
     // Check if the player is colliding with the wall.
     if (rectangleCollision(player1.x, player1.y, bounds))
     {
@@ -546,6 +648,24 @@ void clearPlat(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, ui
             xOld++;
         }
     }
+}
+
+void drawPlat(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+{
+    drawLineH(x, y, x+30, BLACK);
+    drawRect(x, y+1, 30, 6, INTER_BROWN);
+    drawRect(x+1, y+2, 28, 4, INTER_GOLD);
+    drawRect(x+2, y+3, 26, 2, getColor(PLATFORM_MIDDLE_COLOR, ver));
+    drawLineH(x, y+7, x+30, BLACK);
+}
+
+void drawLiquid(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+{
+    drawRect(x, y, w, h, BLACK);
+    drawLineH(x+1, y, x+w-1, getColor(LIQUID_TOP_COLOR, ver));
+    drawLineH(x+1, y+1, x+w-1, getColor(LIQUID_MIDDLE_COLOR, ver));
+    drawLineH(x+1, y+2, x+w-1, getColor(LIQUID_BOTTOM_COLOR, ver));
+    drawLineH(x+1, y+3, x+w-1, getColor(LIQUID_BOTTOM_COLOR, ver));
 }
 
 bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t w, uint8_t h)
@@ -663,17 +783,9 @@ void drawInteractables()
     drawSprite(230, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
     drawSpriteMirror(230 + BUTTON_WIDTH * 2, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 2
 
-
-    drawSprite(150, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue);
-    drawSpriteMirror(150 + WATER_WIDTH * 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue); // water
-
-
-    drawSprite(215, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1);
-    drawSpriteMirror(215 + WATER_WIDTH * 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1); // lava
-
-
-    drawSprite(189, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 2);
-    drawSpriteMirror(189 + WATER_WIDTH * 2, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 2); // shrek-cum
+    drawLiquid(150, 230, WATER_WIDTH*4, WATER_HEIGHT, 0); // water
+    drawLiquid(215, 230, WATER_WIDTH*4, WATER_HEIGHT, 1); // lava
+    drawLiquid(189, 180, WATER_WIDTH*4, WATER_HEIGHT, 2); // PISS-ON
 
 
     drawSprite(55, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
@@ -702,10 +814,7 @@ void drawInteractables()
     drawSprite(86, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);
     drawSpriteMirror(86 + SIGN_WIDTH * 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed); // Red sign
 
-
-    drawSprite(10, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, 1);
-    drawSprite(10 + PLATFORM_WIDTH * 2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, 1);
-    drawSpriteMirror(10 + PLATFORM_WIDTH * 4, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, 1); // Platform 2
+    drawPlat(10, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, 1);// Platform 2
 
 
     drawSprite(12, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
@@ -727,7 +836,6 @@ void drawInteractables()
     drawSprite(86, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1);
     drawSpriteMirror(86 + LEVER_BASE_WIDTH * 2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1); // LeverBase
 
-
     drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, 1); // LeverTop
 }
 
@@ -747,7 +855,7 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
     case 3: // 0011
         return PLAYER_YELLOW;
 
-    case 4: // 0100
+    case LIQUID_BOTTOM_COLOR: // 0100
         if (ver == 0)
         {
             return PLAYER_DARK_BLUE;
@@ -761,7 +869,7 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
             return INTER_BROWN;
         }
 
-    case 5: // 0101
+    case LIQUID_MIDDLE_COLOR: // 0101
         if (ver == 0)
         {
             return PLAYER_BLUE;
@@ -775,7 +883,7 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
             return SWAMP_GREEN;
         }
 
-    case 6: // 0110
+    case LIQUID_TOP_COLOR: // 0110
         if (ver == 0)
         {
             return PLAYER_LIGHT_BLUE;
@@ -797,7 +905,7 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
     case 9: // 1001
         return INTER_GOLD;
 
-    case 10: // 1010
+    case PLATFORM_MIDDLE_COLOR: // 0b00001010
         if (ver == 0)
         {
             return INTER_PURPLE;

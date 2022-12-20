@@ -34,6 +34,10 @@
 
 #define FOREGROUND_LIGHT 0x7346         ///<  14,  26,   6
 #define FOREGROUND_DARK 0x5A85          ///<  11,  20,   5
+#define PLATFORM_MIDDLE_COLOR 0b00001010
+#define LIQUID_TOP_COLOR 0b00000110
+#define LIQUID_MIDDLE_COLOR 0b00000101
+#define LIQUID_BOTTOM_COLOR 0b00000100
 //--------------------------------------------------------
 
 // Prototypes
@@ -61,7 +65,9 @@ void SEND_COMMAND_WITH_ARGUMENTS(uint8_t, uint8_t *, uint8_t);
 
 void START_UP();
 
-void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color);
+void fillRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t);
+void drawRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t);
+void drawLineH(uint16_t x, uint8_t y, uint16_t x2, uint16_t color);
 
 
 void setupSPI() {
@@ -89,11 +95,30 @@ void drawPixel(uint16_t x, uint16_t y, uint16_t color) {
     }
 }
 
+//drawRect
+void drawRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color) {
+    for (uint16_t this_x = 0; this_x < width; ++this_x) {
+        drawPixel(this_x + x, y, color);
+        drawPixel(this_x + x, y + height - 1, color);
+    }
+    for (uint8_t this_y = 0; this_y < height; ++this_y) {
+        drawPixel(x, this_y + y, color);
+        drawPixel(x + width - 1, this_y + y, color);
+    }
+}
+
 void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color) {
     for (uint16_t this_x = 0; this_x < width; ++this_x) {
         for (int this_y = 0; this_y < height; ++this_y) {
             drawPixel(this_x + x, this_y + y, color);
         }
+    }
+}
+
+void drawLineH(uint16_t x, uint8_t y, uint16_t x2, uint16_t color){
+    while(x < x2){
+        drawPixel(x, y, color);
+        x++;
     }
 }
 

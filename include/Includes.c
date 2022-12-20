@@ -9,13 +9,10 @@
 #include "Player2.c"
 
 #include "Button.c"
-#include "WaterBlue.c"
 #include "DoorCorner.c"
 #include "DoorEdge.c"
 #include "SignBlue.c"
 #include "SignRed.c"
-#include "PlatformEdge.c"
-#include "PlatformMiddle.c"
 #include "LeverBase.c"
 #include "LeverTop.c"
 #include "DiaBlue.c"

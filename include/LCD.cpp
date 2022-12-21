@@ -336,7 +336,7 @@ void drawString(const char *string, uint16_t posX, uint16_t posY, uint16_t size,
     }
 }
 
-void drawBorder(uint16_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t thickness, uint16_t color)
+void drawBorder(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint8_t thickness, uint16_t color)
 {
     // Draw top border
     for (uint16_t i = x; i < x + width; i++)

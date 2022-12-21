@@ -40,6 +40,8 @@ void drawSettings();
 
 void drawPlayerSelectScreen();
 
+void drawLevelSelectScreen();
+
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
 
 void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
@@ -207,7 +209,7 @@ bool isDataBit = false;
 
 enum gameState
 {
-    MENU, GAME, LEVELSELECT, SETTINGS, PAUSE, GAMEOVER, PLAYERSELECTSCREEN
+    MENU, GAME, LEVELSELECT, SETTINGS, PAUSE, GAMEOVER, PLAYER_SELECT_SCREEN
 };
 gameState currentGameState = MENU;
 gameState oldGameState = GAME;
@@ -305,8 +307,7 @@ int main(void)
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
 
-    setFreq(EEPROM_read(20));
-
+    setFreq(IR_38KHZ);
     // Setup screen
     Wire.begin();
     setupSPI();
@@ -316,12 +317,23 @@ int main(void)
     // Start the screen and send startup commands
     init_LCD();
 
-
-
-
     //Start touch
 //    touchBegin();
     touch.begin();
+    if (EEPROM_read(20) == 0)
+    {
+        currentGameState = PLAYER_SELECT_SCREEN;
+        drawPlayerSelectScreen();
+    } else if (EEPROM_read(20) == IR_38KHZ)
+    {
+        setFreq(IR_38KHZ);
+        drawMenu();
+    } else if (EEPROM_read(20) == IR_56KHZ)
+    {
+        setFreq(IR_56KHZ);
+        drawMenu();
+    }
+
     // Setup IR sending
     // Check nunckuk connection
     while (!startNunchuk(NUNCHUK_ADDRESS))
@@ -337,80 +349,80 @@ int main(void)
 
 
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
+    bool playerSelectButtonPressed = false;
+    bool menuButtonPressed = false;
 
     uint16_t x, y;
     uint8_t z;
 
-    Serial.begin(9600);
     while (true)
     {
         if (intCurrentMs > FRAME_TIME)
         {
-            Serial.println("xmin");
-            Serial.println(map(65, 0, 320, 150, 3800));
-            Serial.println("xmax");
-            Serial.println(map((65 + 212), 0, 320, 150, 3800));
-            Serial.println("ymin");
-            Serial.println(map(130, 240, 0, 130, 4000));
-            Serial.println("ymax");
-            Serial.println(map((130 + 50), 240, 0, 130, 4000));
-
             //30 FPS
             intCurrentMs = 0;
             frameCounter++;
-            checkGameState();
             if (currentGameState == GAME)
             {
                 //Game code
                 update();
                 draw();
-            }
-            if (currentGameState == MENU)
+            } else if (currentGameState == MENU)
             {
                 //Menu code
                 if (touch.touched())
                 {
                     while (!touch.bufferEmpty())
                     {
-//                        Serial.print(touch.bufferSize());
                         touch.readData(&y, &x, &z); //reversed order because of screen rotation
-                        /*Serial.print("->(");
-                        Serial.print(x);
-                        Serial.print(", ");
-                        Serial.print(y);
-                        Serial.print(", ");
-                        Serial.print(z);
-                        Serial.println(")");*/
-                        if (x > 1404 && x < 2727 && y > 2378 && y < 3193) //check if you pressed play button
+                        if ((x > 1404 && x < 2727 && y > 2378 && y < 3193) && !menuButtonPressed) //check if you pressed play button
                         {
-                            currentGameState = GAME;
-                        } else if (x > 891 && x < 3309 && y > 1903 && y < 1097) //check if you pressed settings button
+                            menuButtonPressed = true;
+                            currentGameState = LEVELSELECT;
+                            drawLevelSelectScreen();
+//                            drawBackground();
+//                            drawInteractables();
+                        } else if ((x > 891 && x < 3310 && y > 1098 && y < 1903) && !menuButtonPressed) //check if you pressed settings button
                         {
-                            currentGameState = SETTINGS;
+                            menuButtonPressed = true;
+                            drawPlayerSelectScreen();
+                            currentGameState = PLAYER_SELECT_SCREEN;
                         }
                     }
                 }
-            }
-            if (currentGameState == PLAYERSELECTSCREEN)
+            } else if (currentGameState == LEVELSELECT)
             {
+                if(touch.touched()){
+                    while (!touch.bufferEmpty())
+                    {
+                        touch.readData(&y, &x, &z); //reversed order because of screen rotation
+
+                    }
+                }
+            } else if (currentGameState == PLAYER_SELECT_SCREEN)
+            {
+                menuButtonPressed = false;
                 if (touch.touched())
                 {
                     while (!touch.bufferEmpty())
                     {
                         touch.readData(&y, &x, &z); //reversed order because of screen rotation
-                        if (x > 1404 && x < 2727 && y > 2378 && y < 3193) //check if you pressed Player1 button #TODO coords fixen
+                        if ((x > 150 && x < 1900 && y > 130 && y < 4000) && !playerSelectButtonPressed) //check if you pressed Player1 button #TODO coords fixen
                         {
-                            EEPROM_write(20, 52);
-                            setFreq(52);
-                            currentGameState = SETTINGS;
-                        } else if (x > 891 && x < 3309 && y > 1903 && y < 1097) //check if you pressed Player2 button
+                            playerSelectButtonPressed = true;
+                            EEPROM_write(20, IR_38KHZ);
+                            setFreq(IR_38KHZ);
+                            currentGameState = MENU;
+                            drawMenu();
+                        } else if ((x > 1900 && x < 3800 && y > 130 && y < 4000) && !playerSelectButtonPressed) //check if you pressed Player2 button
                         {
-                            EEPROM_write(20, 35);
-                            setFreq(35);
-                            currentGameState = SETTINGS;
+                            playerSelectButtonPressed = true;
+                            EEPROM_write(20, IR_56KHZ);
+                            setFreq(IR_56KHZ);
+                            currentGameState = MENU;
+                            drawMenu();
                         }
                     }
-
                 }
             }
         }
@@ -433,8 +445,6 @@ void init_timer0()
 
 void setFreq(uint8_t freq)
 {
-
-
     if (freq == IR_38KHZ)
     {
         msTime = 37;
@@ -449,46 +459,18 @@ void setFreq(uint8_t freq)
         zeroTime = 55;
         oneTime = 167;
         offTime = 55;
-    } else
-    {
-        currentGameState = PLAYERSELECTSCREEN;
-        return; //to avoid timer0 going crazy
     }
 
     OCR0A = freq;
 }
 
-void checkGameState()
-{
-    if (currentGameState == GAME && oldGameState != GAME)
-    {
-        oldGameState = GAME;
-        drawBackground();
-        drawInteractables();
-    }
-    if (currentGameState == MENU && oldGameState != MENU)
-    {
-        oldGameState = MENU;
-        drawMenu();
-    }
-    if (currentGameState == SETTINGS && oldGameState != SETTINGS)
-    {
-        oldGameState = SETTINGS;
-        drawSettings();
-    }
-    if (currentGameState == PLAYERSELECTSCREEN && oldGameState != PLAYERSELECTSCREEN)
-    {
-        oldGameState = PLAYERSELECTSCREEN;
-        drawPlayerSelectScreen();
-    }
-}
 
 void drawPlayerSelectScreen()
 {
     fillRect(0, 0, 320, 240, 0x0);
-    drawString("Choose your player", 20, 10, 5, PLAYER_RED);
-    drawString("Player1(38KHZ)", 20, 200, 5, PLAYER_RED);
-    drawString("Player2(56KHZ)", 250, 200, 5, PLAYER_RED);
+    drawString("Choose your player", 70, 16, 2, PLAYER_RED);
+    drawString("Player1(38KHZ)", 10, 140, 2, PLAYER_RED);
+    drawString("Player2(56KHZ)", 176, 160, 2, PLAYER_RED);
 }
 
 
@@ -501,10 +483,25 @@ void drawMenu()
     drawString("Settings", 75, 140, 4, PLAYER_RED);
 }
 
-void drawSettings()
+void drawLevelSelectScreen()
 {
-    drawString("drol", 100, 60, 4, PLAYER_RED);
+    //Delete old menu screen
+    drawBorder(110, 50, 116, 50, 5, 0x0);
+    drawBorder(65, 130, 212, 50, 5, 0x0);
+    drawString("Play", 120, 60, 4, 0x0);
+    drawString("Settings", 75, 140, 4, 0x0);
+    //Draw new screen
+    drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); //Level 1 button
+    drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); //Level 2 button
+    drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE); //Level 3 button
+    drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE); //Exit button
+    drawString("Level 1", 75, 197, 4, 0xFFFF);
+    drawString("Level 2", 75, 137, 4, 0xFFFF);
+    drawString("Level 3", 75, 77, 4, 0xFFFF);
+    drawString("Back to menu", 50, 13, 3, 0xFFFF);
+
 }
+
 
 void update()
 {

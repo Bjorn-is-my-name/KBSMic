@@ -351,6 +351,10 @@ int main(void)
     volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
     bool playerSelectButtonPressed = false;
     bool menuButtonPressed = false;
+    bool exitButtonPressed = false;
+    bool level1ButtonPressed = false;
+    bool level2ButtonPressed = false;
+    bool level3ButtonPressed = false;
 
     uint16_t x, y;
     uint8_t z;
@@ -392,11 +396,44 @@ int main(void)
                 }
             } else if (currentGameState == LEVELSELECT)
             {
-                if(touch.touched()){
+                if (touch.touched())
+                {
                     while (!touch.bufferEmpty())
                     {
                         touch.readData(&y, &x, &z); //reversed order because of screen rotation
+                        if ((x > 552 && x < 1232 && y > 52 && y < 196) && !exitButtonPressed)
+                        {
+                            exitButtonPressed = true;
+                            currentGameState = MENU;
+                            drawMenu();
+                        }
+                        if ((x > 880 && x < 1656 && y < 598 && y > 556) && !level2ButtonPressed) // Level 2 button
 
+                        {
+                            //level 1 code
+                            currentGameState = GAME;
+                            level1ButtonPressed = true;
+                            drawBackground();
+                            drawInteractables();
+                        }
+
+                        if ((x > 880 && x < 1656 && y > 556 && y < 598) && !level2ButtonPressed) // Level 2 button
+                        {
+                            //level 2 code
+                            currentGameState = GAME;
+                            level2ButtonPressed = true;
+                            drawBackground();
+                            drawInteractables();
+
+                        }
+                        if ((x > 880 && x < 1656 && y < 438 && y > 396) && !level3ButtonPressed) // Level 3 button
+                        {
+                            //level 3 code
+                            currentGameState = GAME;
+                            level3ButtonPressed = true;
+                            drawBackground();
+                            drawInteractables();
+                        }
                     }
                 }
             } else if (currentGameState == PLAYER_SELECT_SCREEN)

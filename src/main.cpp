@@ -371,7 +371,9 @@ int main(void)
                 //Game code
                 update();
                 draw();
-            } else if (currentGameState == MENU)
+            }
+                //Not in a game so checking in what menu it is.
+            else if (currentGameState == MENU)
             {
                 //Menu code
                 if (touch.touched())
@@ -382,6 +384,7 @@ int main(void)
                         if ((x > 1404 && x < 2727 && y > 2378 && y < 3193) && !menuButtonPressed) //check if you pressed play button
                         {
                             menuButtonPressed = true;
+                            exitButtonPressed = false;
                             currentGameState = LEVELSELECT;
                             drawLevelSelectScreen();
 //                            drawBackground();
@@ -401,23 +404,20 @@ int main(void)
                     while (!touch.bufferEmpty())
                     {
                         touch.readData(&y, &x, &z); //reversed order because of screen rotation
-                        if ((x > 552 && x < 1232 && y > 52 && y < 196) && !exitButtonPressed)
+                        if ((x > 309 && x < 3663 && y > 3138 && y < 4000) && !exitButtonPressed)
                         {
+                            menuButtonPressed = false;
                             exitButtonPressed = true;
                             currentGameState = MENU;
                             drawMenu();
-                        }
-                        if ((x > 880 && x < 1656 && y < 598 && y > 556) && !level2ButtonPressed) // Level 2 button
-
+                        } else if ((x > 663 && x < 3275 && y < 242 && y > 920) && !level2ButtonPressed) // Level 1 button
                         {
                             //level 1 code
                             currentGameState = GAME;
                             level1ButtonPressed = true;
                             drawBackground();
                             drawInteractables();
-                        }
-
-                        if ((x > 880 && x < 1656 && y > 556 && y < 598) && !level2ButtonPressed) // Level 2 button
+                        } else if ((x > 663 && x < 3275 && y > 1210 && y < 1888) && !level2ButtonPressed) // Level 2 button
                         {
                             //level 2 code
                             currentGameState = GAME;
@@ -425,8 +425,7 @@ int main(void)
                             drawBackground();
                             drawInteractables();
 
-                        }
-                        if ((x > 880 && x < 1656 && y < 438 && y > 396) && !level3ButtonPressed) // Level 3 button
+                        } else if ((x > 663 && x < 3275 && y < 2193 && y > 2871) && !level3ButtonPressed) // Level 3 button
                         {
                             //level 3 code
                             currentGameState = GAME;

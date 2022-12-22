@@ -108,8 +108,8 @@ void drawRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t co
 }
 
 void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color) {
-    for (uint16_t this_x = 0; this_x < width; ++this_x) {
-        for (int this_y = 0; this_y < height; ++this_y) {
+    for (uint8_t this_y = 0; this_y < height; ++this_y) {
+        for (uint16_t this_x = 0; this_x < width; ++this_x) {
             drawPixel(this_x + x, this_y + y, color);
         }
     }

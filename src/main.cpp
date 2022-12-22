@@ -7,6 +7,7 @@ struct Rect
     uint8_t width;
     uint8_t height;
 };
+volatile int frameCounter = 0;
 
 void initTimer0();
 void checkWallCollision();
@@ -15,8 +16,10 @@ void checkCollision(Rect &);
 bool rectangleCollision(uint16_t, uint8_t, Rect &);
 void checkButtons();
 void checkLevers();
+void checkDias();
 
 void setFreq(uint8_t);
+uint8_t getFreq();
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
 void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
 bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
@@ -25,17 +28,23 @@ void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ve
 void drawBackground();
 void drawInteractables();
 uint16_t getColor(uint8_t, uint8_t ver = 0);
-void update();
-void draw();
+void Update();
+void DrawPlayers();
+
+void level1();
+void level2();
+
 void clearPlat(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
-void drawPlat(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
+void drawPlatH(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
+void drawPlatV(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
 void drawLiquid(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
+void drawLever(uint16_t, uint8_t, uint8_t);
 
 struct
 {
 public:
-    uint16_t x = 180;
-    uint8_t y = 20;
+    uint16_t x = 20;
+    uint8_t y = 120;
     uint16_t xOld = x;
     uint8_t yOld = y;
     int8_t yVelocity = 0;
@@ -49,7 +58,6 @@ public:
     uint8_t y = 40;
     uint16_t xOld = x;
     uint8_t yOld = y;
-    // uint8_t animation
 }player2;
 
 struct Collect
@@ -58,28 +66,28 @@ struct Collect
     uint8_t y;
     uint8_t w;
     uint8_t h;
+    uint8_t version;
+
+    void draw()
+    {
+        if(x == NULL) return;
+        drawSprite(x, y, DIA_WIDTH, DIA_HEIGHT, DiaBlue, version);
+        drawSpriteMirror(x + DIA_WIDTH * 2, y, DIA_WIDTH, DIA_HEIGHT, DiaBlue, version);
+    }
 };
 
 struct Platform
 {
-    Rect *bounds;
+    Rect bounds;
     uint16_t minX;
     uint16_t maxX;
     uint8_t minY;
     uint8_t maxY;
     uint8_t version;
 
-    Platform(Rect *Bounds, uint16_t MinX, uint16_t MaxX, uint8_t MinY, uint8_t MaxY, uint8_t Version = 0)
-    {
-        this->bounds = Bounds;
-        this->minX = MinX;
-        this->maxX = MaxX;
-        this->minY = MinY;
-        this->maxY = MaxY;
-        this->version = Version;
-    }
     void MoveMax()
     {
+        if(bounds.x == NULL) return;
         if(maxX == minX){
             MoveMaxY();
         }else if(maxY == minY){
@@ -88,6 +96,7 @@ struct Platform
     }
     void MoveMin()
     {
+        if(bounds.x == NULL) return;
         if(maxX == minX){
             MoveMinY();
         }else if(maxY == minY){
@@ -96,43 +105,44 @@ struct Platform
     }
     void MoveMaxX()
     {
-        if(bounds->x < maxX)
+        if(bounds.x < maxX && frameCounter%3==0)
         {
-            clearPlat(bounds->x+1, bounds->y, bounds->x, bounds->y, bounds->width, bounds->height);
-            bounds->x+=1;
-            draw();
+            clearPlat(bounds.x-3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.x+=3;
+            this->draw();
         }
     }
     void MoveMaxY()
     {
-        if(bounds->y < maxY)
+        if(bounds.y < maxY && frameCounter%3==0)
         {
-            clearPlat(bounds->x, bounds->y+1, bounds->x, bounds->y, bounds->width, bounds->height);
-            bounds->y++;
-            draw();
+            clearPlat(bounds.x, bounds.y+3, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.y+=3;
+            this->draw();
         }
     }
     void MoveMinX()
     {
-        if(bounds->x > minX)
+        if(bounds.x > minX && frameCounter%3==0)
         {
-            clearPlat(bounds->x-1, bounds->y, bounds->x, bounds->y, bounds->width, bounds->height);
-            bounds->x-=1;
-            draw();
+            clearPlat(bounds.x+3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.x-=3;
+            this->draw();
         }
     }
     void MoveMinY()
     {
-        if(bounds->y > minY)
+        if(bounds.y > minY && frameCounter%3==0)
         {
-            clearPlat(bounds->x, bounds->y-1, bounds->x, bounds->y, bounds->width, bounds->height);
-            bounds->y-=1;
-            draw();
+            clearPlat(bounds.x, bounds.y-3, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.y-=3;
+            this->draw();
         }
     }
     bool isMax()
     {
-        if((bounds->x == maxX && bounds->y == maxY) || (bounds->x == minX && bounds->y == minY))
+        if(bounds.x == NULL) return;
+        if((bounds.x >= maxX && bounds.y >= maxY) || (bounds.x <= minX && bounds.y <= minY))
         {
             return true;
         }else
@@ -143,7 +153,13 @@ struct Platform
 
     void draw()
     {
-        drawPlat(bounds->x, bounds->y, PLATFORM_WIDTH, PLATFORM_HEIGHT, version);
+        if(bounds.x == NULL) return;
+        if(maxX == minX){
+            drawPlatH(bounds.x, bounds.y, (bounds.width)*2, bounds.height, version);
+        }else if(maxY == minY){
+            drawPlatV(bounds.x, bounds.y, (bounds.width)*2, bounds.height, version);
+        }
+        
     }
 };
 
@@ -152,31 +168,12 @@ struct lever
     Rect bounds;
     bool state;
     bool standingOn;
-    Platform plat;
-    void activate()
-    {
-        if(state)
-        {
-            //move platform
-            this->plat.MoveMax();
-        }else
-        {
-            //move platform back
-            this->plat.MoveMin();
-        }
-    }
-};
-
-struct button
-{
-    Rect bounds;
-    bool standingOn;
     Platform *plat;
-    button *connectedButton;
-
+    uint8_t Version;
     void activate()
     {
-        if(standingOn || connectedButton->standingOn)
+        if(bounds.x == NULL) return;
+        if(state)
         {
             //move platform
             plat->MoveMax();
@@ -187,10 +184,55 @@ struct button
         }
         if(!(plat->isMax()))
         {
-            drawSprite((bounds).x - 3, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-            drawSpriteMirror((bounds).x - 3 + BUTTON_WIDTH * 2, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+            this->draw();
         }
-        
+    }
+
+    void draw(){
+        if(bounds.x == NULL) return;
+        drawLever(bounds.x - 7, bounds.y + 1, 1);
+        if(state)
+        {
+            drawSpriteMirror((bounds).x -7 , (bounds).y - 7, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, Version);
+        }else
+        {
+            drawSprite((bounds).x + 1, (bounds).y - 7, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, Version);
+        }
+    }
+};
+
+struct button
+{
+    Rect bounds;
+    bool standingOn;
+    Platform *plat[2];
+    button *connectedButton;
+
+    void activate()
+    {
+        if(bounds.x == NULL) return;
+        if(standingOn || connectedButton->standingOn)
+        {
+            // move platform
+            plat[0]->MoveMax();
+            plat[1]->MoveMax();
+        }else
+        {
+            //move platform back
+            plat[0]->MoveMin();
+            plat[1]->MoveMin();
+        }
+        if(!(plat[0]->isMax()))
+        {
+            this->draw();
+        }
+
+    }
+
+    void draw(){
+        if(bounds.x == NULL) return;
+        drawSprite((bounds).x - 4, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+        drawSpriteMirror((bounds).x - 4 + BUTTON_WIDTH * 2, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
     }
 
     void setConnectedButton(button *btn)
@@ -199,69 +241,103 @@ struct button
     }
 };
 
-Rect walls[] = 
+struct Liquid
 {
-    Rect{0, 0, 5, 240},
-    Rect{10, 0, 155, 10},
-    Rect{310, 10, 5, 230},
-    Rect{10, 230, 155, 10},
-    Rect{10, 40, 20, 40},
-    Rect{50, 70, 115, 10},
-    Rect{153, 50, 30, 20},
-    Rect{40, 110, 75, 10},
-    Rect{180, 120, 50, 10},
-    Rect{280, 120, 15, 20},
-    Rect{290, 140, 10, 10},
-    Rect{10, 150, 70, 10},
-    Rect{150, 150, 5, 30},
-    Rect{150, 180, 52, 10},
-    Rect{280, 210, 15, 20},
-    Rect{10, 190, 40, 10}
+    Rect bounds;
+    uint8_t Version;
+    void draw()
+    {
+        if(bounds.x == NULL) return;
+        drawLiquid((bounds).x, (bounds).y, WATER_WIDTH*4, WATER_HEIGHT, Version);
+    }
 };
 
-Rect Platform1Bounds = {280, 72, 15, 8};
-Rect Platform2Bounds = {10, 112, 15, 8};
+Platform Platform1 = {};
+Platform Platform2 = {};
+Platform Platform3 = {};
+Platform Platform4 = {};
+Platform Platform5 = {};
+Platform Platform6 = {};
+Platform Platform7 = {};
+Platform Platform8 = {};
+Platform Platform9 = {};
 
-Platform Platform1 = {&Platform1Bounds, 280, 280, 72, 112};
-Platform Platform2 = {&Platform2Bounds, 10, 10, 112, 142, 1};
+lever Lever1 = {};
+lever Lever2 = {};
+lever Lever3 = {};
+lever Lever4 = {};
+
+button button1 = {};
+button button2 = {};
+button button3 = {};
+button button4 = {};
+
+Collect Dia1 = {};
+Collect Dia2 = {};
+Collect Dia3 = {};
+Collect Dia4 = {};
+
+Liquid liq1 = {};
+Liquid liq2 = {};
+Liquid liq3 = {};
+Liquid liq4 = {};
+Liquid liq5 = {};
+Liquid liq6 = {};
+
+Rect Door1 = {};
+Rect Door2 = {};
+
+Rect walls[] =              // MAX 30 WALLS
+{
+    {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}
+};
 
 Platform *platforms[] = 
 {
     &Platform1,
-    &Platform2
+    &Platform2,
+    &Platform3,
+    &Platform4,
+    &Platform5,
+    &Platform6,
+    &Platform7,
+    &Platform8,
+    &Platform9
 };
 
-Rect Lever1Bounds = {91, 148, 3, 2};
-
-lever Lever1 = {Lever1Bounds, false, false, Platform2};
-
-lever levers[] =
+lever *levers[] =
 {
-    Lever1
+    &Lever1,
+    &Lever2,
+    &Lever3,
+    &Lever4
 };
-
-Rect Button1Bounds = {214, 118, 3, 2};
-Rect Button2Bounds = {234, 68, 3, 2};
-
-button button1 = {Button1Bounds, false, &Platform1};
-button button2 = {Button2Bounds, false, &Platform1};
 
 button *buttons[] =
 {
     &button1,
-    &button2
+    &button2,
+    &button3,
+    &button4
 };
 
-Collect Dias[] =
+Collect *Dias[] =
 {
-    Collect{12, 12, DIA_WIDTH * 2, DIA_HEIGHT},
-    Collect{164, 216, DIA_WIDTH * 2, DIA_HEIGHT},
-    Collect{26, 12, DIA_WIDTH * 2, DIA_HEIGHT},
-    Collect{229, 216, DIA_WIDTH * 2, DIA_HEIGHT}
+    &Dia1,
+    &Dia2,
+    &Dia3,
+    &Dia4
 };
 
-Rect Door1 = {55, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};
-Rect Door2 = {80, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};
+Liquid *liquids[] = 
+{
+    &liq1,
+    &liq2,
+    &liq3,
+    &liq4,
+    &liq5,
+    &liq6
+};
 
 // Check to see if the current bit is done sending
 bool dataIsSend = false;
@@ -335,7 +411,7 @@ ISR(PCINT2_vect)
 
 ISR(TIMER0_COMPA_vect) // Toggle IR light
 {
-    static uint16_t counter = 0;
+    static  uint16_t counter = 0;
     static uint8_t msCounter = 0;
 
     if (++msCounter > msTime)
@@ -383,9 +459,6 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
 
 int main(void)
 {
-    // Connect buttons to eachother
-    button1.setConnectedButton(&button2);
-    button2.setConnectedButton(&button1);
 
     // Setup IR sending
     DDRD |= (1 << DDD6);
@@ -414,10 +487,8 @@ int main(void)
         fillRect(0, 0, 320, 240, PLAYER_RED);
     }
 
-    drawBackground();
-    drawInteractables();
-    volatile int frameCounter = 0; // #TODO reset deze ergens en hem verplaatsen
-
+    level1();
+    
     while (true)
     {
         if (intCurrentMs > FRAME_TIME)
@@ -428,8 +499,8 @@ int main(void)
             if (currentGameState == GAME)
             {
                 // Game code
-                update();
-                draw();
+                Update();
+                DrawPlayers();
             }
         }
     }
@@ -471,7 +542,11 @@ void setFreq(uint8_t freq)
     }
 }
 
-void update()
+uint8_t getFreq(){
+    return OCR0A;
+}
+
+void Update()
 {
     player1.xOld = player1.x;
     player1.yOld = player1.y;
@@ -482,17 +557,17 @@ void update()
     player1.y += player1.yVelocity;
     player1.yVelocity += GRAVITY;
 
-    if(state.z_button == 1)
+    if(state.z_button == 1)          //Testing purposes only ---------------------------------------
     {
         player2.y++;
         player2.x = 229;
     }
-
     // Get the nunchuk input data
     if (!getState(NUNCHUK_ADDRESS))
     {
         return;
     }
+    
 
     // Check for movement to right
     if (state.joy_x_axis > 169)
@@ -510,6 +585,7 @@ void update()
 
     checkButtons();
     checkLevers();
+    checkDias();
 
     // Jumping and falling mechanics
     if (state.c_button == 1 && !player1.jumping)
@@ -536,30 +612,52 @@ void checkButtons()
 
 void checkLevers()
 {
-    for(lever L : levers)
+    for(lever *L : levers)
     {
-        if(rectangleCollision(player1.x, player1.y, L.bounds) || rectangleCollision(player2.x, player2.y, L.bounds))
+        if(rectangleCollision(player1.x, player1.y, L->bounds) || rectangleCollision(player2.x, player2.y, L->bounds))
         {
-            if(!L.standingOn)
+            if(!L->standingOn)
             {
-                L.state =! L.state;
-                L.standingOn = true;
+                L->state = !L->state;
+                L->standingOn = true;
             }
-        }else if(L.standingOn)
+        }else if(L->standingOn)
         {
-            L.standingOn = false;
+            L->standingOn = false;
+        }
+        L->activate();
+    }
+}
+
+void checkDias(){
+    for(Collect *D : Dias)
+    {
+        Rect temp = {D->x, D->y, D->w, D->h};
+        if(rectangleCollision(player1.x, player1.y, temp) && D->version == 0)
+        {
+            //COLLECT DIAMOND
+        }else if(rectangleCollision(player2.x, player2.y, temp) && D->version == 0){
+            D->draw();
+        }else if(rectangleCollision(player1.x, player1.y, temp) && D->version == 1){
+            D->draw();
+        }else if(rectangleCollision(player2.x, player2.y, temp) && D->version == 1){
+            //COLLECT DIAMOND
         }
     }
 }
 
 void CheckPlatformCollision(){
-    for (auto &platform : platforms)
+    for (Platform *platform : platforms)
     {
-        if (rectangleCollision(player1.x, player1.y, *platform->bounds))
+        if (rectangleCollision(player1.x, player1.y, platform->bounds))
         {
-            drawPlat((*platform->bounds).x, (*platform->bounds).y, PLATFORM_WIDTH, PLATFORM_HEIGHT, platform->version);
+            if(platform->maxX == platform->minX){
+                drawPlatH(platform->bounds.x, platform->bounds.y, (platform->bounds.width)*2, platform->bounds.height, platform->version);
+            }else if(platform->maxY == platform->minY){
+                drawPlatV(platform->bounds.x, platform->bounds.y, (platform->bounds.width)*2, platform->bounds.height, platform->version);
+            }
         }
-        checkCollision(*platform->bounds);
+        checkCollision(platform->bounds);
     }
 
 }
@@ -578,7 +676,7 @@ void checkCollision(Rect &bounds)
     if (rectangleCollision(player1.x, player1.y, bounds))
     {
         // Check if the player is colliding with the wall from the top
-        if (player1.yOld + PLAYER_HEIGHT <= bounds.y)
+        if (player1.yOld + PLAYER_HEIGHT <= bounds.y || player1.y < bounds.y)
         {
             player1.y = bounds.y - PLAYER_HEIGHT;
             player1.yVelocity = 0;
@@ -592,15 +690,16 @@ void checkCollision(Rect &bounds)
         else if (player1.xOld + PLAYER_ACTUAL_WIDTH <= bounds.x)
         { // Check if the player is colliding with the wall from the left
             player1.x = bounds.x - PLAYER_ACTUAL_WIDTH;
+            
         }
-        else if (player1.xOld >= bounds.x + (bounds.width * 2))
+        else if (player1.xOld >= bounds.x + (bounds.width * 2)) 
         { // Check if the player is colliding with the wall from the right
             player1.x = bounds.x + (bounds.width * 2);
         }
     }
 }
 
-void draw()
+void DrawPlayers()
 {
     clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
     drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
@@ -650,13 +749,21 @@ void clearPlat(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, ui
     }
 }
 
-void drawPlat(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+void drawPlatH(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
 {
-    drawLineH(x, y, x+30, BLACK);
-    drawRect(x, y+1, 30, 6, INTER_BROWN);
-    drawRect(x+1, y+2, 28, 4, INTER_GOLD);
-    drawRect(x+2, y+3, 26, 2, getColor(PLATFORM_MIDDLE_COLOR, ver));
-    drawLineH(x, y+7, x+30, BLACK);
+    drawLineH(x, y, x+w, BLACK);
+    drawRect(x, y+1, w, h-2, INTER_BROWN);
+    drawRect(x+1, y+2, w-2, h-4, INTER_GOLD);
+    drawRect(x+2, y+3, w-4, h-6, getColor(PLATFORM_MIDDLE_COLOR, ver));
+    drawLineH(x, y+7, x+w, BLACK);
+}
+
+void drawPlatV(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+{
+    drawRect(x, y, w, h, BLACK);
+    drawRect(x+1, y, w-2, h, INTER_BROWN);
+    drawRect(x+2, y+1, w-4, h-2, INTER_GOLD);
+    drawRect(x+3, y+2, w-6, h-4, getColor(PLATFORM_MIDDLE_COLOR, ver));
 }
 
 void drawLiquid(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
@@ -666,6 +773,32 @@ void drawLiquid(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
     drawLineH(x+1, y+1, x+w-1, getColor(LIQUID_MIDDLE_COLOR, ver));
     drawLineH(x+1, y+2, x+w-1, getColor(LIQUID_BOTTOM_COLOR, ver));
     drawLineH(x+1, y+3, x+w-1, getColor(LIQUID_BOTTOM_COLOR, ver));
+}
+
+void drawDoor(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+{
+    drawRect(x, y, w, h, BLACK);
+    drawRect(x+1, y+1, w-2, h-1, SWAMP_GREEN);
+    drawRect(x+2, y+2, w-4, h-2, SWAMP_GREEN);
+    drawRect(x+3, y+3, w-6, h-3, BLACK);
+    fillRect(x+4, y+4, w-8, h-4, INTER_BROWN);
+
+    if(ver == 0)
+    {
+        drawSprite(x + 6, y + 8, SIGN_WIDTH, SIGN_HEIGHT, SignBlue, ver);
+        drawSpriteMirror(x + 6 + SIGN_WIDTH * 2, y + 8, SIGN_WIDTH, SIGN_HEIGHT, SignBlue, ver);
+    }else
+    {
+        drawSprite(x+6, y+8, SIGN_WIDTH, SIGN_HEIGHT, SignRed, ver);
+        drawSpriteMirror(x + 6 + SIGN_WIDTH * 2, y + 8, SIGN_WIDTH, SIGN_HEIGHT, SignRed, ver);
+
+    }
+}
+
+void drawLever(uint16_t x, uint8_t y, uint8_t ver){
+    drawRect(x, y, LEVER_BASE_WIDTH*4, LEVER_BASE_HEIGHT, BLACK);
+    drawRect(x+1, y+1, LEVER_BASE_WIDTH*4-2, LEVER_BASE_HEIGHT-3, INTER_GOLD);
+    drawLineH(x+1, y+3, LEVER_BASE_WIDTH*4-2, INTER_BROWN);
 }
 
 bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t w, uint8_t h)
@@ -777,66 +910,83 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
 
 void drawInteractables()
 {
-    drawSprite(210, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-    drawSpriteMirror(210 + BUTTON_WIDTH * 2, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 1
+    for(button *B : buttons){
+        B->draw();
+    }
 
-    drawSprite(230, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-    drawSpriteMirror(230 + BUTTON_WIDTH * 2, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button); // Button 2
+    for(lever *L : levers){
+        L->draw();
+    }
 
+    for(Platform *P : platforms){
+        P->draw();
+    }
+
+    for(Collect *D : Dias){
+        D->draw();
+    }
+
+    drawDoor(Door1.x, Door1.y, Door1.width, Door1.height, 0);
+    drawDoor(Door2.x, Door2.y, Door2.width, Door2.height, 1);
+    
     drawLiquid(150, 230, WATER_WIDTH*4, WATER_HEIGHT, 0); // water
     drawLiquid(215, 230, WATER_WIDTH*4, WATER_HEIGHT, 1); // lava
-    drawLiquid(189, 180, WATER_WIDTH*4, WATER_HEIGHT, 2); // PISS-ON
+    drawLiquid(189, 180, WATER_WIDTH*4, WATER_HEIGHT, 2); // poison
+}
 
+void level1(){
+    //initialize all walls in lvl 1
+    walls[0] = Rect{0, 0, 5, 240};
+    walls[1] = Rect{10, 0, 155, 10};
+    walls[2] = Rect{310, 10, 5, 230};
+    walls[3] = Rect{10, 230, 155, 10};
+    walls[4] = Rect{10, 40, 20, 40};
+    walls[5] = Rect{50, 70, 115, 10};
+    walls[6] = Rect{153, 50, 30, 20};
+    walls[7] = Rect{40, 110, 75, 10};
+    walls[8] = Rect{180, 120, 50, 10};
+    walls[9] = Rect{280, 120, 15, 20};
+    walls[10] = Rect{290, 140, 10, 10};
+    walls[11] = Rect{10, 150, 70, 10};
+    walls[12] = Rect{150, 150, 5, 30};
+    walls[13] = Rect{150, 180, 52, 10};
+    walls[14] = Rect{280, 210, 15, 20};
+    walls[15] = Rect{10, 190, 40, 10};
 
-    drawSprite(55, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2); // DoorTop left
+    Door1 = {55, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};                              //door blue
+    Door2 = {80, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};                              //door red
 
-    drawSprite(55, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2); // DoorFrame left
+    liq1 = {150, 230, WATER_WIDTH*4, WATER_HEIGHT, 0};                              //water
+    liq2 = {215, 230, WATER_WIDTH*4, WATER_HEIGHT, 1};                              //lava
+    liq3 = {189, 180, WATER_WIDTH*4, WATER_HEIGHT, 2};                              //poison
+    liq4 = {};
+    liq5 = {};
 
-    drawSprite(55, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2); // DoorFrame left
+    Platform1 = {{280, 70, 15, 8}, 280, 280, 72, 112};                              //main purple platform
+    Platform2 = {{10, 112, 15, 8}, 10, 10, 112, 142, 1};                            //yellow platform
+    Platform3 = {{40, 10, 4, 30}, 40, 70, 10, 10};                                  //diamonds purple platform
 
+    Lever1 = {{93, 149, 1, 1}, false, false, &Platform2, 1};                        // lever for yellow platform
 
-    drawSprite(80, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2); // DoorTop right
+    button1 = {{146, 108, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}};       //button for purple platform
+    button2 = {{181, 48, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}};        //button for purple platform
 
-    drawSprite(80, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2); // DoorFrame right
+    // Connect buttons to eachother
+    button1.setConnectedButton(&button2);
+    button2.setConnectedButton(&button1);
 
-    drawSprite(80, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2); // DoorFrame right
+    Dia1 = {12, 12, DIA_WIDTH * 2, DIA_HEIGHT, 0};      //blue diamond upperleft
+    Dia2 = {164, 216, DIA_WIDTH * 2, DIA_HEIGHT, 0};    //blue diamond bottom
+    Dia3 = {26, 12, DIA_WIDTH * 2, DIA_HEIGHT, 1};      //red diamond upperleft
+    Dia4 = {229, 216, DIA_WIDTH * 2, DIA_HEIGHT, 1};    //red diamond bottom
 
+    //draw everything
+    drawBackground();
+    drawInteractables();
+}
 
-    drawSprite(61, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue);
-    drawSpriteMirror(61 + SIGN_WIDTH * 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue); // Blue sign
+void level2(){
 
-    drawSprite(86, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);
-    drawSpriteMirror(86 + SIGN_WIDTH * 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed); // Red sign
-
-    drawPlat(10, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, 1);// Platform 2
-
-
-    drawSprite(12, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
-    drawSpriteMirror(12 + DIA_WIDTH * 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue); // Dia Blue 1
-
-
-    drawSprite(164, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
-    drawSpriteMirror(164 + DIA_WIDTH * 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue); // DiaBlue 2
-
-
-    drawSprite(26, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);
-    drawSpriteMirror(26 + DIA_WIDTH * 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1); // DiaRed 1
-
-
-    drawSprite(229, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);
-    drawSpriteMirror(229 + DIA_WIDTH * 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1); // DiaRed 2
-
-
-    drawSprite(86, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1);
-    drawSpriteMirror(86 + LEVER_BASE_WIDTH * 2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1); // LeverBase
-
-    drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, 1); // LeverTop
 }
 
 uint16_t getColor(uint8_t Color, uint8_t ver)

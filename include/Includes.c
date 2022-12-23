@@ -1,0 +1,24 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <Wire.h>
+
+#include <Adafruit_STMPE610.h>
+#include <Background.c>
+#include <Button.c>
+#include <Defines.c>
+#include <DiaBlue.c>
+#include <DiaRed.c>
+#include <DoorCorner.c>
+#include <DoorEdge.c>
+#include <EEPROM.c>
+#include <font.c>
+#include <LCD.cpp>
+#include <LeverBase.c>
+#include <LeverTop.c>
+#include <Nunchuk.cpp>
+#include <optimized_wire.cpp>
+#include <Player1.c>
+#include <Player2.c>
+#include <SignBlue.c>
+#include <SignRed.c>
+#include <touch.cpp>

@@ -33,15 +33,15 @@
 
 #define BUTTON_WIDTH 3
 #define BUTTON_HEIGHT 4
-#define WATER_WIDTH 10
-#define WATER_HEIGHT 5
+#define LIQUID_WIDTH 38
+#define LIQUID_HEIGHT 5
 
-#define DOOR_WIDTH 5
-#define DOOR_HEIGHT 10
+#define DOOR_WIDTH 20
+#define DOOR_HEIGHT 30
 
 #define SIGN_WIDTH 2
 #define SIGN_HEIGHT 13
-#define PLATFORM_WIDTH 5
+#define PLATFORM_WIDTH 30
 #define PLATFORM_HEIGHT 8
 #define DIA_WIDTH 3
 #define DIA_HEIGHT 9

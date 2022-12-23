@@ -4,7 +4,7 @@ struct Rect
 {
     uint16_t x;
     uint8_t y;
-    uint8_t width;
+    uint16_t width;
     uint8_t height;
 };
 volatile int frameCounter = 0;
@@ -22,7 +22,7 @@ void setFreq(uint8_t);
 uint8_t getFreq();
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
 void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
-bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
+bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t);
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
 void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
 void drawBackground();
@@ -103,14 +103,16 @@ struct Platform
             MoveMinX();
         }
     }
+
     void MoveMaxX()
     {
-        if(bounds.x < maxX && frameCounter%3==0)
-        {
-            clearPlat(bounds.x-3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
-            bounds.x+=3;
-            this->draw();
-        }
+        if(bounds.x > minX && frameCounter%3==0)
+            {
+                clearPlat(bounds.x+3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
+                bounds.x-=3;
+                this->draw();
+            }
+        
     }
     void MoveMaxY()
     {
@@ -120,6 +122,7 @@ struct Platform
             bounds.y+=3;
             this->draw();
         }
+    
     }
     void MoveMinX()
     {
@@ -129,6 +132,7 @@ struct Platform
             bounds.x-=3;
             this->draw();
         }
+    
     }
     void MoveMinY()
     {
@@ -139,6 +143,7 @@ struct Platform
             this->draw();
         }
     }
+
     bool isMax()
     {
         if(bounds.x == NULL) return;
@@ -155,9 +160,9 @@ struct Platform
     {
         if(bounds.x == NULL) return;
         if(maxX == minX){
-            drawPlatH(bounds.x, bounds.y, (bounds.width)*2, bounds.height, version);
+            drawPlatH(bounds.x, bounds.y, bounds.width, bounds.height, version);
         }else if(maxY == minY){
-            drawPlatV(bounds.x, bounds.y, (bounds.width)*2, bounds.height, version);
+            drawPlatV(bounds.x, bounds.y, bounds.width, bounds.height, version);
         }
         
     }
@@ -168,7 +173,7 @@ struct lever
     Rect bounds;
     bool state;
     bool standingOn;
-    Platform *plat;
+    Platform *plat[2];
     uint8_t Version;
     void activate()
     {
@@ -176,13 +181,15 @@ struct lever
         if(state)
         {
             //move platform
-            plat->MoveMax();
+            plat[0]->MoveMax();
+            plat[1]->MoveMax();
         }else
         {
             //move platform back
-            plat->MoveMin();
+            plat[0]->MoveMin();
+            plat[1]->MoveMin();
         }
-        if(!(plat->isMax()))
+        if(!(plat[0]->isMax()))
         {
             this->draw();
         }
@@ -206,6 +213,7 @@ struct button
     Rect bounds;
     bool standingOn;
     Platform *plat[2];
+    uint8_t Version;
     button *connectedButton;
 
     void activate()
@@ -231,8 +239,8 @@ struct button
 
     void draw(){
         if(bounds.x == NULL) return;
-        drawSprite((bounds).x - 4, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-        drawSpriteMirror((bounds).x - 4 + BUTTON_WIDTH * 2, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
+        drawSprite((bounds).x - 4, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button, Version);
+        drawSpriteMirror((bounds).x - 4 + BUTTON_WIDTH * 2, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button, Version);
     }
 
     void setConnectedButton(button *btn)
@@ -248,44 +256,21 @@ struct Liquid
     void draw()
     {
         if(bounds.x == NULL) return;
-        drawLiquid((bounds).x, (bounds).y, WATER_WIDTH*4, WATER_HEIGHT, Version);
+        drawLiquid(bounds.x, bounds.y, bounds.width, bounds.height, Version);
     }
 };
 
-Platform Platform1 = {};
-Platform Platform2 = {};
-Platform Platform3 = {};
-Platform Platform4 = {};
-Platform Platform5 = {};
-Platform Platform6 = {};
-Platform Platform7 = {};
-Platform Platform8 = {};
-Platform Platform9 = {};
+Platform Platform1, Platform2, Platform3, Platform4, Platform5, Platform6, Platform7, Platform8, Platform9;
 
-lever Lever1 = {};
-lever Lever2 = {};
-lever Lever3 = {};
-lever Lever4 = {};
+lever Lever1, Lever2, Lever3, Lever4;
 
-button button1 = {};
-button button2 = {};
-button button3 = {};
-button button4 = {};
+button button1, button2, button3, button4;
 
-Collect Dia1 = {};
-Collect Dia2 = {};
-Collect Dia3 = {};
-Collect Dia4 = {};
+Collect Dia1, Dia2, Dia3, Dia4;
 
-Liquid liq1 = {};
-Liquid liq2 = {};
-Liquid liq3 = {};
-Liquid liq4 = {};
-Liquid liq5 = {};
-Liquid liq6 = {};
+Liquid liq1, liq2, liq3, liq4;
 
-Rect Door1 = {};
-Rect Door2 = {};
+Rect Door1, Door2;
 
 Rect walls[] =              // MAX 30 WALLS
 {
@@ -334,9 +319,7 @@ Liquid *liquids[] =
     &liq1,
     &liq2,
     &liq3,
-    &liq4,
-    &liq5,
-    &liq6
+    &liq4
 };
 
 // Check to see if the current bit is done sending
@@ -488,6 +471,7 @@ int main(void)
     }
 
     level1();
+    // level2();
     
     while (true)
     {
@@ -560,7 +544,7 @@ void Update()
     if(state.z_button == 1)          //Testing purposes only ---------------------------------------
     {
         player2.y++;
-        player2.x = 229;
+        player2.x = 176;
     }
     // Get the nunchuk input data
     if (!getState(NUNCHUK_ADDRESS))
@@ -652,9 +636,9 @@ void CheckPlatformCollision(){
         if (rectangleCollision(player1.x, player1.y, platform->bounds))
         {
             if(platform->maxX == platform->minX){
-                drawPlatH(platform->bounds.x, platform->bounds.y, (platform->bounds.width)*2, platform->bounds.height, platform->version);
+                drawPlatH(platform->bounds.x, platform->bounds.y, platform->bounds.width, platform->bounds.height, platform->version);
             }else if(platform->maxY == platform->minY){
-                drawPlatV(platform->bounds.x, platform->bounds.y, (platform->bounds.width)*2, platform->bounds.height, platform->version);
+                drawPlatV(platform->bounds.x, platform->bounds.y, platform->bounds.width, platform->bounds.height, platform->version);
             }
         }
         checkCollision(platform->bounds);
@@ -675,8 +659,15 @@ void checkCollision(Rect &bounds)
     // Check if the player is colliding with the wall.
     if (rectangleCollision(player1.x, player1.y, bounds))
     {
-        // Check if the player is colliding with the wall from the top
-        if (player1.yOld + PLAYER_HEIGHT <= bounds.y || player1.y < bounds.y)
+        if (player1.xOld + PLAYER_ACTUAL_WIDTH <= bounds.x)
+        { // Check if the player is colliding with the wall from the left
+            player1.x = bounds.x - PLAYER_ACTUAL_WIDTH;
+            
+        }
+        else if (player1.xOld >= bounds.x + bounds.width ) 
+        { // Check if the player is colliding with the wall from the right
+            player1.x = bounds.x + bounds.width;
+        }else if (player1.yOld + PLAYER_HEIGHT <= bounds.y || player1.y < bounds.y)// Check if the player is colliding with the wall from the top
         {
             player1.y = bounds.y - PLAYER_HEIGHT;
             player1.yVelocity = 0;
@@ -686,15 +677,6 @@ void checkCollision(Rect &bounds)
         { // Check if the player is colliding with the wall from the bottom
             player1.y = bounds.y + bounds.height;
             player1.yVelocity = 0;
-        }
-        else if (player1.xOld + PLAYER_ACTUAL_WIDTH <= bounds.x)
-        { // Check if the player is colliding with the wall from the left
-            player1.x = bounds.x - PLAYER_ACTUAL_WIDTH;
-            
-        }
-        else if (player1.xOld >= bounds.x + (bounds.width * 2)) 
-        { // Check if the player is colliding with the wall from the right
-            player1.x = bounds.x + (bounds.width * 2);
         }
     }
 }
@@ -721,7 +703,7 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
         {
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
-            if (color != 255 && !pointInRect(xOld, yOld, x, y, w, h))
+            if (color != 255 && !pointInRect(xOld, yOld, x, y, w*2, h))
             {
                 uint8_t idx = ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
                 drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
@@ -733,11 +715,11 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
 
 void clearPlat(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, uint8_t h)
 {
-    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+    for (uint16_t PixGroup = 0; PixGroup < w/2 * h; PixGroup++)
     {
-        if (PixGroup % w == 0 && PixGroup != 0)
+        if (PixGroup % (w/2) == 0 && PixGroup != 0)
         {
-            xOld -= w * 2;
+            xOld -= w;
             yOld++;
         }
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
@@ -801,14 +783,14 @@ void drawLever(uint16_t x, uint8_t y, uint8_t ver){
     drawLineH(x+1, y+3, LEVER_BASE_WIDTH*4-2, INTER_BROWN);
 }
 
-bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t w, uint8_t h)
+bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint16_t w, uint8_t h)
 {
-    return pointX >= x && pointX <= x + w * 2 - 1 && pointY >= y && pointY <= y + h - 1;
+    return pointX >= x && pointX <= x + w - 1 && pointY >= y && pointY <= y + h - 1;
 }
 
 bool rectangleCollision(uint16_t playerX, uint8_t playerY, Rect &bounds)
 {
-    return playerX + PLAYER_ACTUAL_WIDTH > bounds.x && playerX < bounds.x + (bounds.width * 2) && playerY + PLAYER_HEIGHT > bounds.y && playerY < bounds.y + bounds.height;
+    return playerX + PLAYER_ACTUAL_WIDTH > bounds.x && playerX < bounds.x + bounds.width && playerY + PLAYER_HEIGHT > bounds.y && playerY < bounds.y + bounds.height;
 }
 
 void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver)
@@ -926,50 +908,47 @@ void drawInteractables()
         D->draw();
     }
 
+    for(Liquid *L : liquids){
+        L->draw();
+    }
+
     drawDoor(Door1.x, Door1.y, Door1.width, Door1.height, 0);
     drawDoor(Door2.x, Door2.y, Door2.width, Door2.height, 1);
-    
-    drawLiquid(150, 230, WATER_WIDTH*4, WATER_HEIGHT, 0); // water
-    drawLiquid(215, 230, WATER_WIDTH*4, WATER_HEIGHT, 1); // lava
-    drawLiquid(189, 180, WATER_WIDTH*4, WATER_HEIGHT, 2); // poison
 }
 
 void level1(){
-    //initialize all walls in lvl 1
-    walls[0] = Rect{0, 0, 5, 240};
-    walls[1] = Rect{10, 0, 155, 10};
-    walls[2] = Rect{310, 10, 5, 230};
-    walls[3] = Rect{10, 230, 155, 10};
-    walls[4] = Rect{10, 40, 20, 40};
-    walls[5] = Rect{50, 70, 115, 10};
-    walls[6] = Rect{153, 50, 30, 20};
-    walls[7] = Rect{40, 110, 75, 10};
-    walls[8] = Rect{180, 120, 50, 10};
-    walls[9] = Rect{280, 120, 15, 20};
-    walls[10] = Rect{290, 140, 10, 10};
-    walls[11] = Rect{10, 150, 70, 10};
-    walls[12] = Rect{150, 150, 5, 30};
-    walls[13] = Rect{150, 180, 52, 10};
-    walls[14] = Rect{280, 210, 15, 20};
-    walls[15] = Rect{10, 190, 40, 10};
+    walls[0]  = {0, 0, 10, 240};
+    walls[1]  = {10, 0, 310, 10};
+    walls[2]  = {310, 10, 10, 230};
+    walls[3]  = {10, 230, 310, 10};
+    walls[4]  = {10, 40, 40, 40};
+    walls[5]  = {50, 70, 230, 10};
+    walls[6]  = {153, 50, 60, 20};
+    walls[7]  = {40, 110, 150, 10};
+    walls[8]  = {180, 120, 100, 10};
+    walls[9]  = {280, 120, 30, 20};
+    walls[10] = {290, 140, 20, 10};
+    walls[11] = {10, 150, 140, 10};
+    walls[12] = {150, 150, 10, 30};
+    walls[13] = {150, 180, 104, 10};
+    walls[14] = {280, 210, 30, 20};
+    walls[15] = {10, 190, 80, 10};
 
-    Door1 = {55, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};                              //door blue
-    Door2 = {80, 40, DOOR_WIDTH * 4, DOOR_HEIGHT * 3};                              //door red
+    Door1 = {55, 40, DOOR_WIDTH, DOOR_HEIGHT};                                      //door blue
+    Door2 = {80, 40, DOOR_WIDTH, DOOR_HEIGHT};                                      //door red
 
-    liq1 = {150, 230, WATER_WIDTH*4, WATER_HEIGHT, 0};                              //water
-    liq2 = {215, 230, WATER_WIDTH*4, WATER_HEIGHT, 1};                              //lava
-    liq3 = {189, 180, WATER_WIDTH*4, WATER_HEIGHT, 2};                              //poison
-    liq4 = {};
-    liq5 = {};
+    liq1 = {150, 230, LIQUID_WIDTH, LIQUID_HEIGHT, 0};                              //water
+    liq3 = {189, 180, LIQUID_WIDTH, LIQUID_HEIGHT, 2};                              //poison
+    liq2 = {215, 230, LIQUID_WIDTH, LIQUID_HEIGHT, 1};                              //lava
 
-    Platform1 = {{280, 70, 15, 8}, 280, 280, 72, 112};                              //main purple platform
-    Platform2 = {{10, 112, 15, 8}, 10, 10, 112, 142, 1};                            //yellow platform
-    Platform3 = {{40, 10, 4, 30}, 40, 70, 10, 10};                                  //diamonds purple platform
+    Platform1 = {{280, 70, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 280, 280, 112, 72};                              //main purple platform
+    Platform2 = {{10, 111, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 10, 10, 111, 141, 1};                            //yellow platform
+    Platform3 = {{40, 10, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 40, 70, 10, 10};                                  //diamonds purple platform
 
-    Lever1 = {{93, 149, 1, 1}, false, false, &Platform2, 1};                        // lever for yellow platform
+    Lever1 = {{93, 149, 2, 1}, false, false, {&Platform2}, 1};                        // lever for yellow platform
 
-    button1 = {{146, 108, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}};       //button for purple platform
-    button2 = {{181, 48, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}};        //button for purple platform
+    button1 = {{146, 108, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}, 0};       //button for purple platform
+    button2 = {{181, 48, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}, 0};        //button for purple platform
 
     // Connect buttons to eachother
     button1.setConnectedButton(&button2);
@@ -986,7 +965,75 @@ void level1(){
 }
 
 void level2(){
+    walls[0]  = {0, 0, 5, 240};
+    walls[1]  = {5, 0, 310, 5};
+    walls[2]  = {315, 0, 5, 240};
+    walls[3]  = {5, 235, 310, 5};
+    walls[4]  = {5, 227, 68, 8};
+    walls[5]  = {5, 178, 68, 17};
+    walls[6]  = {5, 118, 68, 17};
+    walls[7]  = {5, 65, 68, 23};
+    walls[8]  = {35, 35, 5, 30};
+    walls[9]  = {70, 35, 26, 45};
+    walls[10] = {96, 73, 50, 7};
+    walls[11] = {103, 178, 147, 17};
+    walls[12] = {124, 150, 21, 10};
+    walls[13] = {195, 150, 22, 10};
+    walls[14] = {205, 80, 40, 7};
+    walls[15] = {245, 150, 5, 28};
+    walls[16] = {250, 150, 30, 21};
+    walls[17] = {260, 35, 55, 10};
+    walls[18] = {280, 150, 5, 28};
+    walls[19] = {280, 178, 35, 17};
 
+    Door1 = {45, 35, DOOR_WIDTH, DOOR_HEIGHT};                                      //door blue
+    Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT};                                      //door red
+
+    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0};                              //water
+
+    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1};                              //lava
+    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1};                              //lava
+
+    liq4 = {116, 178, 124, LIQUID_HEIGHT, 2};                                       //poison
+
+    Platform1 = {{5, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 5, 5, 6, 27, 0};                 //purple platform
+    Platform2 = {{40, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 40, 40, 6, 27, 1};              //yellow platform
+    Platform3 = {{127, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 127, 88, 5, 5, 2};              //Red platform left
+    Platform4 = {{260, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 260, 221, 5, 5, 2};             //Red platform right
+    Platform5 = {{65, 88, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 65, 104, 88, 88, 3};            //Green platform left
+    Platform6 = {{73, 118, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 118, 226, 4};          //Blue platform
+    Platform7 = {{250, 203, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 173, 203, 5};       //Light_blue platform top
+    Platform8 = {{250, 219, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 189, 219, 5};       //Light_blue platform bottom
+    Platform9 = {{285, 150, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 285, 285, 150, 108, 6};       //White Platform
+
+    Lever1 = {{280, 34, 2, 1}, true, false, {&Platform7, &Platform8}, 5};//Lever light_blue
+    Lever2 = {{310, 34, 2, 1}, true, false, {&Platform2}, 1};//Lever yellow
+    Lever3 = {{299, 177, 2, 1}, false, false, {&Platform5}, 3};//Lever green
+    Lever4 = {{299, 234, 2, 1}, true, false, {&Platform1}, 0};//Lever purple
+
+    button1 = {{127, 233, BUTTON_WIDTH, 2}, false, {&Platform6}, 4};                //button for blue platform
+    button2 = {{12, 225, BUTTON_WIDTH, 2}, false, {&Platform9}, 6};                 //button for white platform
+    button3 = {{12, 176, BUTTON_WIDTH, 2}, false, {&Platform6}, 4};                 //button for blue platform
+    button4 = {{12, 116, BUTTON_WIDTH, 2}, false, {&Platform3, &Platform4}, 2};     //button for red platform
+
+    // Connect buttons to eachother
+    button1.setConnectedButton(&button3);
+    button3.setConnectedButton(&button1);
+
+    Dia1 = {};      //blue diamond upperleft
+    Dia2 = {};    //blue diamond bottom
+    Dia3 = {};      //red diamond upperleft
+    Dia4 = {};    //red diamond bottom
+
+    player1.x = 207;
+    player1.y = 215;
+
+    player2.x = 187;
+    player2.y = 215;
+
+    //draw everything
+    drawBackground();
+    drawInteractables();
 }
 
 uint16_t getColor(uint8_t Color, uint8_t ver)
@@ -1060,9 +1107,24 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
         {
             return INTER_PURPLE;
         }
-        else
+        else if(ver == 1)
         {
             return INTER_YELLOW;
+        }else if(ver == 2)
+        {
+            return PLAYER_RED;
+        }else if(ver == 3)
+        {
+            return SWAMP_GREEN;
+        }else if(ver == 4)
+        {
+            return PLAYER_DARK_BLUE;
+        }else if(ver == 5)
+        {
+            return PLAYER_LIGHT_BLUE;
+        }else if(ver == 6)
+        {
+            return WHITE;
         }
 
     case 11: // 1011
@@ -1074,11 +1136,11 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
         return BACKGROUND_DARK;
 
     case 14:           // 1110
-        return 0xFFFF; // white
+        return WHITE; // white
 
     case 15: // 1111
-        return 255;
+        return ALPHA;
     default:
-        return 255;
+        return ALPHA;
     }
 }

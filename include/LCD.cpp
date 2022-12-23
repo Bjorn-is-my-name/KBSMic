@@ -13,6 +13,8 @@
 
 // Colors-------------------------------------------------
 #define BLACK 0x0000                    ///<   0,   0,   0
+#define WHITE 0xFFFF                    ///< 255, 255, 255
+#define ALPHA 255
 
 #define PLAYER_DARK_BLUE 0x007f         ///<   0,   3,  31
 #define PLAYER_BLUE 0x033f              ///<   0,  25,  31

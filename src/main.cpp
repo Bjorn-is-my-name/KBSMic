@@ -107,11 +107,11 @@ struct Platform
     void MoveMaxX()
     {
         if(bounds.x > minX && frameCounter%3==0)
-            {
-                clearPlat(bounds.x+3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
-                bounds.x-=3;
-                this->draw();
-            }
+        {
+            clearPlat(bounds.x+3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.x-=3;
+            this->draw();
+        }
         
     }
     void MoveMaxY()
@@ -189,7 +189,7 @@ struct lever
             plat[0]->MoveMin();
             plat[1]->MoveMin();
         }
-        if(!(plat[0]->isMax()))
+        if(!(plat[0]->isMax()) || rectangleCollision(player1.x, player1.y, bounds) || rectangleCollision(player2.x, player2.y, bounds))
         {
             this->draw();
         }
@@ -215,6 +215,7 @@ struct button
     Platform *plat[2];
     uint8_t Version;
     button *connectedButton;
+    bool state;
 
     void activate()
     {
@@ -222,15 +223,25 @@ struct button
         if(standingOn || connectedButton->standingOn)
         {
             // move platform
-            plat[0]->MoveMax();
-            plat[1]->MoveMax();
+            if(state){
+                plat[0]->MoveMin();
+                plat[1]->MoveMin();
+            }else{
+                plat[0]->MoveMax();
+                plat[1]->MoveMax();
+            }
         }else
         {
             //move platform back
-            plat[0]->MoveMin();
-            plat[1]->MoveMin();
+            if(state){
+                plat[0]->MoveMax();
+                plat[1]->MoveMax();
+            }else{
+                plat[0]->MoveMin();
+                plat[1]->MoveMin();
+            }
         }
-        if(!(plat[0]->isMax()))
+        if(!(plat[0]->isMax() || plat[1]->isMax()) || rectangleCollision(player1.x, player1.y, bounds) || rectangleCollision(player2.x, player2.y, bounds))
         {
             this->draw();
         }
@@ -246,6 +257,10 @@ struct button
     void setConnectedButton(button *btn)
     {
         this->connectedButton = btn;
+    }
+
+    void setState(bool state){
+        this->state = state;
     }
 };
 
@@ -264,7 +279,7 @@ Platform Platform1, Platform2, Platform3, Platform4, Platform5, Platform6, Platf
 
 lever Lever1, Lever2, Lever3, Lever4;
 
-button button1, button2, button3, button4;
+button button1, button2, button3, button4, buttonExtra;
 
 Collect Dia1, Dia2, Dia3, Dia4;
 
@@ -274,7 +289,7 @@ Rect Door1, Door2;
 
 Rect walls[] =              // MAX 30 WALLS
 {
-    {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}
+    {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}
 };
 
 Platform *platforms[] = 
@@ -470,8 +485,8 @@ int main(void)
         fillRect(0, 0, 320, 240, PLAYER_RED);
     }
 
-    level1();
-    // level2();
+    // level1();
+    level2();
     
     while (true)
     {
@@ -986,44 +1001,47 @@ void level2(){
     walls[18] = {280, 150, 5, 28};
     walls[19] = {280, 178, 35, 17};
 
-    Door1 = {45, 35, DOOR_WIDTH, DOOR_HEIGHT};                                      //door blue
-    Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT};                                      //door red
+    Door1 = {45, 35, DOOR_WIDTH, DOOR_HEIGHT};                                              //door blue
+    Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT};                                              //door red
 
-    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0};                              //water
-
-    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1};                              //lava
-    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1};                              //lava
-
-    liq4 = {116, 178, 124, LIQUID_HEIGHT, 2};                                       //poison
+    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0};                                       //water
+    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1};                                       //lava
+    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1};                                       //lava
+    liq4 = {116, 178, 124, LIQUID_HEIGHT, 2};                                               //poison
 
     Platform1 = {{5, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 5, 5, 6, 27, 0};                 //purple platform
     Platform2 = {{40, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 40, 40, 6, 27, 1};              //yellow platform
-    Platform3 = {{127, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 127, 88, 5, 5, 2};              //Red platform left
-    Platform4 = {{260, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 260, 221, 5, 5, 2};             //Red platform right
+    Platform3 = {{127, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 88, 127, 5, 5, 2};              //Red platform left
+    Platform4 = {{260, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 221, 260, 5, 5, 2};             //Red platform right
     Platform5 = {{65, 88, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 65, 104, 88, 88, 3};            //Green platform left
     Platform6 = {{73, 118, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 118, 226, 4};          //Blue platform
     Platform7 = {{250, 203, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 173, 203, 5};       //Light_blue platform top
     Platform8 = {{250, 219, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 189, 219, 5};       //Light_blue platform bottom
-    Platform9 = {{285, 150, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 285, 285, 150, 108, 6};       //White Platform
+    Platform9 = {{285, 150, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 285, 285, 108, 150, 6};       //White Platform
 
-    Lever1 = {{280, 34, 2, 1}, true, false, {&Platform7, &Platform8}, 5};//Lever light_blue
-    Lever2 = {{310, 34, 2, 1}, true, false, {&Platform2}, 1};//Lever yellow
-    Lever3 = {{299, 177, 2, 1}, false, false, {&Platform5}, 3};//Lever green
-    Lever4 = {{299, 234, 2, 1}, true, false, {&Platform1}, 0};//Lever purple
+    Lever1 = {{280, 34, 2, 1}, true, false, {&Platform7, &Platform8}, 5};                   //Lever light_blue
+    Lever2 = {{310, 34, 2, 1}, true, false, {&Platform2}, 1};                               //Lever yellow
+    Lever3 = {{299, 177, 2, 1}, false, false, {&Platform5}, 3};                             //Lever green
+    Lever4 = {{299, 234, 2, 1}, true, false, {&Platform1}, 0};                              //Lever purple
 
-    button1 = {{127, 233, BUTTON_WIDTH, 2}, false, {&Platform6}, 4};                //button for blue platform
-    button2 = {{12, 225, BUTTON_WIDTH, 2}, false, {&Platform9}, 6};                 //button for white platform
-    button3 = {{12, 176, BUTTON_WIDTH, 2}, false, {&Platform6}, 4};                 //button for blue platform
-    button4 = {{12, 116, BUTTON_WIDTH, 2}, false, {&Platform3, &Platform4}, 2};     //button for red platform
+    button1 = {{127, 233, BUTTON_WIDTH, 2}, false, {&Platform6}, 4};                        //button for blue platform
+    button2 = {{12, 225, BUTTON_WIDTH, 2}, false, {&Platform9}, 6};                         //button for white platform
+    button3 = {{12, 176, BUTTON_WIDTH, 2}, false, {&Platform6}, 4};                         //button for blue platform
+    button4 = {{12, 116, BUTTON_WIDTH, 2}, false, {&Platform3, &Platform4}, 2};             //button for red platform
 
     // Connect buttons to eachother
     button1.setConnectedButton(&button3);
+    button2.setConnectedButton(&buttonExtra);
+    button4.setConnectedButton(&buttonExtra);
     button3.setConnectedButton(&button1);
 
+    button4.setState(true);
+    button2.setState(true);
+
     Dia1 = {};      //blue diamond upperleft
-    Dia2 = {};    //blue diamond bottom
+    Dia2 = {};      //blue diamond bottom
     Dia3 = {};      //red diamond upperleft
-    Dia4 = {};    //red diamond bottom
+    Dia4 = {};      //red diamond bottom
 
     player1.x = 207;
     player1.y = 215;

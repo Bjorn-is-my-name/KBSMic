@@ -319,6 +319,7 @@ int main(void)
 
     //Start touch
 //    touchBegin();
+    Serial.begin(9600);
     touch.begin();
     if (EEPROM_read(20) == 0)
     {
@@ -503,7 +504,7 @@ void setFreq(uint8_t freq)
 
 void drawPlayerSelectScreen()
 {
-    fillRect(0, 0, 320, 240, 0x0);
+    fillScreen(0x0);
     drawString("Choose your player", 70, 16, 2, PLAYER_RED);
     drawString("Player1(38KHZ)", 10, 140, 2, PLAYER_RED);
     drawString("Player2(56KHZ)", 176, 160, 2, PLAYER_RED);
@@ -512,7 +513,7 @@ void drawPlayerSelectScreen()
 
 void drawMenu()
 {
-    fillRect(0, 0, 320, 240, 0x0);
+    fillScreen(0x0);
     drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); //Play button
     drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); //Settings button
     drawString("Play", 120, 60, 4, PLAYER_RED);

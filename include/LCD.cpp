@@ -1,6 +1,5 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <Wire.h>
 #include <SPI.h>
 #include "font.c"
 // Defines
@@ -174,8 +173,8 @@ void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t co
 void setupSPI()
 {
     /*
-    SS pins on internal pull-up (DC & CD)
-    SS (DC & CD) & MOSI & SCK pins on output
+    SS pins on internal pull-up (DC & CS)
+    SS (DC & CS) & MOSI & SCK pins on output
     SCK Frequentie -> /2
     Master Mode & Enable SPI
     Data order MSB-first & set to MSB & set to DataMode 0
@@ -201,13 +200,29 @@ void drawPixel(uint16_t x, uint16_t y, uint16_t color)
 
 void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color)
 {
-    for (uint16_t this_x = 0; this_x < width; ++this_x)
+
+    for (uint8_t this_y = 0; this_y < height; ++this_y)
     {
-        for (int this_y = 0; this_y < height; ++this_y)
+        for (uint16_t this_x = 0; this_x < width; ++this_x)
         {
             drawPixel(this_x + x, this_y + y, color);
         }
     }
+}
+
+void fillScreen(uint16_t color)
+{
+    SPI_CS_LOW();
+    setAddrWindow(0, 0, WIDTH, HEIGHT);
+    SPI_WRITE_COMMAND(MEMORY_WRITE);
+    for (uint8_t y = HEIGHT; y > 0; y--)
+    {
+        for (uint16_t x = WIDTH; x > 0; x--)
+        {
+            SPI_WRITE16(color);
+        }
+    }
+    SPI_CS_HIGH();
 }
 
 void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h)
@@ -268,6 +283,7 @@ void SPI_DC_HIGH()
     PORTB |= (1 << PB1);
 }
 
+
 void SPI_WRITE8(uint8_t data)
 {
     SPDR = data;
@@ -318,7 +334,6 @@ void drawChar(uint8_t ascii, uint16_t posX, uint16_t posY, uint16_t size, uint16
             {
                 fillRect(posX + i * size, posY + f * size, size, size, color);
             }
-
         }
     }
 }
@@ -339,40 +354,16 @@ void drawString(const char *string, uint16_t posX, uint16_t posY, uint16_t size,
 void drawBorder(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint8_t thickness, uint16_t color)
 {
     // Draw top border
-    for (uint16_t i = x; i < x + width; i++)
-    {
-        for (int t = 0; t < thickness; t++)
-        {
-            drawPixel(i, y + t, color);
-        }
-    }
+    fillRect(x, y, width, thickness, color);
 
     // Draw bottom border
-    for (uint16_t i = x; i < x + width; i++)
-    {
-        for (int t = 0; t < thickness; t++)
-        {
-            drawPixel(i, y + height - t - 1, color);
-        }
-    }
+    fillRect(x, y + height - thickness, width, thickness, color);
 
     // Draw left border
-    for (uint8_t j = y; j < y + height; j++)
-    {
-        for (int t = 0; t < thickness; t++)
-        {
-            drawPixel(x + t, j, color);
-        }
-    }
+    fillRect(x, y, thickness, height, color);
 
     // Draw right border
-    for (uint8_t j = y; j < y + height; j++)
-    {
-        for (int t = 0; t < thickness; t++)
-        {
-            drawPixel(x + width - t - 1, j, color);
-        }
-    }
+    fillRect(x + width - thickness, y, thickness, height, color);
 }
 
 
@@ -428,64 +419,35 @@ void init_LCD()
 //Touch screen functions
 
 
-/*
-void writeRegister8(uint8_t reg, uint8_t val)
-{
-    SPI_CS_LOW();
-    SPI_WRITE_COMMAND(reg);
-    SPI_WRITE8(val);
-    SPI_CS_HIGH();
-}
+//bool touchBegin()
+//{
+//    writeRegister8(STMPE_SYS_CTRL1, STMPE_SYS_CTRL1_RESET);
+//    _delay_ms(10);
+//
+//    for (uint8_t i = 0; i < 65; i++)
+//    {
+//        readRegister8(i);
+//    }
+//    writeRegister8(STMPE_SYS_CTRL2, 0x0); // turn on clocks!
+//    writeRegister8(STMPE_TSC_CTRL, STMPE_TSC_CTRL_XYZ | STMPE_TSC_CTRL_EN); // XYZ and enable!
+//    Serial.println(readRegister8(STMPE_TSC_CTRL), HEX);
+//    writeRegister8(STMPE_INT_EN, STMPE_INT_EN_TOUCHDET);
+//    writeRegister8(STMPE_ADC_CTRL1, STMPE_ADC_CTRL1_10BIT | (0x6 << 4)); // 96 clocks per conversion
+//    writeRegister8(STMPE_ADC_CTRL2, STMPE_ADC_CTRL2_6_5MHZ);
+//    writeRegister8(STMPE_TSC_CFG, STMPE_TSC_CFG_4SAMPLE | STMPE_TSC_CFG_DELAY_1MS | STMPE_TSC_CFG_SETTLE_5MS);
+//    writeRegister8(STMPE_TSC_FRACTION_Z, 0x6);
+//    writeRegister8(STMPE_FIFO_TH, 1);
+//    writeRegister8(STMPE_FIFO_STA, STMPE_FIFO_STA_RESET);
+//    writeRegister8(STMPE_FIFO_STA, 0); // unreset
+//    writeRegister8(STMPE_TSC_I_DRIVE, STMPE_TSC_I_DRIVE_50MA);
+//    writeRegister8(STMPE_INT_STA, 0xFF); // reset all ints
+//    writeRegister8(STMPE_INT_CTRL, STMPE_INT_CTRL_POL_HIGH | STMPE_INT_CTRL_ENABLE);
+//    return true;
+//}
+//
+//boolean touched()
+//{
+//    return (readRegister8(STMPE_TSC_CTRL) & 0x80);
+//}
 
 
-bool touchBegin()
-{
-    writeRegister8(STMPE_SYS_CTRL1, STMPE_SYS_CTRL1_RESET);
-    _delay_ms(10);
-
-    for (uint8_t i = 0; i < 65; i++)
-    {
-        readRegister8(i);
-    }
-    writeRegister8(STMPE_SYS_CTRL2, 0x0); // turn on clocks!
-    writeRegister8(STMPE_TSC_CTRL, STMPE_TSC_CTRL_XYZ | STMPE_TSC_CTRL_EN); // XYZ and enable!
-    Serial.println(readRegister8(STMPE_TSC_CTRL), HEX);
-    writeRegister8(STMPE_INT_EN, STMPE_INT_EN_TOUCHDET);
-    writeRegister8(STMPE_ADC_CTRL1, STMPE_ADC_CTRL1_10BIT | (0x6 << 4)); // 96 clocks per conversion
-    writeRegister8(STMPE_ADC_CTRL2, STMPE_ADC_CTRL2_6_5MHZ);
-    writeRegister8(STMPE_TSC_CFG, STMPE_TSC_CFG_4SAMPLE | STMPE_TSC_CFG_DELAY_1MS | STMPE_TSC_CFG_SETTLE_5MS);
-    writeRegister8(STMPE_TSC_FRACTION_Z, 0x6);
-    writeRegister8(STMPE_FIFO_TH, 1);
-    writeRegister8(STMPE_FIFO_STA, STMPE_FIFO_STA_RESET);
-    writeRegister8(STMPE_FIFO_STA, 0); // unreset
-    writeRegister8(STMPE_TSC_I_DRIVE, STMPE_TSC_I_DRIVE_50MA);
-    writeRegister8(STMPE_INT_STA, 0xFF); // reset all ints
-    writeRegister8(STMPE_INT_CTRL, STMPE_INT_CTRL_POL_HIGH | STMPE_INT_CTRL_ENABLE);
-    return true;
-}
-
-boolean touched()
-{
-    return (readRegister8(STMPE_TSC_CTRL) & 0x80);
-}
-
-void readData(uint16_t *x, uint16_t *y, uint8_t *z)
-{
-    uint8_t data[4];
-
-    for (unsigned char & i : data)
-    {
-        i = readRegister8(0xD7); // _spi->transfer(0x00);
-        Serial.print("0x");
-        Serial.print(i, HEX);
-        Serial.print(" / ");
-    }
-    *x = data[0];
-    *x <<= 4;
-    *x |= (data[1] >> 4);
-    *y = data[1] & 0x0F;
-    *y <<= 8;
-    *y |= data[2];
-    *z = data[3];
-}
-*/

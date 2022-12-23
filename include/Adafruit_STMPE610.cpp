@@ -85,20 +85,24 @@ Adafruit_STMPE610::Adafruit_STMPE610(TwoWire *theWire) {
  */
 boolean Adafruit_STMPE610::begin(uint8_t i2caddr) {
   if (_CS != -1 && _CLK == -1) {
+      Serial.println(1);
     // hardware SPI
     pinMode(_CS, OUTPUT);
     digitalWrite(_CS, HIGH);
 
-    _spi->begin();
+    SPIClass::begin();
     mySPISettings = SPISettings(1000000, MSBFIRST, SPI_MODE0);
     m_spiMode = SPI_MODE0;
   } else if (_CS != -1) {
-    // software SPI
+      Serial.println(2);
+
+      // software SPI
     pinMode(_CLK, OUTPUT);
     pinMode(_CS, OUTPUT);
     pinMode(_MOSI, OUTPUT);
     pinMode(_MISO, INPUT);
   } else {
+        Serial.println(3);
     _wire->begin();
     _i2caddr = i2caddr;
   }

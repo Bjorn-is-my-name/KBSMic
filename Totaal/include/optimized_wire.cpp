@@ -15,7 +15,7 @@ void twi_init(void)
 {
     // initialize state
     twi_state = TWI_READY;
-    twi_sendStop = true;		// default value
+    twi_sendStop = true; // default value
     twi_inRepStart = false;
 
     // activate internal pullups for twi.

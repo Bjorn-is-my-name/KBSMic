@@ -1,57 +1,8 @@
-#include <Includes.c>
+#include <main.h>
 
-struct Rect
-{
-    uint16_t x;
-    uint8_t y;
-    uint16_t width;
-    uint8_t height;
-};
 volatile int frameCounter = 0;
-void drawPlayerSelectScreen();
-void drawLevelSelectScreen();
-void initTimer0();
-void setFreq(uint8_t);
-uint8_t getFreq();
-void Update();
 
-void showLives(uint8_t value);
-uint8_t getLives();
-void setLives(uint8_t &lives);
-
-void showScore(bool scoreType, uint8_t level);
-void updateHighscore(uint8_t score, uint8_t level);
-
-void checkWallCollision();
-void CheckPlatformCollision();
-uint8_t checkPoolCollision();
-void checkCollision(Rect &);
-bool rectangleCollision(uint16_t, uint8_t, Rect &);
-bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t);
-
-void checkButtons();
-void checkLevers();
-void checkDias();
-
-void level1();
-void level2();
-
-void drawBackground();
-void drawInteractables();
-void DrawPlayers();
-void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
-void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
-void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
-void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
-void clearWholeSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h);
-uint16_t getColor(uint8_t, uint8_t ver = 0);
-void clearPlat(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
-void drawPlatH(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
-void drawPlatV(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
-void drawLiquid(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
-void drawLever(uint16_t, uint8_t, uint8_t);
-void drawScore(uint8_t highscore, bool clearScore);
-void drawMenu();
+// Structs
 struct
 {
 public:
@@ -84,8 +35,8 @@ struct Collect
     {
         if (x == NULL)
             return;
-        drawSprite(x, y, DIA_WIDTH, DIA_HEIGHT, DiaBlue, version);
-        drawSpriteMirror(x + DIA_WIDTH * 2, y, DIA_WIDTH, DIA_HEIGHT, DiaBlue, version);
+        drawSprite(x, y, DIA_WIDTH, DIA_HEIGHT, Diamond, version);
+        drawSpriteMirror(x + DIA_WIDTH * 2, y, DIA_WIDTH, DIA_HEIGHT, Diamond, version);
     }
 };
 
@@ -292,43 +243,16 @@ struct Liquid
     }
 };
 
+// Level objects
 Platform Platform1, Platform2, Platform3, Platform4, Platform5, Platform6, Platform7, Platform8, Platform9;
-
 lever Lever1, Lever2, Lever3, Lever4;
-
 button button1, button2, button3, button4;
-
 Collect Dia1, Dia2, Dia3, Dia4;
-
 Liquid liq1, liq2, liq3, liq4;
-
 Rect Door1, Door2;
+Rect walls[20];
 
-const uint8_t liveCount[MAX_LIVES + 1] = {
-    //+1 since we start at 0.
-    // Patterns for all the numbers and letters.
-    0x3F, // 0
-    0x6,  // 1
-    0x5B, // 2
-    0x4F, // 3
-    0x66, // 4
-    0x6D  // 5
-          // 0x7D, // 6
-          // 0x7,  // 7
-          // 0x7F, // 8
-          // 0x6F, // 9
-          // 0x77, // A
-          // 0x7C, // B
-          // 0x39, // C
-          // 0x5E, // D
-          // 0x79, // E
-          // 0x71, // F
-};
-
-Rect walls[] = // MAX 30 WALLS
-    {
-        {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
-
+// Arrays to store the objects (mainly for looping purposes)
 Platform *platforms[] =
     {
         &Platform1,
@@ -369,31 +293,31 @@ Liquid *liquids[] =
         &liq3,
         &liq4};
 
-// Check to see if the current bit is done sending
-bool dataIsSend = false;
-// Data to send over IR
-uint32_t sendingData = 0;
-// The data bit to send;
-int8_t sendingBit = SENDINGBIT_START_VALUE;
+// IR sending variables
+bool dataIsSend = false;                    // Check to see if the current bit is done sending
+uint32_t sendingData = 0;                   // Data to send over IR
+int8_t sendingBit = SENDINGBIT_START_VALUE; // The data bit to send;
 uint16_t onTime = 0;
-volatile uint32_t currentMs = 0;
-volatile uint8_t intCurrentMs = 0;
 
+// Time variables
 uint8_t msTime;
-uint16_t startTime;
-uint8_t zeroTime;
-uint8_t oneTime;
-uint8_t offTime;
-uint8_t player_accel = 0;
-uint32_t startMs = 0;
-bool startBitReceived = false;
-uint32_t receivedData = 0;
-uint8_t bitCounter = 0;
-bool isDataBit = false;
+volatile uint32_t currentMs = 0;   // Keeps track of the milliseconds passed since startup
+volatile uint8_t intCurrentMs = 0; // Keeps track of the milliseconds passed and resets every frame
 
-Adafruit_STMPE610 touch = Adafruit_STMPE610(8);
-uint8_t lives = 5;
-bool playerDied = false;
+// Time lengths for IR data sending
+uint16_t startTime; // Length of startbit
+uint8_t zeroTime;   // Length of 0
+uint8_t oneTime;    // Length of 1
+uint8_t offTime;    // Length of pause between bits
+
+// IR receiving variables
+uint32_t startMs = 0;          // Used to determin the length of each received bit
+bool startBitReceived = false; // Tracks if the staring bit was received before accepting data
+uint32_t receivedData = 0;     // All the received bits
+uint8_t bitCounter = 0;        // Current bit (used for bitshifting 1's in to receivedData)
+bool isDataBit = false;        // Differentiates data from pauses
+
+// All the gamestates
 enum gameState
 {
     MENU,
@@ -403,10 +327,9 @@ enum gameState
     PAUSE,
     GAMEOVER,
     PLAYER_SELECT_SCREEN
-};
-gameState currentGameState = MENU;
-gameState oldGameState = GAME;
+} currentGameState;
 
+// IR receiving protocol
 ISR(PCINT2_vect)
 {
     isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)
@@ -448,11 +371,13 @@ ISR(PCINT2_vect)
     startMs = currentMs; // Save the time from startup to now
 }
 
-ISR(TIMER0_COMPA_vect) // Toggle IR light
+// IR sending protocol (with timer to keep track of ms)
+ISR(TIMER0_COMPA_vect)
 {
     static uint16_t counter = 0;
     static uint8_t msCounter = 0;
 
+    // After enough interupts, a ms has passed
     if (++msCounter > msTime)
     {
         currentMs++;
@@ -498,8 +423,7 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
 
 int main(void)
 {
-
-    // Setup IR sending
+    // Setup IR led
     DDRD |= (1 << DDD6);
     initTimer0();
 
@@ -508,61 +432,61 @@ int main(void)
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
 
-    setFreq(IR_38KHZ);
-    currentGameState = GAME;
-
-    // Setup screen
+    // Setup wire
     Wire.begin();
-    setupSPI();
 
+    // Start the SPI communication and send screen startup commands
+    setupSPI();
+    START_UP();
+
+    // Always set a start frequency so the game loop can run (because ms timer is in ISR of IR sending)
+    setFreq(IR_38KHZ);
+
+    // Check if the frequency has already been set
+    {
+        uint8_t freq = EEPROM_read(20);
+        if (freq == IR_38KHZ || freq == IR_56KHZ)
+        {
+            setFreq(freq);
+            currentGameState = MENU;
+            drawMenu();
+        }
+        else
+        {
+            currentGameState = PLAYER_SELECT_SCREEN;
+            drawPlayerSelectScreen();
+        }
+    }
+
+    // Enable global interupts
     sei();
 
-    // Start the screen and send startup commands
-    init_LCD();
-
-    // Start touch
-    //    touchBegin();
-    Serial.begin(9600);
-    touch.begin();
-    if (EEPROM_read(20) == 0)
-    {
-        currentGameState = PLAYER_SELECT_SCREEN;
-        drawPlayerSelectScreen();
-    }
-    else if (EEPROM_read(20) == IR_38KHZ)
-    {
-        setFreq(IR_38KHZ);
-        drawMenu();
-    }
-    else if (EEPROM_read(20) == IR_56KHZ)
-    {
-        setFreq(IR_56KHZ);
-        drawMenu();
-    }
-
-    // Setup IR sending
     // Check nunckuk connection
-    while (!startNunchuk(NUNCHUK_ADDRESS))
+    if (!startNunchuk(NUNCHUK_ADDRESS))
     {
-        drawString("Nunchuk", 60, 80, 5, PLAYER_RED);
-        drawString("not", 60, 120, 5, PLAYER_RED);
-        drawString("found", 60, 160, 5, PLAYER_RED);
+        fillScreen(0);
 
-        drawString("Nunchuk", 60, 80, 5, PLAYER_YELLOW);
-        drawString("not", 60, 120, 5, PLAYER_YELLOW);
-        drawString("found", 60, 160, 5, PLAYER_YELLOW);
+        while (!startNunchuk(NUNCHUK_ADDRESS))
+        {
+            drawString("Nunchuk", 60, 80, 5, PLAYER_RED);
+            drawString("not", 60, 120, 5, PLAYER_RED);
+            drawString("found", 60, 160, 5, PLAYER_RED);
+
+            drawString("Nunchuk", 60, 80, 5, PLAYER_YELLOW);
+            drawString("not", 60, 120, 5, PLAYER_YELLOW);
+            drawString("found", 60, 160, 5, PLAYER_YELLOW);
+        }
+
+        switch (currentGameState)
+        {
+        case MENU:
+            drawMenu();
+            break;
+        case PLAYER_SELECT_SCREEN:
+            drawPlayerSelectScreen();
+            break;
+        }
     }
-
-    volatile int frameCounter = 0; // #TODO reset deze ergens en hem verplaatsen
-    bool playerSelectButtonPressed = false;
-    bool menuButtonPressed = false;
-    bool exitButtonPressed = false;
-    bool level1ButtonPressed = false;
-    bool level2ButtonPressed = false;
-    bool level3ButtonPressed = false;
-
-    uint16_t x, y;
-    uint8_t z;
 
     while (true)
     {
@@ -571,230 +495,67 @@ int main(void)
             // 30 FPS
             intCurrentMs = 0;
             frameCounter++;
+
+            // Get the nunchuk input data
+            []()
+            {
+                if (!getState(NUNCHUK_ADDRESS))
+                {
+                    return;
+                }
+            }();
+
             if (currentGameState == GAME)
             {
                 // Game code
                 Update();
                 DrawPlayers();
             }
-            // Not in a game so checking in what menu it is.
             else if (currentGameState == MENU)
             {
-                // Menu code
-                if (touch.touched())
+                if (state.c_button && !state.c_button_old)
                 {
-                    while (!touch.bufferEmpty())
-                    {
-                        touch.readData(&y, &x, &z);                                               // reversed order because of screen rotation
-                        if ((x > 1404 && x < 2727 && y > 2378 && y < 3193) && !menuButtonPressed) // check if you pressed play button
-                        {
-                            menuButtonPressed = true;
-                            exitButtonPressed = false;
-                            currentGameState = LEVELSELECT;
-                            drawLevelSelectScreen();
-                            //                            drawBackground();
-                            //                            drawInteractables();
-                        }
-                        else if ((x > 891 && x < 3310 && y > 1098 && y < 1903) && !menuButtonPressed) // check if you pressed settings button
-                        {
-                            menuButtonPressed = true;
-                            drawPlayerSelectScreen();
-                            currentGameState = PLAYER_SELECT_SCREEN;
-                        }
-                    }
+                    currentGameState = LEVELSELECT;
+                    drawLevelSelectScreen();
+                }
+                else if (state.z_button && !state.z_button_old)
+                {
+                    currentGameState = PLAYER_SELECT_SCREEN;
+                    drawPlayerSelectScreen();
                 }
             }
             else if (currentGameState == LEVELSELECT)
             {
-                if (touch.touched())
+                if (state.c_button && !state.c_button_old)
                 {
-                    while (!touch.bufferEmpty())
-                    {
-                        touch.readData(&y, &x, &z); // reversed order because of screen rotation
-                        if ((x > 309 && x < 3663 && y > 3138 && y < 4000) && !exitButtonPressed)
-                        {
-                            menuButtonPressed = false;
-                            exitButtonPressed = true;
-                            currentGameState = MENU;
-                            drawMenu();
-                        }
-                        else if ((x > 663 && x < 3275 && y < 242 && y > 920) && !level2ButtonPressed) // Level 1 button
-                        {
-                            // level 1 code
-                            currentGameState = GAME;
-                            level1ButtonPressed = true;
-                            drawBackground();
-                            drawInteractables();
-                        }
-                        else if ((x > 663 && x < 3275 && y > 1210 && y < 1888) && !level2ButtonPressed) // Level 2 button
-                        {
-                            // level 2 code
-                            currentGameState = GAME;
-                            level2ButtonPressed = true;
-                            drawBackground();
-                            drawInteractables();
-                        }
-                        else if ((x > 663 && x < 3275 && y < 2193 && y > 2871) && !level3ButtonPressed) // Level 3 button
-                        {
-                            // level 3 code
-                            currentGameState = GAME;
-                            level3ButtonPressed = true;
-                            drawBackground();
-                            drawInteractables();
-                        }
-                    }
+                    currentGameState = GAME;
+                    level1();
+                }
+                else if (state.z_button && !state.z_button_old)
+                {
+                    currentGameState = MENU;
+                    drawMenu();
                 }
             }
             else if (currentGameState == PLAYER_SELECT_SCREEN)
             {
-                menuButtonPressed = false;
-                if (touch.touched())
+                if (state.c_button && !state.c_button_old)
                 {
-                    while (!touch.bufferEmpty())
-                    {
-                        touch.readData(&y, &x, &z);                                                     // reversed order because of screen rotation
-                        if ((x > 150 && x < 1900 && y > 130 && y < 4000) && !playerSelectButtonPressed) // check if you pressed Player1 button #TODO coords fixen
-                        {
-                            playerSelectButtonPressed = true;
-                            EEPROM_write(20, IR_38KHZ);
-                            setFreq(IR_38KHZ);
-                            currentGameState = MENU;
-                            drawMenu();
-                        }
-                        else if ((x > 1900 && x < 3800 && y > 130 && y < 4000) && !playerSelectButtonPressed) // check if you pressed Player2 button
-                        {
-                            playerSelectButtonPressed = true;
-                            EEPROM_write(20, IR_56KHZ);
-                            setFreq(IR_56KHZ);
-                            currentGameState = MENU;
-                            drawMenu();
-                        }
-                    }
+                    EEPROM_write(20, IR_38KHZ);
+                    setFreq(IR_38KHZ);
+                    currentGameState = MENU;
+                    drawMenu();
+                }
+                else if (state.z_button && !state.z_button_old)
+                {
+                    EEPROM_write(20, IR_56KHZ);
+                    setFreq(IR_56KHZ);
+                    currentGameState = MENU;
+                    drawMenu();
                 }
             }
         }
     }
-}
-
-void clearWholeSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
-{
-    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
-    {
-        if (PixGroup % w == 0 && PixGroup != 0)
-        {
-            x -= w * 2;
-            y++;
-        }
-        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
-        {
-            uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
-            drawPixel(x, y, getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4)));
-            x++;
-        }
-    }
-}
-
-uint8_t getLives()
-{
-    return EEPROM_read(LIVES_ADDR);
-}
-
-void setLives(uint8_t &lives)
-{
-    if (lives > MAX_LIVES)
-    {
-        lives = 5; // Limits the live amount to MAX_LIVES = 5.
-    }
-    if (lives == 0)
-    {
-        lives = 5; // Resets the lives to 5 if the player has no lives left.
-    }
-
-    EEPROM_update(LIVES_ADDR, lives);
-}
-
-void showLives(uint8_t value)
-{                                    // Talks to port expander and tells which pins to toggle.
-    Wire.beginTransmission(IO_ADDR); // Starts transmission with the port expander on port 0x37.
-    Wire.write(~liveCount[value]);   // Sends the reverse of the pattern for the correct letter, reverse because common anode.
-    Wire.endTransmission();          // Ends transmission
-}
-
-void showScore(bool scoreType, uint8_t level)
-{
-    // Checks what scoretype is selected and shows the score accordingly in the level or at the menu screen.
-    if (scoreType == HIGHSCORE)
-    {
-        // Draw score on the menu screen.
-        //  EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + level);
-    }
-    else
-    {
-        // Draw score on the game screen.
-    }
-}
-
-void updateHighscore(uint8_t score, uint8_t level)
-{
-    // Checks if level is in range.
-    if (level > MAX_LEVEL)
-    {
-        level = MAX_LEVEL;
-    }
-    // Checks if the score is higher than the highscore and updates it if it is.
-    if (score > EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + level))
-    {
-        EEPROM_write(HIGHSCORE_START_LEVEL_ADDR + level, score);
-    }
-}
-
-void drawScore(uint8_t highscore, bool clearScore)
-{
-    uint16_t color = PLAYER_BLUE;
-    if (clearScore)
-    {
-        color = BACKGROUND_LIGHT;
-    }
-    else if (highscore < 50)
-    {
-        color = PLAYER_RED;
-    }
-    else if (highscore >= 50 && highscore < 100)
-    {
-        color = PLAYER_YELLOW;
-    }
-
-    unsigned char *pText = new unsigned char[4];
-    pText[0] = highscore / 100 + '0';
-    pText[1] = (highscore % 100) / 10 + '0';
-    pText[2] = highscore % 10 + '0';
-    pText[3] = '\0';
-    drawString((const char *)pText, SCORE_POS, 2, 2, color);
-
-    delete[] pText;
-    pText = nullptr;
-}
-
-uint8_t checkPoolCollision()
-{
-    for (auto *pool : liquids)
-    {
-        // Check if the player is colliding with the top of the pool
-        if (player1.x + PLAYER_WIDTH > pool->bounds.x && player1.x < pool->bounds.x + (pool->bounds.width * 3) && player1.y + PLAYER_HEIGHT >= pool->bounds.y)
-        {
-            // Check if the player is colliding with the pool from the top.
-            if (player1.yOld + PLAYER_HEIGHT <= pool->bounds.y)
-            {
-                player1.yVelocity = 0;
-                player1.y = pool->bounds.y - PLAYER_HEIGHT;
-                player1.jumping = false;
-                player_accel = 0;
-                return pool->Version;
-            }
-        }
-    }
-
-    return -1;
 }
 
 void initTimer0()
@@ -846,38 +607,15 @@ void Update()
     player1.y += player1.yVelocity;
     player1.yVelocity += GRAVITY;
 
-    // Get the nunchuk input data
-    if (!getState(NUNCHUK_ADDRESS))
-    {
-        return;
-    }
-
-    if (player_accel >= PLAYER_MAX_ACCEL)
-    {
-        player_accel = PLAYER_MAX_ACCEL;
-    }
-    else
-    {
-        player_accel += PLAYER_ACCEL;
-    }
-
     // Check for movement to right
     if (state.joy_x_axis > 169)
     {
-        player1.x += player_accel;
+        player1.x += MOVEMENT_SPEED;
     }
     // Check for movement to left
     else if (state.joy_x_axis < 85)
     {
-        player1.x -= player_accel;
-    }
-
-    //      NEEDS CORRECTION   :    Check for correct pool
-    if (checkPoolCollision() == 1)
-    {
-        lives--;
-        setLives(lives);
-        playerDied = true;
+        player1.x -= MOVEMENT_SPEED;
     }
 
     checkWallCollision();
@@ -892,11 +630,6 @@ void Update()
     {
         player1.jumping = true;
         player1.yVelocity -= INITIAL_Y_VEL;
-    }
-
-    if (player1.xOld == player1.x)
-    {
-        player_accel = 0;
     }
 }
 
@@ -1490,6 +1223,7 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
         return ALPHA;
     }
 }
+
 void drawPlayerSelectScreen()
 {
     fillScreen(0x0);

@@ -485,8 +485,8 @@ int main(void)
         fillRect(0, 0, 320, 240, PLAYER_RED);
     }
 
-    // level1();
-    level2();
+    level1();
+    // level2();
     
     while (true)
     {

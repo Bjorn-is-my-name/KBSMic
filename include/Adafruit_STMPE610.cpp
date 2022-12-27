@@ -47,7 +47,8 @@ static SPISettings mySPISettings;
  *          CLK pin
  */
 Adafruit_STMPE610::Adafruit_STMPE610(uint8_t cspin, uint8_t mosipin,
-                                     uint8_t misopin, uint8_t clkpin) {
+                                     uint8_t misopin, uint8_t clkpin)
+{
   _CS = cspin;
   _MOSI = mosipin;
   _MISO = misopin;
@@ -61,7 +62,8 @@ Adafruit_STMPE610::Adafruit_STMPE610(uint8_t cspin, uint8_t mosipin,
  *  @param  *theSPI
  *          spi object
  */
-Adafruit_STMPE610::Adafruit_STMPE610(uint8_t cspin, SPIClass *theSPI) {
+Adafruit_STMPE610::Adafruit_STMPE610(uint8_t cspin, SPIClass *theSPI)
+{
   _CS = cspin;
   _MOSI = _MISO = _CLK = -1;
   _spi = theSPI;
@@ -72,7 +74,8 @@ Adafruit_STMPE610::Adafruit_STMPE610(uint8_t cspin, SPIClass *theSPI) {
  *  @param  *theWire
  *          wire object
  */
-Adafruit_STMPE610::Adafruit_STMPE610(TwoWire *theWire) {
+Adafruit_STMPE610::Adafruit_STMPE610(TwoWire *theWire)
+{
   _CS = _MISO = _MOSI = _CLK = -1;
   _wire = theWire;
 }
@@ -83,9 +86,10 @@ Adafruit_STMPE610::Adafruit_STMPE610(TwoWire *theWire) {
  *          I2C address (defaults to STMPE_ADDR)
  *  @return True if process is successful
  */
-boolean Adafruit_STMPE610::begin(uint8_t i2caddr) {
-  if (_CS != -1 && _CLK == -1) {
-      Serial.println(1);
+boolean Adafruit_STMPE610::begin(uint8_t i2caddr)
+{
+  if (_CS != -1 && _CLK == -1)
+  {
     // hardware SPI
     pinMode(_CS, OUTPUT);
     digitalWrite(_CS, HIGH);
@@ -93,38 +97,45 @@ boolean Adafruit_STMPE610::begin(uint8_t i2caddr) {
     SPIClass::begin();
     mySPISettings = SPISettings(1000000, MSBFIRST, SPI_MODE0);
     m_spiMode = SPI_MODE0;
-  } else if (_CS != -1) {
-      Serial.println(2);
+  }
+  else if (_CS != -1)
+  {
 
-      // software SPI
+    // software SPI
     pinMode(_CLK, OUTPUT);
     pinMode(_CS, OUTPUT);
     pinMode(_MOSI, OUTPUT);
     pinMode(_MISO, INPUT);
-  } else {
-        Serial.println(3);
+  }
+  else
+  {
     _wire->begin();
     _i2caddr = i2caddr;
   }
 
   // try mode0
-  if (getVersion() != 0x811) {
-    if (_CS != -1 && _CLK == -1) {
-       Serial.println("try MODE1");
+  if (getVersion() != 0x811)
+  {
+    if (_CS != -1 && _CLK == -1)
+    {
       mySPISettings = SPISettings(1000000, MSBFIRST, SPI_MODE1);
       m_spiMode = SPI_MODE1;
 
-      if (getVersion() != 0x811) {
+      if (getVersion() != 0x811)
+      {
         return false;
       }
-    } else {
+    }
+    else
+    {
       return false;
     }
   }
   writeRegister8(STMPE_SYS_CTRL1, STMPE_SYS_CTRL1_RESET);
-   _delay_ms(10);
+  _delay_ms(10);
 
-  for (uint8_t i = 0; i < 65; i++) {
+  for (uint8_t i = 0; i < 65; i++)
+  {
     readRegister8(i);
   }
 
@@ -155,7 +166,8 @@ boolean Adafruit_STMPE610::begin(uint8_t i2caddr) {
  *  @brief  Returns true if touched, false otherwise
  *  @return True if if touched, false otherwise
  */
-boolean Adafruit_STMPE610::touched() {
+boolean Adafruit_STMPE610::touched()
+{
   return (readRegister8(STMPE_TSC_CTRL) & 0x80);
 }
 
@@ -163,7 +175,8 @@ boolean Adafruit_STMPE610::touched() {
  *  @brief  Checks if buffer is empty
  *  @return True if empty, false otherwise
  */
-boolean Adafruit_STMPE610::bufferEmpty() {
+boolean Adafruit_STMPE610::bufferEmpty()
+{
   return (readRegister8(STMPE_FIFO_STA) & STMPE_FIFO_STA_EMPTY);
 }
 
@@ -171,7 +184,8 @@ boolean Adafruit_STMPE610::bufferEmpty() {
  *  @brief  Returns the FIFO buffer size
  *  @return The FIFO buffer size
  */
-uint8_t Adafruit_STMPE610::bufferSize() {
+uint8_t Adafruit_STMPE610::bufferSize()
+{
   return readRegister8(STMPE_FIFO_SIZE);
 }
 
@@ -179,7 +193,8 @@ uint8_t Adafruit_STMPE610::bufferSize() {
  *  @brief  Returns the STMPE610 version number
  *  @return The STMPE610 version number
  */
-uint16_t Adafruit_STMPE610::getVersion() {
+uint16_t Adafruit_STMPE610::getVersion()
+{
   uint16_t v;
   // Serial.print("get version");
   v = readRegister8(0);
@@ -198,10 +213,12 @@ uint16_t Adafruit_STMPE610::getVersion() {
  *  @param  *z
  *	    The z coordinate
  */
-void Adafruit_STMPE610::readData(uint16_t *x, uint16_t *y, uint8_t *z) {
+void Adafruit_STMPE610::readData(uint16_t *x, uint16_t *y, uint8_t *z)
+{
   uint8_t data[4];
 
-  for (uint8_t i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < 4; i++)
+  {
     data[i] = readRegister8(0xD7); // _spi->transfer(0x00);
     // Serial.print("0x"); Serial.print(data[i], HEX); Serial.print(" / ");
   }
@@ -218,12 +235,14 @@ void Adafruit_STMPE610::readData(uint16_t *x, uint16_t *y, uint8_t *z) {
  *  @brief  Returns point for touchscreen data
  *  @return The touch point using TS_Point
  */
-TS_Point Adafruit_STMPE610::getPoint() {
+TS_Point Adafruit_STMPE610::getPoint()
+{
   uint16_t x = 0, y = 0;
   uint8_t z;
 
   /* Making sure that we are reading all data before leaving */
-  while (!bufferEmpty()) {
+  while (!bufferEmpty())
+  {
     readData(&x, &y, &z);
   }
 
@@ -236,11 +255,14 @@ TS_Point Adafruit_STMPE610::getPoint() {
 /*!
  *  @brief  Reads SPI data
  */
-uint8_t Adafruit_STMPE610::spiIn() {
-  if (_CLK == -1) {
+uint8_t Adafruit_STMPE610::spiIn()
+{
+  if (_CLK == -1)
+  {
     uint8_t d = _spi->transfer(0);
     return d;
-  } else
+  }
+  else
     return shiftIn(_MISO, _CLK, MSBFIRST);
 }
 
@@ -249,10 +271,13 @@ uint8_t Adafruit_STMPE610::spiIn() {
  *  @param  x
  *          Data to send (one byte)
  */
-void Adafruit_STMPE610::spiOut(uint8_t x) {
-  if (_CLK == -1) {
+void Adafruit_STMPE610::spiOut(uint8_t x)
+{
+  if (_CLK == -1)
+  {
     _spi->transfer(x);
-  } else
+  }
+  else
     shiftOut(_MOSI, _CLK, MSBFIRST, x);
 }
 
@@ -262,9 +287,11 @@ void Adafruit_STMPE610::spiOut(uint8_t x) {
  *          The register
  *  @return Data in the register
  */
-uint8_t Adafruit_STMPE610::readRegister8(uint8_t reg) {
+uint8_t Adafruit_STMPE610::readRegister8(uint8_t reg)
+{
   uint8_t x;
-  if (_CS == -1) {
+  if (_CS == -1)
+  {
     // use i2c
     _wire->beginTransmission(_i2caddr);
     _wire->write((byte)reg);
@@ -274,7 +301,9 @@ uint8_t Adafruit_STMPE610::readRegister8(uint8_t reg) {
 
     // Serial.print("$"); Serial.print(reg, HEX);
     // Serial.print(": 0x"); Serial.println(x, HEX);
-  } else {
+  }
+  else
+  {
     if (_CLK == -1)
       _spi->beginTransaction(mySPISettings);
 
@@ -297,9 +326,11 @@ uint8_t Adafruit_STMPE610::readRegister8(uint8_t reg) {
  *          The register
  *  @return Data in the register
  */
-uint16_t Adafruit_STMPE610::readRegister16(uint8_t reg) {
+uint16_t Adafruit_STMPE610::readRegister16(uint8_t reg)
+{
   uint16_t x = 0;
-  if (_CS == -1) {
+  if (_CS == -1)
+  {
     // use i2c
     _wire->beginTransmission(_i2caddr);
     _wire->write((byte)reg);
@@ -309,7 +340,8 @@ uint16_t Adafruit_STMPE610::readRegister16(uint8_t reg) {
     x <<= 8;
     x |= _wire->read();
   }
-  if (_CLK == -1) {
+  if (_CLK == -1)
+  {
     // hardware SPI
     if (_CLK == -1)
       _spi->beginTransaction(mySPISettings);
@@ -336,14 +368,18 @@ uint16_t Adafruit_STMPE610::readRegister16(uint8_t reg) {
  *  @param  val
  *          Value to write
  */
-void Adafruit_STMPE610::writeRegister8(uint8_t reg, uint8_t val) {
-  if (_CS == -1) {
+void Adafruit_STMPE610::writeRegister8(uint8_t reg, uint8_t val)
+{
+  if (_CS == -1)
+  {
     // use i2c
     _wire->beginTransmission(_i2caddr);
     _wire->write((byte)reg);
     _wire->write(val);
     _wire->endTransmission();
-  } else {
+  }
+  else
+  {
     if (_CLK == -1)
       _spi->beginTransaction(mySPISettings);
     digitalWrite(_CS, LOW);
@@ -369,7 +405,8 @@ TS_Point::TS_Point() { x = y = 0; }
  *  @param  z0
  *          Initial z
  */
-TS_Point::TS_Point(int16_t x0, int16_t y0, int16_t z0) {
+TS_Point::TS_Point(int16_t x0, int16_t y0, int16_t z0)
+{
   x = x0;
   y = y0;
   z = z0;
@@ -379,7 +416,8 @@ TS_Point::TS_Point(int16_t x0, int16_t y0, int16_t z0) {
  *  @brief  Equality operator for TS_Point
  *  @return True if points are equal
  */
-bool TS_Point::operator==(TS_Point p1) {
+bool TS_Point::operator==(TS_Point p1)
+{
   return ((p1.x == x) && (p1.y == y) && (p1.z == z));
 }
 
@@ -387,6 +425,7 @@ bool TS_Point::operator==(TS_Point p1) {
  *  @brief  Non-equality operator for TS_Point
  *  @return True if points are not equal
  */
-bool TS_Point::operator!=(TS_Point p1) {
+bool TS_Point::operator!=(TS_Point p1)
+{
   return ((p1.x != x) || (p1.y != y) || (p1.z != z));
 }

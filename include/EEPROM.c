@@ -16,3 +16,12 @@ unsigned char EEPROM_read(unsigned int uiAddress)
     EECR |= (1 << EERE);
     return EEDR;
 }
+
+void EEPROM_update(unsigned short uiAddress, unsigned char ucData)
+{
+    unsigned char ucOldData = EEPROM_read(uiAddress);
+    if (ucOldData != ucData)
+    {
+        EEPROM_write(uiAddress, ucData);
+    }
+}

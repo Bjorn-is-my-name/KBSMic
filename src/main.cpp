@@ -1,129 +1,13 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <Wire.h>
-#include "LCD.cpp"
-#include "Player1.c"
-#include "Player2.c"
+#include <main.h>
 
+volatile int frameCounter = 0;
 
-#include "EEPROM.c"
-#include "Adafruit_STMPE610.h"
-#include "Adafruit_STMPE610.cpp"
-
-#include "Button.c"
-#include "WaterBlue.c"
-#include "DoorCorner.c"
-#include "DoorEdge.c"
-#include "SignBlue.c"
-#include "SignRed.c"
-#include "PlatformEdge.c"
-#include "PlatformMiddle.c"
-#include "LeverBase.c"
-#include "LeverTop.c"
-#include "DiaBlue.c"
-#include "DiaRed.c"
-
-#include "Background.c"
-#include "Nunchuk.cpp"
-
-void init_timer0();
-
-void checkWallCollision();
-
-void setFreq(uint8_t);
-
-void checkGameState();
-
-void drawMenu();
-
-void drawSettings();
-
-void drawPlayerSelectScreen();
-
-void drawLevelSelectScreen();
-
-void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
-
-void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
-
-bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
-
-void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
-
-void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
-
-void drawBackground();
-
-void drawInteractables();
-
-
-uint16_t getColor(uint8_t, uint8_t ver = 0);
-
-void update();
-
-void draw();
-
-#define NUNCHUK_ADDRESS 0x52
-
-#define IR_38KHZ 52
-#define IR_56KHZ 35
-
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
-
-#define PLAYER_WIDTH 8
-#define PLAYER_ACTUAL_WIDTH 16
-#define PLAYER_HEIGHT 20
-
-#define SENDINGDATA_LEN 16 // bits - 1
-#define SENDINGBIT_START_VALUE (- 2)
-
-#define STARTBIT_VALUE (-1)
-#define STARTBIT_MIN 3
-#define STARTBIT_MAX 6
-#define ZERO_MAX 2
-#define ONE_MIN 1
-#define ONE_MAX 4
-
-#define INITIAL_Y_VEL 10
-#define FRAME_TIME 32 //(1000/30FPS)-1 = 32
-
-#define BG_SPRITE_AMOUNT 192
-#define BG_SPRITE_WIDTH 10
-#define BG_SPRITE_ACTUAL_WIDTH 20
-#define BG_SPRITE_HEIGHT 10
-
-#define GRAVITY 1
-
-#define BUTTON_WIDTH 3
-#define BUTTON_HEIGHT 4
-#define WATER_WIDTH 10
-#define WATER_HEIGHT 5
-#define DOOR_WIDTH 5
-#define DOOR_HEIGHT 10
-#define SIGN_WIDTH 2
-#define SIGN_HEIGHT 13
-#define PLATFORM_WIDTH 5
-#define PLATFORM_HEIGHT 8
-#define DIA_WIDTH 3
-#define DIA_HEIGHT 9
-#define LEVER_BASE_WIDTH 4
-#define LEVER_BASE_HEIGHT 6
-#define LEVER_TOP_WIDTH 4
-#define LEVER_TOP_HEIGHT 7
-
-#define PLAY_BUTTON_MIN_X 1384
-#define PLAY_BUTTON_MAX_X 2707
-
-#define PLAY_BUTTON_MIN_Y 700
-#define PLAY_BUTTON_MAX_Y 1270
-
-
+// Structs
 struct
 {
 public:
-    uint16_t x = 13;
-    uint8_t y = 170;
+    uint16_t x = 20;
+    uint8_t y = 120;
     uint16_t xOld = x;
     uint8_t yOld = y;
     int8_t yVelocity = 0;
@@ -133,87 +17,318 @@ public:
 struct
 {
 public:
-    uint16_t x = 13;
-    uint8_t y = 210;
+    uint16_t x = 229;
+    uint8_t y = 40;
     uint16_t xOld = x;
     uint8_t yOld = y;
-//    uint8_t animation
 } player2;
 
-struct Rect
-{
-    uint16_t x;
-    uint8_t y;
-    uint8_t width;
-    uint8_t height;
-};
-
-struct Interactables
+struct Collect
 {
     uint16_t x;
     uint8_t y;
     uint8_t w;
     uint8_t h;
+    uint8_t version;
+
+    void draw()
+    {
+        if (x == NULL)
+            return;
+        drawSprite(x, y, DIA_WIDTH, DIA_HEIGHT, Diamond, version);
+        drawSpriteMirror(x + DIA_WIDTH * 2, y, DIA_WIDTH, DIA_HEIGHT, Diamond, version);
+    }
 };
 
-Rect walls[] = {
-        Rect{0, 0, 5, 240},
-        Rect{10, 0, 155, 10},
-        Rect{310, 10, 5, 230},
-        Rect{10, 230, 155, 10},
-        Rect{10, 40, 20, 40},
-        Rect{50, 70, 115, 10},
-        Rect{153, 50, 30, 20},
-        Rect{40, 110, 75, 10},
-        Rect{180, 120, 50, 10},
-        Rect{280, 120, 15, 20},
-        Rect{290, 140, 10, 10},
-        Rect{10, 150, 70, 10},
-        Rect{150, 150, 5, 30},
-        Rect{150, 180, 52, 10},
-        Rect{280, 210, 15, 20},
-        Rect{10, 190, 40, 10}
+struct Platform
+{
+    Rect bounds;
+    uint16_t minX;
+    uint16_t maxX;
+    uint8_t minY;
+    uint8_t maxY;
+    uint8_t version;
+
+    void MoveMax()
+    {
+        if (bounds.x == NULL)
+            return;
+        if (maxX == minX)
+        {
+            MoveMaxY();
+        } else if (maxY == minY)
+        {
+            MoveMaxX();
+        }
+    }
+
+    void MoveMin()
+    {
+        if (bounds.x == NULL)
+            return;
+        if (maxX == minX)
+        {
+            MoveMinY();
+        } else if (maxY == minY)
+        {
+            MoveMinX();
+        }
+    }
+
+    void MoveMaxX()
+    {
+        if (bounds.x > minX && frameCounter % 3 == 0)
+        {
+            clearPlat(bounds.x + 3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.x -= 3;
+            this->draw();
+        }
+    }
+
+    void MoveMaxY()
+    {
+        if (bounds.y < maxY && frameCounter % 3 == 0)
+        {
+            clearPlat(bounds.x, bounds.y + 3, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.y += 3;
+            this->draw();
+        }
+    }
+
+    void MoveMinX()
+    {
+        if (bounds.x > minX && frameCounter % 3 == 0)
+        {
+            clearPlat(bounds.x + 3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.x -= 3;
+            this->draw();
+        }
+    }
+
+    void MoveMinY()
+    {
+        if (bounds.y > minY && frameCounter % 3 == 0)
+        {
+            clearPlat(bounds.x, bounds.y - 3, bounds.x, bounds.y, bounds.width, bounds.height);
+            bounds.y -= 3;
+            this->draw();
+        }
+    }
+
+    bool isMax()
+    {
+        if (bounds.x == NULL)
+            return false;
+        if ((bounds.x >= maxX && bounds.y >= maxY) || (bounds.x <= minX && bounds.y <= minY))
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
+
+    void draw()
+    {
+        if (bounds.x == NULL)
+            return;
+        if (maxX == minX)
+        {
+            drawPlatH(bounds.x, bounds.y, bounds.width, bounds.height, version);
+        } else if (maxY == minY)
+        {
+            drawPlatV(bounds.x, bounds.y, bounds.width, bounds.height, version);
+        }
+    }
 };
 
-Interactables Interactable[] = {
-        Interactables{12, 12, DIA_WIDTH * 2, DIA_HEIGHT},
-        Interactables{164, 216, DIA_WIDTH * 2, DIA_HEIGHT},
-        Interactables{26, 12, DIA_WIDTH * 2, DIA_HEIGHT},
-        Interactables{229, 216, DIA_WIDTH * 2, DIA_HEIGHT}
+struct lever
+{
+    Rect bounds;
+    bool state;
+    bool standingOn;
+    Platform *plat[2];
+    uint8_t Version;
+
+    void activate()
+    {
+        if (bounds.x == NULL)
+            return;
+        if (state)
+        {
+            // move platform
+            plat[0]->MoveMax();
+            plat[1]->MoveMax();
+        } else
+        {
+            // move platform back
+            plat[0]->MoveMin();
+            plat[1]->MoveMin();
+        }
+        if (!(plat[0]->isMax()))
+        {
+            this->draw();
+        }
+    }
+
+    void draw()
+    {
+        if (bounds.x == NULL)
+            return;
+        drawLever(bounds.x - 7, bounds.y + 1, 1);
+        if (state)
+        {
+            drawSpriteMirror((bounds).x - 7, (bounds).y - 7, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, Version);
+        } else
+        {
+            drawSprite((bounds).x + 1, (bounds).y - 7, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, Version);
+        }
+    }
 };
 
-Adafruit_STMPE610 touch = Adafruit_STMPE610(8);
+struct button
+{
+    Rect bounds;
+    bool standingOn;
+    Platform *plat[2];
+    uint8_t Version;
+    button *connectedButton;
 
+    void activate()
+    {
+        if (bounds.x == NULL)
+            return;
+        if (standingOn || connectedButton->standingOn)
+        {
+            // move platform
+            plat[0]->MoveMax();
+            plat[1]->MoveMax();
+        } else
+        {
+            // move platform back
+            plat[0]->MoveMin();
+            plat[1]->MoveMin();
+        }
+        if (!(plat[0]->isMax()))
+        {
+            this->draw();
+        }
+    }
 
-// Check to see if the current bit is done sending
-bool dataIsSend = false;
-// Data to send over IR
-uint32_t sendingData = 0;
-// The data bit to send;
-int8_t sendingBit = SENDINGBIT_START_VALUE;
+    void draw()
+    {
+        if (bounds.x == NULL)
+            return;
+        drawSprite((bounds).x - 4, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button, Version);
+        drawSpriteMirror((bounds).x - 4 + BUTTON_WIDTH * 2, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button, Version);
+    }
+
+    void setConnectedButton(button *btn)
+    {
+        this->connectedButton = btn;
+    }
+};
+
+struct Liquid
+{
+    Rect bounds;
+    uint8_t Version;
+
+    void draw()
+    {
+        if (bounds.x == NULL)
+            return;
+        drawLiquid(bounds.x, bounds.y, bounds.width, bounds.height, Version);
+    }
+};
+
+// Level objects
+Platform Platform1, Platform2, Platform3, Platform4, Platform5, Platform6, Platform7, Platform8, Platform9;
+lever Lever1, Lever2, Lever3, Lever4;
+button button1, button2, button3, button4;
+Collect Dia1, Dia2, Dia3, Dia4;
+Liquid liq1, liq2, liq3, liq4;
+Rect Door1, Door2;
+Rect walls[20];
+
+// Arrays to store the objects (mainly for looping purposes)
+Platform *platforms[] =
+        {
+                &Platform1,
+                &Platform2,
+                &Platform3,
+                &Platform4,
+                &Platform5,
+                &Platform6,
+                &Platform7,
+                &Platform8,
+                &Platform9};
+
+lever *levers[] =
+        {
+                &Lever1,
+                &Lever2,
+                &Lever3,
+                &Lever4};
+
+button *buttons[] =
+        {
+                &button1,
+                &button2,
+                &button3,
+                &button4};
+
+Collect *Dias[] =
+        {
+                &Dia1,
+                &Dia2,
+                &Dia3,
+                &Dia4};
+
+Liquid *liquids[] =
+        {
+                &liq1,
+                &liq2,
+                &liq3,
+                &liq4};
+
+// IR sending variables
+bool dataIsSend = false;                    // Check to see if the current bit is done sending
+uint32_t sendingData = 0;                   // Data to send over IR
+int8_t sendingBit = SENDINGBIT_START_VALUE; // The data bit to send;
 uint16_t onTime = 0;
-volatile uint32_t currentMs = 0;
-volatile uint8_t intCurrentMs = 0;
 
+// Time variables
 uint8_t msTime;
-uint16_t startTime;
-uint8_t zeroTime;
-uint8_t oneTime;
-uint8_t offTime;
+volatile uint32_t currentMs = 0;   // Keeps track of the milliseconds passed since startup
+volatile uint8_t intCurrentMs = 0; // Keeps track of the milliseconds passed and resets every frame
 
-uint32_t startMs = 0;
-bool startBitReceived = false;
-uint32_t receivedData = 0;
-uint8_t bitCounter = 0;
-bool isDataBit = false;
+// Time lengths for IR data sending
+uint16_t startTime; // Length of startbit
+uint8_t zeroTime;   // Length of 0
+uint8_t oneTime;    // Length of 1
+uint8_t offTime;    // Length of pause between bits
 
+// IR receiving variables
+uint32_t startMs = 0;          // Used to determin the length of each received bit
+bool startBitReceived = false; // Tracks if the staring bit was received before accepting data
+uint32_t receivedData = 0;     // All the received bits
+uint8_t bitCounter = 0;        // Current bit (used for bitshifting 1's in to receivedData)
+bool isDataBit = false;        // Differentiates data from pauses
+
+// All the gamestates
 enum gameState
 {
-    MENU, GAME, LEVELSELECT, SETTINGS, PAUSE, GAMEOVER, PLAYER_SELECT_SCREEN
-};
-gameState currentGameState = MENU;
-gameState oldGameState = GAME;
+    MENU,
+    GAME,
+    LEVELSELECT,
+    SETTINGS,
+    PAUSE,
+    GAMEOVER,
+    PLAYER_SELECT_SCREEN
+} currentGameState;
 
+// IR receiving protocol
 ISR(PCINT2_vect)
 {
     isDataBit = ((PIND >> PIND2) & 1) != 0; // Check for the pin state (high or low)
@@ -232,9 +347,12 @@ ISR(PCINT2_vect)
         if (startBitReceived) // If the start bit has been send, check what the data is
         {
             if (difference < ZERO_MAX) // Check if its a zero
+            {
                 receivedData &= ~(1 << bitCounter++);
-            else if (difference > ONE_MIN && difference < ONE_MAX) // Check if its a one
+            } else if (difference > ONE_MIN && difference < ONE_MAX) // Check if its a one
+            {
                 receivedData |= (1 << bitCounter++);
+            }
 
             if (bitCounter == SENDINGDATA_LEN) // If all bits are send, save the value in the variable
             {
@@ -247,14 +365,17 @@ ISR(PCINT2_vect)
             }
         }
     }
+
     startMs = currentMs; // Save the time from startup to now
 }
 
-ISR(TIMER0_COMPA_vect) // Toggle IR light
+// IR sending protocol (with timer to keep track of ms)
+ISR(TIMER0_COMPA_vect)
 {
     static uint16_t counter = 0;
     static uint8_t msCounter = 0;
 
+    // After enough interupts, a ms has passed
     if (++msCounter > msTime)
     {
         currentMs++;
@@ -273,10 +394,13 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
             if (sendingBit++ < SENDINGDATA_LEN)
             {
                 if (sendingBit == STARTBIT_VALUE) // Send start bit
+                {
                     onTime = startTime;
-                else                                                                 // Send data
-                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime
-                                                               : zeroTime; // Set the time corresponding to the bit
+                } else // Send data
+                {
+                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime : zeroTime; // Set the time corresponding to the bit
+                }
+
                 TCCR0A &= ~(1 << COM0A1); // Enable TC0
             } else
             {
@@ -292,181 +416,137 @@ ISR(TIMER0_COMPA_vect) // Toggle IR light
     }
 }
 
-long map(long x, long in_min, long in_max, long out_min, long out_max)
-{
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
 int main(void)
 {
+    // Setup IR led
     DDRD |= (1 << DDD6);
-    init_timer0();
+    initTimer0();
 
     // Setup IR recieving
-    PORTD |= (1 << PORTD2); //pull up
+    PORTD |= (1 << PORTD2); // pull up
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
 
-    setFreq(IR_38KHZ);
-    // Setup screen
+    // Setup wire
     Wire.begin();
-    setupSPI();
 
+    // Start the SPI communication and send screen startup commands
+    setupSPI();
+    START_UP();
+
+    // Always set a start frequency so the game loop can run (because ms timer is in ISR of IR sending)
+    setFreq(IR_38KHZ);
+
+    // Check if the frequency has already been set
+    {
+        uint8_t freq = EEPROM_read(20);
+        if (freq == IR_38KHZ || freq == IR_56KHZ)
+        {
+            setFreq(freq);
+            currentGameState = MENU;
+            drawMenu();
+        } else
+        {
+            currentGameState = PLAYER_SELECT_SCREEN;
+            drawPlayerSelectScreen();
+        }
+    }
+
+    // Enable global interupts
     sei();
 
-    // Start the screen and send startup commands
-    init_LCD();
-
-    //Start touch
-//    touchBegin();
-    Serial.begin(9600);
-    touch.begin();
-    if (EEPROM_read(20) == 0)
-    {
-        currentGameState = PLAYER_SELECT_SCREEN;
-        drawPlayerSelectScreen();
-    } else if (EEPROM_read(20) == IR_38KHZ)
-    {
-        setFreq(IR_38KHZ);
-        drawMenu();
-    } else if (EEPROM_read(20) == IR_56KHZ)
-    {
-        setFreq(IR_56KHZ);
-        drawMenu();
-    }
-
-    // Setup IR sending
     // Check nunckuk connection
-    while (!startNunchuk(NUNCHUK_ADDRESS))
+    if (!startNunchuk(NUNCHUK_ADDRESS))
     {
-        drawString("Nunchuk", 60, 80, 5, PLAYER_RED);
-        drawString("not", 60, 120, 5, PLAYER_RED);
-        drawString("found", 60, 160, 5, PLAYER_RED);
+        fillScreen(0);
 
-        drawString("Nunchuk", 60, 80, 5, PLAYER_YELLOW);
-        drawString("not", 60, 120, 5, PLAYER_YELLOW);
-        drawString("found", 60, 160, 5, PLAYER_YELLOW);
+        while (!startNunchuk(NUNCHUK_ADDRESS))
+        {
+            drawString("Nunchuk", 60, 80, 5, PLAYER_RED);
+            drawString("not", 60, 120, 5, PLAYER_RED);
+            drawString("found", 60, 160, 5, PLAYER_RED);
+
+            drawString("Nunchuk", 60, 80, 5, PLAYER_YELLOW);
+            drawString("not", 60, 120, 5, PLAYER_YELLOW);
+            drawString("found", 60, 160, 5, PLAYER_YELLOW);
+        }
+
+        switch (currentGameState)
+        {
+            case MENU:
+                drawMenu();
+                break;
+            case PLAYER_SELECT_SCREEN:
+                drawPlayerSelectScreen();
+                break;
+        }
     }
-
-
-    volatile int frameCounter = 0; //#TODO reset deze ergens en hem verplaatsen
-    bool playerSelectButtonPressed = false;
-    bool menuButtonPressed = false;
-    bool exitButtonPressed = false;
-    bool level1ButtonPressed = false;
-    bool level2ButtonPressed = false;
-    bool level3ButtonPressed = false;
-
-    uint16_t x, y;
-    uint8_t z;
 
     while (true)
     {
         if (intCurrentMs > FRAME_TIME)
         {
-            //30 FPS
+            // 30 FPS
             intCurrentMs = 0;
             frameCounter++;
+
+            // Get the nunchuk input data
+            []()
+            {
+                if (!getState(NUNCHUK_ADDRESS))
+                {
+                    return;
+                }
+            }();
+
             if (currentGameState == GAME)
             {
-                //Game code
-                update();
-                draw();
-            }
-                //Not in a game so checking in what menu it is.
-            else if (currentGameState == MENU)
+                // Game code
+                Update();
+                DrawPlayers();
+            } else if (currentGameState == MENU)
             {
-                //Menu code
-                if (touch.touched())
+                if (state.c_button && !state.c_button_old)
                 {
-                    while (!touch.bufferEmpty())
-                    {
-                        touch.readData(&y, &x, &z); //reversed order because of screen rotation
-                        if ((x > 1404 && x < 2727 && y > 2378 && y < 3193) && !menuButtonPressed) //check if you pressed play button
-                        {
-                            menuButtonPressed = true;
-                            exitButtonPressed = false;
-                            currentGameState = LEVELSELECT;
-                            drawLevelSelectScreen();
-//                            drawBackground();
-//                            drawInteractables();
-                        } else if ((x > 891 && x < 3310 && y > 1098 && y < 1903) && !menuButtonPressed) //check if you pressed settings button
-                        {
-                            menuButtonPressed = true;
-                            drawPlayerSelectScreen();
-                            currentGameState = PLAYER_SELECT_SCREEN;
-                        }
-                    }
+                    currentGameState = LEVELSELECT;
+                    drawLevelSelectScreen();
+                } else if (state.z_button && !state.z_button_old)
+                {
+                    currentGameState = PLAYER_SELECT_SCREEN;
+                    drawPlayerSelectScreen();
                 }
             } else if (currentGameState == LEVELSELECT)
             {
-                if (touch.touched())
+                if (state.c_button && !state.c_button_old)
                 {
-                    while (!touch.bufferEmpty())
-                    {
-                        touch.readData(&y, &x, &z); //reversed order because of screen rotation
-                        if ((x > 309 && x < 3663 && y > 3138 && y < 4000) && !exitButtonPressed)
-                        {
-                            menuButtonPressed = false;
-                            exitButtonPressed = true;
-                            currentGameState = MENU;
-                            drawMenu();
-                        } else if ((x > 663 && x < 3275 && y < 242 && y > 920) && !level2ButtonPressed) // Level 1 button
-                        {
-                            //level 1 code
-                            currentGameState = GAME;
-                            level1ButtonPressed = true;
-                            drawBackground();
-                            drawInteractables();
-                        } else if ((x > 663 && x < 3275 && y > 1210 && y < 1888) && !level2ButtonPressed) // Level 2 button
-                        {
-                            //level 2 code
-                            currentGameState = GAME;
-                            level2ButtonPressed = true;
-                            drawBackground();
-                            drawInteractables();
-
-                        } else if ((x > 663 && x < 3275 && y < 2193 && y > 2871) && !level3ButtonPressed) // Level 3 button
-                        {
-                            //level 3 code
-                            currentGameState = GAME;
-                            level3ButtonPressed = true;
-                            drawBackground();
-                            drawInteractables();
-                        }
-                    }
+                    currentGameState = GAME;
+                    level1();
+                } else if (state.z_button && !state.z_button_old)
+                {
+                    currentGameState = MENU;
+                    drawMenu();
                 }
             } else if (currentGameState == PLAYER_SELECT_SCREEN)
             {
-                menuButtonPressed = false;
-                if (touch.touched())
+                if (state.c_button && !state.c_button_old)
                 {
-                    while (!touch.bufferEmpty())
-                    {
-                        touch.readData(&y, &x, &z); //reversed order because of screen rotation
-                        if ((x > 150 && x < 1900 && y > 130 && y < 4000) && !playerSelectButtonPressed) //check if you pressed Player1 button #TODO coords fixen
-                        {
-                            playerSelectButtonPressed = true;
-                            EEPROM_write(20, IR_38KHZ);
-                            setFreq(IR_38KHZ);
-                            currentGameState = MENU;
-                            drawMenu();
-                        } else if ((x > 1900 && x < 3800 && y > 130 && y < 4000) && !playerSelectButtonPressed) //check if you pressed Player2 button
-                        {
-                            playerSelectButtonPressed = true;
-                            EEPROM_write(20, IR_56KHZ);
-                            setFreq(IR_56KHZ);
-                            currentGameState = MENU;
-                            drawMenu();
-                        }
-                    }
+                    EEPROM_write(20, IR_38KHZ);
+                    setFreq(IR_38KHZ);
+                    currentGameState = MENU;
+                    drawMenu();
+                } else if (state.z_button && !state.z_button_old)
+                {
+                    EEPROM_write(20, IR_56KHZ);
+                    setFreq(IR_56KHZ);
+                    currentGameState = MENU;
+                    drawMenu();
                 }
             }
         }
     }
 }
 
-void init_timer0()
+void initTimer0()
 {
     /*
     Fast-PWM mode (TOP = OCRA) -> WGM0[2:0] = 0b111
@@ -482,6 +562,8 @@ void init_timer0()
 
 void setFreq(uint8_t freq)
 {
+    OCR0A = freq;
+
     if (freq == IR_38KHZ)
     {
         msTime = 37;
@@ -489,7 +571,7 @@ void setFreq(uint8_t freq)
         zeroTime = 37;
         oneTime = 113;
         offTime = 37;
-    } else if (freq == IR_56KHZ)
+    } else
     {
         msTime = 55;
         startTime = 279;
@@ -497,80 +579,40 @@ void setFreq(uint8_t freq)
         oneTime = 167;
         offTime = 55;
     }
-
-    OCR0A = freq;
 }
 
-
-void drawPlayerSelectScreen()
+uint8_t getFreq()
 {
-    fillScreen(0x0);
-    drawString("Choose your player", 70, 16, 2, PLAYER_RED);
-    drawString("Player1(38KHZ)", 10, 140, 2, PLAYER_RED);
-    drawString("Player2(56KHZ)", 176, 160, 2, PLAYER_RED);
+    return OCR0A;
 }
 
-
-void drawMenu()
-{
-    fillScreen(0x0);
-    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); //Play button
-    drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); //Settings button
-    drawString("Play", 120, 60, 4, PLAYER_RED);
-    drawString("Settings", 75, 140, 4, PLAYER_RED);
-}
-
-void drawLevelSelectScreen()
-{
-    //Delete old menu screen
-    drawBorder(110, 50, 116, 50, 5, 0x0);
-    drawBorder(65, 130, 212, 50, 5, 0x0);
-    drawString("Play", 120, 60, 4, 0x0);
-    drawString("Settings", 75, 140, 4, 0x0);
-    //Draw new screen
-    drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); //Level 1 button
-    drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); //Level 2 button
-    drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE); //Level 3 button
-    drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE); //Exit button
-    drawString("Level 1", 75, 197, 4, 0xFFFF);
-    drawString("Level 2", 75, 137, 4, 0xFFFF);
-    drawString("Level 3", 75, 77, 4, 0xFFFF);
-    drawString("Back to menu", 50, 13, 3, 0xFFFF);
-
-}
-
-
-void update()
+void Update()
 {
     player1.xOld = player1.x;
     player1.yOld = player1.y;
+
     player1.y += player1.yVelocity;
+    player1.yVelocity += GRAVITY;
 
-    //Checks if the player is not already at the bottom of the screen.
-    if (player1.y + PLAYER_HEIGHT + player1.yVelocity <= SCREEN_HEIGHT)
+    // Check for movement to right
+    if (state.joy_x_axis > 169)
     {
-        player1.yVelocity += GRAVITY;
-    } else
-    {
-        player1.yVelocity = 0;
-        player1.jumping = false;
+        player1.x += MOVEMENT_SPEED;
     }
-    // Get the nunchuk input data
-    if (!getState(NUNCHUK_ADDRESS))
+        // Check for movement to left
+    else if (state.joy_x_axis < 85)
     {
-        return;
+        player1.x -= MOVEMENT_SPEED;
     }
-
-    if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
-        player1.x += 2;
-
-        // Check for movement to left (only move when not against the wall)
-    else if (state.joy_x_axis < 100 && player1.x > 0)
-        player1.x -= 2;
 
     checkWallCollision();
+    CheckPlatformCollision();
 
-    //Jumping and falling mechanics
+    checkButtons();
+    checkLevers();
+    checkDias();
+
+    // Jumping and falling mechanics
     if (state.c_button == 1 && !player1.jumping)
     {
         player1.jumping = true;
@@ -578,35 +620,112 @@ void update()
     }
 }
 
-void checkWallCollision()
+void checkButtons()
 {
-    for (auto &wall: walls)
+    for (button *B: buttons)
     {
-        // Check if the player is colliding with the wall.
-        if (player1.x + PLAYER_ACTUAL_WIDTH > wall.x && player1.x < wall.x + (wall.width * 2) && player1.y + PLAYER_HEIGHT > wall.y && player1.y < wall.y + wall.height)
+        if (rectangleCollision(player1.x, player1.y, B->bounds) || rectangleCollision(player2.x, player2.y, B->bounds))
         {
-            // Check if the player is colliding with the wall from the top
-            if (player1.yOld + PLAYER_HEIGHT <= wall.y)
+            B->standingOn = true;
+        } else
+        {
+            B->standingOn = false;
+        }
+        B->activate();
+    }
+}
+
+void checkLevers()
+{
+    for (lever *L: levers)
+    {
+        if (rectangleCollision(player1.x, player1.y, L->bounds) || rectangleCollision(player2.x, player2.y, L->bounds))
+        {
+            if (!L->standingOn)
             {
-                player1.y = wall.y - PLAYER_HEIGHT;
-                player1.yVelocity = 0;
-                player1.jumping = false;
-            } else if (player1.yOld >= wall.y + wall.height)
-            { // Check if the player is colliding with the wall from the bottom
-                player1.y = wall.y + wall.height;
-                player1.yVelocity = 0;
-            } else if (player1.xOld + PLAYER_ACTUAL_WIDTH <= wall.x)
-            { // Check if the player is colliding with the wall from the left
-                player1.x = wall.x - PLAYER_ACTUAL_WIDTH;
-            } else if (player1.xOld >= wall.x + (wall.width * 2))
-            { // Check if the player is colliding with the wall from the right
-                player1.x = wall.x + (wall.width * 2);
+                L->state = !L->state;
+                L->standingOn = true;
             }
+        } else if (L->standingOn)
+        {
+            L->standingOn = false;
+        }
+        L->activate();
+    }
+}
+
+void checkDias()
+{
+    for (Collect *D: Dias)
+    {
+        Rect temp = {D->x, D->y, D->w, D->h};
+        if (rectangleCollision(player1.x, player1.y, temp) && D->version == 0)
+        {
+            // COLLECT DIAMOND
+        } else if (rectangleCollision(player2.x, player2.y, temp) && D->version == 0)
+        {
+            D->draw();
+        } else if (rectangleCollision(player1.x, player1.y, temp) && D->version == 1)
+        {
+            D->draw();
+        } else if (rectangleCollision(player2.x, player2.y, temp) && D->version == 1)
+        {
+            // COLLECT DIAMOND
         }
     }
 }
 
-void draw()
+void CheckPlatformCollision()
+{
+    for (Platform *platform: platforms)
+    {
+        if (rectangleCollision(player1.x, player1.y, platform->bounds))
+        {
+            if (platform->maxX == platform->minX)
+            {
+                drawPlatH(platform->bounds.x, platform->bounds.y, platform->bounds.width, platform->bounds.height, platform->version);
+            } else if (platform->maxY == platform->minY)
+            {
+                drawPlatV(platform->bounds.x, platform->bounds.y, platform->bounds.width, platform->bounds.height, platform->version);
+            }
+        }
+        checkCollision(platform->bounds);
+    }
+}
+
+void checkWallCollision()
+{
+    for (auto &wall: walls)
+    {
+        checkCollision(wall);
+    }
+}
+
+void checkCollision(Rect &bounds)
+{
+    // Check if the player is colliding with the wall.
+    if (rectangleCollision(player1.x, player1.y, bounds))
+    {
+        if (player1.xOld + PLAYER_ACTUAL_WIDTH <= bounds.x)
+        { // Check if the player is colliding with the wall from the left
+            player1.x = bounds.x - PLAYER_ACTUAL_WIDTH;
+        } else if (player1.xOld >= bounds.x + bounds.width)
+        { // Check if the player is colliding with the wall from the right
+            player1.x = bounds.x + bounds.width;
+        } else if (player1.yOld + PLAYER_HEIGHT <= bounds.y || player1.y < bounds.y) // Check if the player is colliding with the wall from the top
+        {
+            player1.y = bounds.y - PLAYER_HEIGHT;
+            player1.yVelocity = 0;
+            player1.jumping = false;
+        } else if (player1.yOld >= bounds.y + bounds.height)
+        { // Check if the player is colliding with the wall from the bottom
+            player1.y = bounds.y + bounds.height;
+            player1.yVelocity = 0;
+        }
+    }
+}
+
+void DrawPlayers()
 {
     clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
     drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
@@ -628,11 +747,9 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
         {
             uint16_t color = getColor(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
 
-            if (color != 255 && !pointInRect(xOld, yOld, x, y, w, h))
+            if (color != 255 && !pointInRect(xOld, yOld, x, y, w * 2, h))
             {
-                uint8_t idx =
-                        ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 +
-                        yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                uint8_t idx = ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
                 drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
             }
             xOld++;
@@ -640,9 +757,84 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
     }
 }
 
-bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint8_t w, uint8_t h)
+void clearPlat(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, uint8_t h)
 {
-    return pointX >= x && pointX <= x + w * 2 - 1 && pointY >= y && pointY <= y + h - 1;
+    for (uint16_t PixGroup = 0; PixGroup < w / 2 * h; PixGroup++)
+    {
+        if (PixGroup % (w / 2) == 0 && PixGroup != 0)
+        {
+            xOld -= w;
+            yOld++;
+        }
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
+        {
+            uint8_t idx = ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+            drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
+            xOld++;
+        }
+    }
+}
+
+void drawPlatH(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+{
+    drawLineH(x, y, x + w, BLACK);
+    drawRect(x, y + 1, w, h - 2, INTER_BROWN);
+    drawRect(x + 1, y + 2, w - 2, h - 4, INTER_GOLD);
+    drawRect(x + 2, y + 3, w - 4, h - 6, getColor(PLATFORM_MIDDLE_COLOR, ver));
+    drawLineH(x, y + 7, x + w, BLACK);
+}
+
+void drawPlatV(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+{
+    drawRect(x, y, w, h, BLACK);
+    drawRect(x + 1, y, w - 2, h, INTER_BROWN);
+    drawRect(x + 2, y + 1, w - 4, h - 2, INTER_GOLD);
+    drawRect(x + 3, y + 2, w - 6, h - 4, getColor(PLATFORM_MIDDLE_COLOR, ver));
+}
+
+void drawLiquid(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+{
+    drawRect(x, y, w, h, BLACK);
+    drawLineH(x + 1, y, x + w - 1, getColor(LIQUID_TOP_COLOR, ver));
+    drawLineH(x + 1, y + 1, x + w - 1, getColor(LIQUID_MIDDLE_COLOR, ver));
+    drawLineH(x + 1, y + 2, x + w - 1, getColor(LIQUID_BOTTOM_COLOR, ver));
+    drawLineH(x + 1, y + 3, x + w - 1, getColor(LIQUID_BOTTOM_COLOR, ver));
+}
+
+void drawDoor(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
+{
+    drawRect(x, y, w, h, BLACK);
+    drawRect(x + 1, y + 1, w - 2, h - 1, SWAMP_GREEN);
+    drawRect(x + 2, y + 2, w - 4, h - 2, SWAMP_GREEN);
+    drawRect(x + 3, y + 3, w - 6, h - 3, BLACK);
+    fillRect(x + 4, y + 4, w - 8, h - 4, INTER_BROWN);
+
+    if (ver == 0)
+    {
+        drawSprite(x + 6, y + 8, SIGN_WIDTH, SIGN_HEIGHT, SignBlue, ver);
+        drawSpriteMirror(x + 6 + SIGN_WIDTH * 2, y + 8, SIGN_WIDTH, SIGN_HEIGHT, SignBlue, ver);
+    } else
+    {
+        drawSprite(x + 6, y + 8, SIGN_WIDTH, SIGN_HEIGHT, SignRed, ver);
+        drawSpriteMirror(x + 6 + SIGN_WIDTH * 2, y + 8, SIGN_WIDTH, SIGN_HEIGHT, SignRed, ver);
+    }
+}
+
+void drawLever(uint16_t x, uint8_t y, uint8_t ver)
+{
+    drawRect(x, y, LEVER_BASE_WIDTH * 4, LEVER_BASE_HEIGHT, BLACK);
+    drawRect(x + 1, y + 1, LEVER_BASE_WIDTH * 4 - 2, LEVER_BASE_HEIGHT - 3, INTER_GOLD);
+    drawLineH(x + 1, y + 3, LEVER_BASE_WIDTH * 4 - 2, INTER_BROWN);
+}
+
+bool pointInRect(uint16_t pointX, uint8_t pointY, uint16_t x, uint8_t y, uint16_t w, uint8_t h)
+{
+    return pointX >= x && pointX <= x + w - 1 && pointY >= y && pointY <= y + h - 1;
+}
+
+bool rectangleCollision(uint16_t playerX, uint8_t playerY, Rect &bounds)
+{
+    return playerX + PLAYER_ACTUAL_WIDTH > bounds.x && playerX < bounds.x + bounds.width && playerY + PLAYER_HEIGHT > bounds.y && playerY < bounds.y + bounds.height;
 }
 
 void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver)
@@ -660,8 +852,7 @@ void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Spri
 
             if (color == 255)
             {
-                uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 +
-                              y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
                 color = getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4), ver);
             }
 
@@ -681,37 +872,36 @@ void drawBackground()
                 drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
         else
             for (uint8_t x = 0; x < 17; x++)
-                drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH - BG_SPRITE_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH,
-                                   BG_SPRITE_HEIGHT);
+                drawBackgroundTile(x * BG_SPRITE_ACTUAL_WIDTH - BG_SPRITE_WIDTH, y * BG_SPRITE_HEIGHT, BG_SPRITE_WIDTH, BG_SPRITE_HEIGHT);
     }
 }
 
-void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver)
+void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite, uint8_t ver)
 {
-    uint8_t Mirr = w - 1;
-    for (uint16_t PixGroup = 0; PixGroup <= w * h; PixGroup++)
+    uint8_t yBackup = y;
+
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
-        if (PixGroup == 1)
-        {
-            Mirr++;
-        }
-
-        for (int8_t Pixel = 1; Pixel >= 0; Pixel--)
-        {
-            uint16_t color = getColor(((Sprite[Mirr] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
-            drawPixel(x, y, (color == 255) ? getColor(
-                    (Background[x % (BG_SPRITE_WIDTH * 2) / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH] &
-                     ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4), ver) : color);
-
-            x++;
-        }
         if (PixGroup % w == 0 && PixGroup != 0)
         {
             x -= w * 2;
             y++;
-            Mirr += w * 2;
         }
-        Mirr--;
+
+        for (int8_t Pixel = 1; Pixel >= 0; Pixel--)
+        {
+            uint16_t color = getColor(((Sprite[w - 1 - PixGroup % w + (y - yBackup) * w] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
+
+            if (color == 255)
+            {
+                uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+                color = getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4), ver);
+            }
+
+            drawPixel(x, y, color);
+
+            x++;
+        }
     }
 }
 
@@ -746,88 +936,174 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
 
 void drawInteractables()
 {
-    drawSprite(210, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-    drawSpriteMirror(210 + BUTTON_WIDTH * 2 - 2, 115, BUTTON_WIDTH, BUTTON_HEIGHT, Button);                 //Button 1
-    drawSprite(230, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);
-    drawSpriteMirror(230 + BUTTON_WIDTH * 2 - 2, 65, BUTTON_WIDTH, BUTTON_HEIGHT, Button);                  //Button 2
+    for (button *B: buttons)
+    {
+        B->draw();
+    }
 
-    drawSprite(150, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue);
-    drawSpriteMirror(150 + WATER_WIDTH * 2 - 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue);                 //water
-    drawSprite(215, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1);
-    drawSpriteMirror(215 + WATER_WIDTH * 2 - 2, 230, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 1);                 //lava
-    drawSprite(189, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue, 2);
-    drawSpriteMirror(189 + WATER_WIDTH * 2 - 2, 180, WATER_WIDTH, WATER_HEIGHT, WaterBlue,
-                     2);                 //shrek-cum
+    for (lever *L: levers)
+    {
+        L->draw();
+    }
 
-    drawSprite(55, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,
-                     2);                     //DoorTop left
-    drawSprite(55, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,
-                     2);         //DoorFrame left
-    drawSprite(55, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(55 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,
-                     2);       //DoorFrame left
+    for (Platform *P: platforms)
+    {
+        P->draw();
+    }
 
-    drawSprite(80, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40, DOOR_WIDTH, DOOR_HEIGHT, DoorCorner,
-                     2);                     //DoorTop right
-    drawSprite(80, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,
-                     2);         //DoorFrame right
-    drawSprite(80, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge, 2);
-    drawSpriteMirror(80 + DOOR_WIDTH * 2 - 2, 40 + DOOR_HEIGHT * 2, DOOR_WIDTH, DOOR_HEIGHT, DoorEdge,
-                     2);       //DoorFrame right
+    for (Collect *D: Dias)
+    {
+        D->draw();
+    }
 
-    drawSprite(61, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue);
-    drawSpriteMirror(61 + SIGN_WIDTH * 2 - 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignBlue);                       //Blue sign
-    drawSprite(86, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);
-    drawSpriteMirror(86 + SIGN_WIDTH * 2 - 2, 48, SIGN_WIDTH, SIGN_HEIGHT, SignRed);                        //Red sign
+    for (Liquid *L: liquids)
+    {
+        L->draw();
+    }
 
-    drawSprite(280, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge);
-    drawSprite(280 + PLATFORM_WIDTH * 2, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle);
-    drawSpriteMirror(280 + PLATFORM_WIDTH * 4 - 2, 72, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge);      //Platform 1
+    drawDoor(Door1.x, Door1.y, Door1.width, Door1.height, 0);
+    drawDoor(Door2.x, Door2.y, Door2.width, Door2.height, 1);
+}
 
-    drawSprite(10, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge, 1);
-    drawSprite(10 + PLATFORM_WIDTH * 2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformMiddle, 1);
-    drawSpriteMirror(10 + PLATFORM_WIDTH * 4 - 2, 112, PLATFORM_WIDTH, PLATFORM_HEIGHT, PlatformEdge,
-                     1);    //Platform 2
+void level1()
+{
+    walls[0] = {0, 0, 10, 240};
+    walls[1] = {10, 0, 310, 10};
+    walls[2] = {310, 10, 10, 230};
+    walls[3] = {10, 230, 310, 10};
+    walls[4] = {10, 40, 40, 40};
+    walls[5] = {50, 70, 230, 10};
+    walls[6] = {153, 50, 60, 20};
+    walls[7] = {40, 110, 150, 10};
+    walls[8] = {180, 120, 100, 10};
+    walls[9] = {280, 120, 30, 20};
+    walls[10] = {290, 140, 20, 10};
+    walls[11] = {10, 150, 140, 10};
+    walls[12] = {150, 150, 10, 30};
+    walls[13] = {150, 180, 104, 10};
+    walls[14] = {280, 210, 30, 20};
+    walls[15] = {10, 190, 80, 10};
 
-    drawSprite(12, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
-    drawSpriteMirror(12 + DIA_WIDTH * 2 - 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaBlue);                          //Dia Blue 1
+    Door1 = {55, 40, DOOR_WIDTH, DOOR_HEIGHT}; // door blue
+    Door2 = {80, 40, DOOR_WIDTH, DOOR_HEIGHT}; // door red
 
-    drawSprite(164, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);
-    drawSpriteMirror(164 + DIA_WIDTH * 2 - 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaBlue);                        //DiaBlue 2
+    liq1 = {150, 230, LIQUID_WIDTH, LIQUID_HEIGHT, 0}; // water
+    liq3 = {189, 180, LIQUID_WIDTH, LIQUID_HEIGHT, 2}; // poison
+    liq2 = {215, 230, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; // lava
 
-    drawSprite(26, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);
-    drawSpriteMirror(26 + DIA_WIDTH * 2 - 2, 12, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);                         //DiaRed 1
+    Platform1 = {{280, 70, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 280, 280, 112, 72};   // main purple platform
+    Platform2 = {{10, 111, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 10, 10, 111, 141, 1}; // yellow platform
+    Platform3 = {{40, 10, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 40, 70, 10, 10};       // diamonds purple platform
 
-    drawSprite(229, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);
-    drawSpriteMirror(229 + DIA_WIDTH * 2 - 2, 216, DIA_WIDTH, DIA_HEIGHT, DiaRed, 1);                       //DiaRed 2
+    Lever1 = {{93, 149, 2, 1}, false, false, {&Platform2}, 1}; // lever for yellow platform
 
-    drawSprite(86, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1);
-    drawSpriteMirror(86 + LEVER_BASE_WIDTH * 2 - 2, 148, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, LeverBase, 1); //LeverBase
+    button1 = {{146, 108, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}, 0}; // button for purple platform
+    button2 = {{181, 48, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}, 0};  // button for purple platform
 
-    drawSprite(94, 142, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, 1);                                 //LeverTop
+    // Connect buttons to eachother
+    button1.setConnectedButton(&button2);
+    button2.setConnectedButton(&button1);
+
+    Dia1 = {12, 12, DIA_WIDTH * 2, DIA_HEIGHT, 0};   // blue diamond upperleft
+    Dia2 = {164, 216, DIA_WIDTH * 2, DIA_HEIGHT, 0}; // blue diamond bottom
+    Dia3 = {26, 12, DIA_WIDTH * 2, DIA_HEIGHT, 1};   // red diamond upperleft
+    Dia4 = {229, 216, DIA_WIDTH * 2, DIA_HEIGHT, 1}; // red diamond bottom
+
+    // draw everything
+    drawBackground();
+    drawInteractables();
+}
+
+void level2()
+{
+    walls[0] = {0, 0, 5, 240};
+    walls[1] = {5, 0, 310, 5};
+    walls[2] = {315, 0, 5, 240};
+    walls[3] = {5, 235, 310, 5};
+    walls[4] = {5, 227, 68, 8};
+    walls[5] = {5, 178, 68, 17};
+    walls[6] = {5, 118, 68, 17};
+    walls[7] = {5, 65, 68, 23};
+    walls[8] = {35, 35, 5, 30};
+    walls[9] = {70, 35, 26, 45};
+    walls[10] = {96, 73, 50, 7};
+    walls[11] = {103, 178, 147, 17};
+    walls[12] = {124, 150, 21, 10};
+    walls[13] = {195, 150, 22, 10};
+    walls[14] = {205, 80, 40, 7};
+    walls[15] = {245, 150, 5, 28};
+    walls[16] = {250, 150, 30, 21};
+    walls[17] = {260, 35, 55, 10};
+    walls[18] = {280, 150, 5, 28};
+    walls[19] = {280, 178, 35, 17};
+
+    Door1 = {45, 35, DOOR_WIDTH, DOOR_HEIGHT}; // door blue
+    Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT}; // door red
+
+    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0}; // water
+
+    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; // lava
+    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; // lava
+
+    liq4 = {116, 178, 124, LIQUID_HEIGHT, 2}; // poison
+
+    Platform1 = {{5, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 5, 5, 6, 27, 0};           // purple platform
+    Platform2 = {{40, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 40, 40, 6, 27, 1};        // yellow platform
+    Platform3 = {{127, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 127, 88, 5, 5, 2};        // Red platform left
+    Platform4 = {{260, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 260, 221, 5, 5, 2};       // Red platform right
+    Platform5 = {{65, 88, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 65, 104, 88, 88, 3};      // Green platform left
+    Platform6 = {{73, 118, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 118, 226, 4};    // Blue platform
+    Platform7 = {{250, 203, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 173, 203, 5}; // Light_blue platform top
+    Platform8 = {{250, 219, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 189, 219, 5}; // Light_blue platform bottom
+    Platform9 = {{285, 150, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 285, 285, 150, 108, 6}; // White Platform
+
+    Lever1 = {{280, 34, 2, 1}, true, false, {&Platform7, &Platform8}, 5}; // Lever light_blue
+    Lever2 = {{310, 34, 2, 1}, true, false, {&Platform2}, 1};             // Lever yellow
+    Lever3 = {{299, 177, 2, 1}, false, false, {&Platform5}, 3};           // Lever green
+    Lever4 = {{299, 234, 2, 1}, true, false, {&Platform1}, 0};            // Lever purple
+
+    button1 = {{127, 233, BUTTON_WIDTH, 2}, false, {&Platform6}, 4};            // button for blue platform
+    button2 = {{12, 225, BUTTON_WIDTH, 2}, false, {&Platform9}, 6};             // button for white platform
+    button3 = {{12, 176, BUTTON_WIDTH, 2}, false, {&Platform6}, 4};             // button for blue platform
+    button4 = {{12, 116, BUTTON_WIDTH, 2}, false, {&Platform3, &Platform4}, 2}; // button for red platform
+
+    // Connect buttons to eachother
+    button1.setConnectedButton(&button3);
+    button3.setConnectedButton(&button1);
+
+    Dia1 = {}; // blue diamond upperleft
+    Dia2 = {}; // blue diamond bottom
+    Dia3 = {}; // red diamond upperleft
+    Dia4 = {}; // red diamond bottom
+
+    player1.x = 207;
+    player1.y = 215;
+
+    player2.x = 187;
+    player2.y = 215;
+
+    // draw everything
+    drawBackground();
+    drawInteractables();
 }
 
 uint16_t getColor(uint8_t Color, uint8_t ver)
 {
     switch (Color)
     {
-        case 0:             //0000
+        case 0: // 0000
             return BLACK;
 
-        case 1:             //0001
+        case 1: // 0001
             return PLAYER_RED;
 
-        case 2:             //0010
+        case 2: // 0010
             return PLAYER_ORANGE;
 
-        case 3:             //0011
+        case 3: // 0011
             return PLAYER_YELLOW;
 
-        case 4:             //0100
+        case LIQUID_BOTTOM_COLOR: // 0100
             if (ver == 0)
             {
                 return PLAYER_DARK_BLUE;
@@ -839,7 +1115,7 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
                 return INTER_BROWN;
             }
 
-        case 5:             //0101
+        case LIQUID_MIDDLE_COLOR: // 0101
             if (ver == 0)
             {
                 return PLAYER_BLUE;
@@ -851,7 +1127,7 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
                 return SWAMP_GREEN;
             }
 
-        case 6:             //0110
+        case LIQUID_TOP_COLOR: // 0110
             if (ver == 0)
             {
                 return PLAYER_LIGHT_BLUE;
@@ -863,36 +1139,87 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
                 return SWAMP_GREEN;
             }
 
-        case 7:             //0111
+        case 7: // 0111
 
-        case 8:             //1000
+        case 8: // 1000
             return INTER_BROWN;
 
-        case 9:             //1001
+        case 9: // 1001
             return INTER_GOLD;
 
-        case 10:            //1010
+        case PLATFORM_MIDDLE_COLOR: // 0b00001010
             if (ver == 0)
             {
                 return INTER_PURPLE;
-            } else
+            } else if (ver == 1)
             {
                 return INTER_YELLOW;
+            } else if (ver == 2)
+            {
+                return PLAYER_RED;
+            } else if (ver == 3)
+            {
+                return SWAMP_GREEN;
+            } else if (ver == 4)
+            {
+                return PLAYER_DARK_BLUE;
+            } else if (ver == 5)
+            {
+                return PLAYER_LIGHT_BLUE;
+            } else if (ver == 6)
+            {
+                return WHITE;
             }
-        case 11:            //1011
 
-        case 12:            //1100
+        case 11: // 1011
+
+        case 12: // 1100
             return BACKGROUND_LIGHT;
 
-        case 13:            //1101
+        case 13: // 1101
             return BACKGROUND_DARK;
 
-        case 14:            //1110
-            return 0xFFFF;  //white
+        case 14:          // 1110
+            return WHITE; // white
 
-        case 15:            //1111
-            return 255;
+        case 15: // 1111
+            return ALPHA;
         default:
-            return 255;
+            return ALPHA;
     }
+}
+
+void drawPlayerSelectScreen()
+{
+    fillScreen(0x0);
+    drawString("Choose your player", 70, 16, 2, PLAYER_RED);
+    drawString("Player1(38KHZ)", 10, 140, 2, PLAYER_RED);
+    drawString("Player2(56KHZ)", 176, 160, 2, PLAYER_RED);
+}
+
+void drawMenu()
+{
+    fillScreen(0x0);
+    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); // Play button
+    drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Settings button
+    drawString("Play", 120, 60, 4, PLAYER_RED);
+    drawString("Settings", 75, 140, 4, PLAYER_RED);
+}
+
+void drawLevelSelectScreen()
+{
+    // Delete old menu screen
+    drawBorder(110, 50, 116, 50, 5, 0x0);
+    drawBorder(65, 130, 212, 50, 5, 0x0);
+    drawString("Play", 120, 60, 4, 0x0);
+    drawString("Settings", 75, 140, 4, 0x0);
+    // Draw new screen
+    drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); // Level 1 button
+    drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+    drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+    drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);   // Exit button
+    drawString("Level 1", 75, 197, 4, 0xFFFF);
+    drawString("Level 2", 75, 137, 4, 0xFFFF);
+    drawString("Level 3", 75, 77, 4, 0xFFFF);
+    drawString("Back to menu", 50, 13, 3, 0xFFFF);
 }

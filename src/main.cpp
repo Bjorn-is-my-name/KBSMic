@@ -293,6 +293,27 @@ Liquid *liquids[] =
         &liq3,
         &liq4};
 
+const uint8_t liveCount[MAX_LIVES + 1] = {
+    //+1 since we start at 0.
+    // Patterns for all the numbers and letters.
+    0x3F, // 0
+    0x6,  // 1
+    0x5B, // 2
+    0x4F, // 3
+    0x66, // 4
+    0x6D  // 5
+          // 0x7D, // 6
+          // 0x7,  // 7
+          // 0x7F, // 8
+          // 0x6F, // 9
+          // 0x77, // A
+          // 0x7C, // B
+          // 0x39, // C
+          // 0x5E, // D
+          // 0x79, // E
+          // 0x71, // F
+};
+
 // IR sending variables
 bool dataIsSend = false;                    // Check to see if the current bit is done sending
 uint32_t sendingData = 0;                   // Data to send over IR
@@ -316,6 +337,13 @@ bool startBitReceived = false; // Tracks if the staring bit was received before 
 uint32_t receivedData = 0;     // All the received bits
 uint8_t bitCounter = 0;        // Current bit (used for bitshifting 1's in to receivedData)
 bool isDataBit = false;        // Differentiates data from pauses
+
+// Other variables
+uint8_t lives = 5;
+uint8_t score = 100;
+uint8_t level = 1;
+bool levelCompleted = false;
+bool playerDied = false;
 
 // All the gamestates
 enum gameState
@@ -461,6 +489,10 @@ int main(void)
     // Enable global interupts
     sei();
 
+    // Set and show lives.
+    lives = getLives();
+    showLives(lives);
+
     // Check nunckuk connection
     if (!startNunchuk(NUNCHUK_ADDRESS))
     {
@@ -488,6 +520,10 @@ int main(void)
         }
     }
 
+    // Draws the score on the screen.
+    fillRect(SCORE_POS, 0, 40, 18, BACKGROUND_LIGHT);
+    drawScore(score, false);
+
     while (true)
     {
         if (intCurrentMs > FRAME_TIME)
@@ -496,20 +532,63 @@ int main(void)
             intCurrentMs = 0;
             frameCounter++;
 
-            // Get the nunchuk input data
-            []()
+            // Get the nunchuk input data (skip the code if the nunchuk is disconnected)
+            if (!getState(NUNCHUK_ADDRESS))
             {
-                if (!getState(NUNCHUK_ADDRESS))
-                {
-                    return;
-                }
-            }();
+                continue;
+            }
 
             if (currentGameState == GAME)
             {
                 // Game code
+                // Checks if the score is 0 or lower. If so, the player loses a life.
+                if (score <= 0)
+                {
+                    lives--;
+                    setLives(lives);
+                    playerDied = true;
+                }
+                // Draws the score on the screen.
+                if (frameCounter % 30 == 0)
+                {
+                    drawScore(score, true); // Draws over the previous score.
+                    score--;
+                    drawScore(score, false);
+                }
+
+                // Game code
                 Update();
                 DrawPlayers();
+                // Check if player is dead.
+                if (playerDied)
+                {
+                    // Show lives on 7 segments display.
+                    showLives(getLives());
+                    // Reset all player positions and draw the interactables.
+                    clearWholeSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+                    player1.x = 13;
+                    player1.y = 170;
+                    playerDied = false;
+
+                    // Reset score and redraw it.
+                    drawScore(score, true);
+                    score = START_SCORE;
+                    drawScore(score, false);
+
+                    // Reset framecounter
+                    frameCounter = 0;
+
+                    drawInteractables();
+                }
+
+                // If level is completed update the highscore and set score to START_SCORE, also add 1 to level.
+                if (levelCompleted)
+                {
+                    updateHighscore(score, level);
+                    levelCompleted = false;
+                    score = START_SCORE;
+                    level++;
+                }
             }
             else if (currentGameState == MENU)
             {
@@ -775,6 +854,24 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
                 drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
             }
             xOld++;
+        }
+    }
+}
+
+void clearWholeSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
+{
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+    {
+        if (PixGroup % w == 0 && PixGroup != 0)
+        {
+            x -= w * 2;
+            y++;
+        }
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
+        {
+            uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+            drawPixel(x, y, getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4)));
+            x++;
         }
     }
 }
@@ -1257,4 +1354,85 @@ void drawLevelSelectScreen()
     drawString("Level 2", 75, 137, 4, 0xFFFF);
     drawString("Level 3", 75, 77, 4, 0xFFFF);
     drawString("Back to menu", 50, 13, 3, 0xFFFF);
+}
+
+uint8_t getLives()
+{
+    return EEPROM_read(LIVES_ADDR);
+}
+
+void setLives(uint8_t &lives)
+{
+    if (lives > MAX_LIVES)
+    {
+        lives = 5; // Limits the live amount to MAX_LIVES = 5.
+    }
+    if (lives == 0)
+    {
+        lives = 5; // Resets the lives to 5 if the player has no lives left.
+    }
+
+    EEPROM_update(LIVES_ADDR, lives);
+}
+
+void showLives(uint8_t value)
+{                                    // Talks to port expander and tells which pins to toggle.
+    Wire.beginTransmission(IO_ADDR); // Starts transmission with the port expander on port 0x37.
+    Wire.write(~liveCount[value]);   // Sends the reverse of the pattern for the correct letter, reverse because common anode.
+    Wire.endTransmission();          // Ends transmission
+}
+
+void showScore(bool scoreType, uint8_t level)
+{
+    // Checks what scoretype is selected and shows the score accordingly in the level or at the menu screen.
+    if (scoreType == HIGHSCORE)
+    {
+        // Draw score on the menu screen.
+        //  EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + level);
+    }
+    else
+    {
+        // Draw score on the game screen.
+    }
+}
+
+void updateHighscore(uint8_t score, uint8_t level)
+{
+    // Checks if level is in range.
+    if (level > MAX_LEVEL)
+    {
+        level = MAX_LEVEL;
+    }
+    // Checks if the score is higher than the highscore and updates it if it is.
+    if (score > EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + level))
+    {
+        EEPROM_write(HIGHSCORE_START_LEVEL_ADDR + level, score);
+    }
+}
+
+void drawScore(uint8_t highscore, bool clearScore)
+{
+    uint16_t color = PLAYER_BLUE;
+    if (clearScore)
+    {
+        color = BACKGROUND_LIGHT;
+    }
+    else if (highscore < 50)
+    {
+        color = PLAYER_RED;
+    }
+    else if (highscore >= 50 && highscore < 100)
+    {
+        color = PLAYER_YELLOW;
+    }
+
+    unsigned char *pText = new unsigned char[4];
+    pText[0] = highscore / 100 + '0';
+    pText[1] = (highscore % 100) / 10 + '0';
+    pText[2] = highscore % 10 + '0';
+    pText[3] = '\0';
+    drawString((const char *)pText, SCORE_POS, 2, 2, color);
+
+    delete[] pText;
+    pText = nullptr;
 }

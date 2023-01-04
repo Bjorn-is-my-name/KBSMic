@@ -43,7 +43,7 @@ void drawPlatV(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
 void drawLiquid(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
 void drawLever(uint16_t, uint8_t, uint8_t);
 void drawScore(uint8_t, bool);
-uint16_t getColor(uint8_t, uint8_t ver = 0);
+uint16_t getcolour(uint8_t, uint8_t ver = 0);
 
 // Collision functions
 void checkWallCollision();
@@ -51,6 +51,7 @@ void CheckPlatformCollision();
 void checkCollision(Rect &);
 bool rectangleCollision(uint16_t, uint8_t, Rect &);
 void checkButtons();
+void checkPoolCollision();
 void checkLevers();
 void checkDias();
 bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t);

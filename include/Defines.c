@@ -280,6 +280,8 @@
 #define HIGHSCORE true
 #define CURRENT_SCORE false
 
+#define DIAMOND_POINTS 30
+
 // Level defines
 #define MAX_LEVEL 3
 
@@ -300,6 +302,20 @@
 #define PLAYER_ACCEL 1
 #define PLAYER_MAX_ACCEL 6
 #define GRAVITY 1
+
+//level one
+#define PLAYER_ONE_X_LVL_ONE 13
+#define PLAYER_ONE_Y_LVL_ONE 170
+
+#define PLAYER_TWO_X_LVL_ONE 13
+#define PLAYER_TWO_Y_LVL_ONE 210
+
+//level two
+#define PLAYER_ONE_X_LVL_TWO 207
+#define PLAYER_ONE_Y_LVL_TWO 215
+
+#define PLAYER_TWO_X_LVL_TWO 187
+#define PLAYER_TWO_Y_LVL_TWO 215
 
 #define SENDINGDATA_LEN 16 // bits - 1
 #define SENDINGBIT_START_VALUE (-2)
@@ -357,7 +373,7 @@
 
 #define BUTTON_WIDTH 3
 #define BUTTON_HEIGHT 4
-#define LIQUID_WIDTH 38
+#define LIQUID_WIDTH 28
 #define LIQUID_HEIGHT 5
 
 #define DOOR_WIDTH 20
@@ -381,7 +397,7 @@
 #define PAGE_ADDRESS_SET 0x2B
 #define MEMORY_WRITE 0x2C
 
-// Colors-------------------------------------------------
+// COLOURs-------------------------------------------------
 #define BLACK 0x0000 ///<   0,   0,   0
 #define WHITE 0xFFFF ///< 255, 255, 255
 #define ALPHA 255
@@ -406,7 +422,7 @@
 
 #define FOREGROUND_LIGHT 0x7346 ///<  14,  26,   6
 #define FOREGROUND_DARK 0x5A85  ///<  11,  20,   5
-#define PLATFORM_MIDDLE_COLOR 0b00001010
-#define LIQUID_TOP_COLOR 0b00000110
-#define LIQUID_MIDDLE_COLOR 0b00000101
-#define LIQUID_BOTTOM_COLOR 0b00000100
+#define PLATFORM_MIDDLE_COLOUR 0b00001010
+#define LIQUID_TOP_COLOUR 0b00000110
+#define LIQUID_MIDDLE_COLOUR 0b00000101
+#define LIQUID_BOTTOM_COLOUR 0b00000100

@@ -26,17 +26,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="alles gemerged">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21-12-2022_08_36_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21-12-2022_08_36__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Adafruit_STMPE610.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/EEPROM.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/EEPROM.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Sprites.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/Sprites.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/main.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/main.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
-    </list>
+    <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="gekke menu enz" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -217,7 +207,7 @@
       <workItem from="1671796315330" duration="2159000" />
       <workItem from="1672148077361" duration="54000" />
       <workItem from="1672658342043" duration="1648000" />
-      <workItem from="1672836125878" duration="6511000" />
+      <workItem from="1672836125878" duration="6849000" />
     </task>
     <task id="LOCAL-00001" summary="update to most recent version">
       <created>1670243123875</created>
@@ -401,7 +391,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672148123039</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="gekke menu enz">
+      <created>1672843326162</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1672843326162</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -444,7 +441,8 @@
     <MESSAGE value="ir keuze menu" />
     <MESSAGE value="menu scherm geupdate" />
     <MESSAGE value="alles gemerged" />
-    <option name="LAST_COMMIT_MESSAGE" value="alles gemerged" />
+    <MESSAGE value="gekke menu enz" />
+    <option name="LAST_COMMIT_MESSAGE" value="gekke menu enz" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

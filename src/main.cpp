@@ -645,21 +645,21 @@ int main(void)
 
                 if (currentHighlightedButton == 0)
                 {
-                    drawBorder(45, 191, 229, 42, 5, 0xFFFF); // Level 1 button
+                    drawBorder(45, 191, 229, 42, 5, WHITE); // Level 1 button
                     drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
                 } else if (currentHighlightedButton == 1)
                 {
-                    drawBorder(45, 131, 229, 42, 5, 0xFFFF); // Level 2 button
+                    drawBorder(45, 131, 229, 42, 5, WHITE); // Level 2 button
                     drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); // Level 1 button
                     drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
                 } else if (currentHighlightedButton == 2)
                 {
-                    drawBorder(45, 70, 229, 42, 5, 0xFFFF);  // Level 3 button
+                    drawBorder(45, 70, 229, 42, 5, WHITE);  // Level 3 button
                     drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
                     drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);   // Exit button
                 } else if (currentHighlightedButton == 3)
                 {
-                    drawBorder(14, 0, 294, 49, 5, 0xFFFF);   // Exit button
+                    drawBorder(14, 0, 294, 49, 5, WHITE);   // Exit button
                     drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
                 }
                 if (state.c_button && !state.c_button_old) //Checks if button was pressed.
@@ -708,11 +708,11 @@ int main(void)
 
                 if (currentHighlightedButton == 0) // Draw border around the highlighted button
                 {
-                    drawBorder(65, 50, 212, 50, 5, 0xFFFF); // Player1 button
+                    drawBorder(65, 50, 212, 50, 5, WHITE); // Player1 button
                     drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Player2 button
                 } else if (currentHighlightedButton == 1)
                 {
-                    drawBorder(65, 130, 212, 50, 5, 0xFFFF); // Player2 button #todo die 0xffff definen
+                    drawBorder(65, 130, 212, 50, 5, WHITE); // Player2 button
                     drawBorder(65, 50, 212, 50, 5, PLAYER_ORANGE); // Player1 button
                 }
 
@@ -1435,10 +1435,10 @@ void drawLevelSelectScreen()
     drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
     drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
     drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);   // Exit button
-    drawString("Level 1", 75, 197, 4, 0xFFFF);
-    drawString("Level 2", 75, 137, 4, 0xFFFF);
-    drawString("Level 3", 75, 77, 4, 0xFFFF);
-    drawString("Back to menu", 50, 13, 3, 0xFFFF);
+    drawString("Level 1", 75, 197, 4, WHITE);
+    drawString("Level 2", 75, 137, 4, WHITE);
+    drawString("Level 3", 75, 77, 4, WHITE);
+    drawString("Back to menu", 50, 13, 3, WHITE);
 }
 
 uint8_t getLives()

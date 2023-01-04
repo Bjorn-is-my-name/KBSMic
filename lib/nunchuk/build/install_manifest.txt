@@ -1,2 +1,0 @@
-C:/Users/Jan/Arduino/lib/libNunchuk.a
-C:/Users/Jan/Arduino/include/arduino/Nunchuk.h

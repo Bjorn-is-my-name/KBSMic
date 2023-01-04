@@ -1,5 +1,0 @@
-C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/Production.dir
-C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/Debug.dir
-C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/Z_DUMMY_TARGET.dir
-C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/edit_cache.dir
-C:/Users/Jan/Projects/MIC/GIT/build/CMakeFiles/rebuild_cache.dir

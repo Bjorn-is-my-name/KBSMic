@@ -26,37 +26,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="touch werkend nu">
-      <change afterPath="$PROJECT_DIR$/include/Defines.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/Sprites.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/main.h" afterDir="false" />
+    <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="alles gemerged">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21-12-2022_08_36_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21-12-2022_08_36__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeListsPrivate.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Adafruit_STMPE610.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Adafruit_STMPE610.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Background.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Button.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/DiaBlue.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/DiaRed.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/DoorCorner.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/DoorEdge.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Adafruit_STMPE610.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Adafruit_STMPE610.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/EEPROM.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/EEPROM.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/LCD.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LCD.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/LeverBase.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/LeverTop.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Nunchuk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/Nunchuk.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/PlatformEdge.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/PlatformMiddle.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Player1.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Player2.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/README" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SignBlue.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SignRed.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/WaterBlue.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/font.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/font.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/optimized_wire.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/touch.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Sprites.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/Sprites.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/main.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/main.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -237,7 +215,9 @@
       <workItem from="1671795462448" duration="389000" />
       <workItem from="1671796156350" duration="124000" />
       <workItem from="1671796315330" duration="2159000" />
-      <workItem from="1672148077361" duration="10000" />
+      <workItem from="1672148077361" duration="54000" />
+      <workItem from="1672658342043" duration="1648000" />
+      <workItem from="1672836125878" duration="6511000" />
     </task>
     <task id="LOCAL-00001" summary="update to most recent version">
       <created>1670243123875</created>
@@ -414,7 +394,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671630308601</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="alles gemerged">
+      <created>1672148123038</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1672148123039</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -456,7 +443,8 @@
     <MESSAGE value="pruttel poep" />
     <MESSAGE value="ir keuze menu" />
     <MESSAGE value="menu scherm geupdate" />
-    <option name="LAST_COMMIT_MESSAGE" value="menu scherm geupdate" />
+    <MESSAGE value="alles gemerged" />
+    <option name="LAST_COMMIT_MESSAGE" value="alles gemerged" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

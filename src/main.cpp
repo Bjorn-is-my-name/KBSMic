@@ -31,7 +31,7 @@ struct Collect
     uint8_t h;
     uint8_t version;
 
-    void draw()
+    void draw() const
     {
         if (x == NULL)
             return;
@@ -115,10 +115,10 @@ struct Platform
         }
     }
 
-    bool isMax()
+    bool isMax() const
     {
         if (bounds.x == NULL)
-            return false;
+            return;
         if ((bounds.x >= maxX && bounds.y >= maxY) || (bounds.x <= minX && bounds.y <= minY))
         {
             return true;
@@ -128,7 +128,7 @@ struct Platform
         }
     }
 
-    void draw()
+    void draw() const
     {
         if (bounds.x == NULL)
             return;
@@ -171,7 +171,7 @@ struct lever
         }
     }
 
-    void draw()
+    void draw() const
     {
         if (bounds.x == NULL)
             return;
@@ -215,7 +215,7 @@ struct button
         }
     }
 
-    void draw()
+    void draw() const
     {
         if (bounds.x == NULL)
             return;
@@ -234,7 +234,7 @@ struct Liquid
     Rect bounds;
     uint8_t Version;
 
-    void draw()
+    void draw() const
     {
         if (bounds.x == NULL)
             return;
@@ -292,6 +292,27 @@ Liquid *liquids[] =
                 &liq3,
                 &liq4};
 
+const uint8_t liveCount[MAX_LIVES + 1] = {
+        //+1 since we start at 0.
+        // Patterns for all the numbers and letters.
+        0x3F, // 0
+        0x6,  // 1
+        0x5B, // 2
+        0x4F, // 3
+        0x66, // 4
+        0x6D  // 5
+        // 0x7D, // 6
+        // 0x7,  // 7
+        // 0x7F, // 8
+        // 0x6F, // 9
+        // 0x77, // A
+        // 0x7C, // B
+        // 0x39, // C
+        // 0x5E, // D
+        // 0x79, // E
+        // 0x71, // F
+};
+
 // IR sending variables
 bool dataIsSend = false;                    // Check to see if the current bit is done sending
 uint32_t sendingData = 0;                   // Data to send over IR
@@ -316,12 +337,19 @@ uint32_t receivedData = 0;     // All the received bits
 uint8_t bitCounter = 0;        // Current bit (used for bitshifting 1's in to receivedData)
 bool isDataBit = false;        // Differentiates data from pauses
 
+// Other variables
+uint8_t lives = 5;
+uint8_t score = 100;
+uint8_t level = 1;
+bool levelCompleted = false;
+bool playerDied = false;
+
 // All the gamestates
 enum gameState
 {
     MENU,
     GAME,
-    LEVELSELECT,
+    LEVEL_SELECT_SCREEN,
     SETTINGS,
     PAUSE,
     GAMEOVER,
@@ -455,6 +483,10 @@ int main(void)
     // Enable global interupts
     sei();
 
+    // Set and show lives.
+    lives = getLives();
+    showLives(lives);
+
     // Check nunckuk connection
     if (!startNunchuk(NUNCHUK_ADDRESS))
     {
@@ -482,6 +514,11 @@ int main(void)
         }
     }
 
+    // Draws the score on the screen.
+    uint8_t currentHighlightedButton;
+    bool normalState = true;
+
+
     while (true)
     {
         if (intCurrentMs > FRAME_TIME)
@@ -490,56 +527,212 @@ int main(void)
             intCurrentMs = 0;
             frameCounter++;
 
-            // Get the nunchuk input data
-            []()
+            // Get the nunchuk input data (skip the code if the nunchuk is disconnected)
+            if (!getState(NUNCHUK_ADDRESS))
             {
-                if (!getState(NUNCHUK_ADDRESS))
-                {
-                    return;
-                }
-            }();
+                continue;
+            }
+
 
             if (currentGameState == GAME)
             {
                 // Game code
-                Update();
-                DrawPlayers();
+                // Checks if the score is 0 or lower. If so, the player loses a life.
+                if (score <= 0)
+                {
+                    lives--;
+                    setLives(lives);
+                    playerDied = true;
+                }
+                // Draws the score on the screen.
+                if (frameCounter % 30 == 0)
+                {
+                    drawScore(score, true); // Draws over the previous score.
+                    score--;
+                    drawScore(score, false);
+                }
+
+                // Game code
+                update();
+                drawPlayers();
+                // Check if player is dead.
+                if (playerDied)
+                {
+                    // Show lives on 7 segments display.
+                    showLives(getLives());
+                    // Reset all player positions and draw the interactables.
+                    clearWholeSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+                    player1.x = 13;
+                    player1.y = 170;
+                    playerDied = false;
+
+                    // Reset score and redraw it.
+                    drawScore(score, true);
+                    score = START_SCORE;
+                    drawScore(score, false);
+
+                    // Reset framecounter
+                    frameCounter = 0;
+
+                    drawInteractables();
+                }
+
+                // If level is completed update the highscore and set score to START_SCORE, also add 1 to level.
+                if (levelCompleted)
+                {
+                    updateHighscore(score, level);
+                    levelCompleted = false;
+                    score = START_SCORE;
+                    level++;
+                }
             } else if (currentGameState == MENU)
             {
-                if (state.c_button && !state.c_button_old)
+                if (state.joy_y_axis > 156) //Checks if the joystick is pushed up
                 {
-                    currentGameState = LEVELSELECT;
-                    drawLevelSelectScreen();
-                } else if (state.z_button && !state.z_button_old)
+                    currentHighlightedButton = 0;
+                } else if (state.joy_y_axis < 100) // Checks if the joystick is pushed down
                 {
-                    currentGameState = PLAYER_SELECT_SCREEN;
-                    drawPlayerSelectScreen();
+                    currentHighlightedButton = 1;
                 }
-            } else if (currentGameState == LEVELSELECT)
+
+                if (currentHighlightedButton == 0) // Draw border around the highlighted button
+                {
+                    drawBorder(110, 50, 116, 50, 5, WHITE); // Play button
+                    drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Settings button
+                } else if (currentHighlightedButton == 1)
+                {
+                    drawBorder(65, 130, 212, 50, 5, WHITE); // Settings button
+                    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); // Play button b
+                }
+
+
+                if (state.c_button && !state.c_button_old) //Checks if button is pressed
+                {
+                    if (currentHighlightedButton == 0)
+                    {
+                        currentHighlightedButton = 0;
+                        currentGameState = LEVEL_SELECT_SCREEN;
+                        drawLevelSelectScreen();
+                    } else
+                    {
+                        currentHighlightedButton = 0;
+                        currentGameState = PLAYER_SELECT_SCREEN;
+                        drawPlayerSelectScreen();
+                    }
+                }
+
+
+            } else if (currentGameState == LEVEL_SELECT_SCREEN)
             {
-                if (state.c_button && !state.c_button_old)
+                if (state.joy_y_axis > 156 && normalState)
                 {
-                    currentGameState = GAME;
-                    level1();
-                } else if (state.z_button && !state.z_button_old)
+                    normalState = false;
+                    if (currentHighlightedButton < 4)
+                    {
+                        currentHighlightedButton++;
+                    }
+                } else if (state.joy_y_axis < 100 && normalState)
                 {
-                    currentGameState = MENU;
-                    drawMenu();
+                    normalState = false;
+                    if (currentHighlightedButton > 0)
+                    {
+                        currentHighlightedButton--;
+                    }
+                } else
+                {
+                    normalState = true;
                 }
+
+                if (currentHighlightedButton == 0)
+                {
+                    drawBorder(45, 191, 229, 42, 5, 0xFFFF); // Level 1 button
+                    drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+                } else if (currentHighlightedButton == 1)
+                {
+                    drawBorder(45, 131, 229, 42, 5, 0xFFFF); // Level 2 button
+                    drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); // Level 1 button
+                    drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+                } else if (currentHighlightedButton == 2)
+                {
+                    drawBorder(45, 70, 229, 42, 5, 0xFFFF);  // Level 3 button
+                    drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+                    drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);   // Exit button
+                } else if (currentHighlightedButton == 3)
+                {
+                    drawBorder(14, 0, 294, 49, 5, 0xFFFF);   // Exit button
+                    drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+                }
+                if (state.c_button && !state.c_button_old) //Checks if button was pressed.
+                {
+                    switch (currentHighlightedButton)
+                    {
+                        case 0:
+                            currentHighlightedButton = 0;
+                            currentGameState = GAME;
+                            level1(); // Maakt hem compleet stuk.
+                            break;
+                        case 1:
+                            currentHighlightedButton = 0;
+//                            currentGameState = GAME;
+//                            level2();
+                            break;
+                        case 2:
+//                            currentHighlightedButton = 0;
+//                            currentGameState = GAME;
+//                            level3();
+                            break;
+                        case 3: // Exit button
+                            currentHighlightedButton = 0;
+                            currentGameState = MENU;
+                            drawMenu();
+                            break;
+                        default:
+                            currentHighlightedButton = 0;
+                            currentGameState = MENU;
+                            drawMenu();
+                            break;
+                    }
+                }
+
+
             } else if (currentGameState == PLAYER_SELECT_SCREEN)
             {
-                if (state.c_button && !state.c_button_old)
+
+                if (state.joy_y_axis > 156) //Checks if the joystick is pushed up
                 {
-                    EEPROM_write(20, IR_38KHZ);
-                    setFreq(IR_38KHZ);
-                    currentGameState = MENU;
-                    drawMenu();
-                } else if (state.z_button && !state.z_button_old)
+                    currentHighlightedButton = 0;
+                } else if (state.joy_y_axis < 100) // Checks if the joystick is pushed down
                 {
-                    EEPROM_write(20, IR_56KHZ);
-                    setFreq(IR_56KHZ);
-                    currentGameState = MENU;
-                    drawMenu();
+                    currentHighlightedButton = 1;
+                }
+
+                if (currentHighlightedButton == 0) // Draw border around the highlighted button
+                {
+                    drawBorder(65, 50, 212, 50, 5, 0xFFFF); // Player1 button
+                    drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Player2 button
+                } else if (currentHighlightedButton == 1)
+                {
+                    drawBorder(65, 130, 212, 50, 5, 0xFFFF); // Player2 button #todo die 0xffff definen
+                    drawBorder(65, 50, 212, 50, 5, PLAYER_ORANGE); // Player1 button
+                }
+
+
+                if (state.c_button && !state.c_button_old) //Checks if button is pressed
+                {
+                    if (currentHighlightedButton == 0)
+                    {
+                        EEPROM_write(20, IR_38KHZ);
+                        setFreq(IR_38KHZ);
+                        currentGameState = MENU;
+                        drawMenu();
+                    } else
+                    {
+                        currentHighlightedButton = 0;
+                        EEPROM_write(20, IR_56KHZ);
+                        setFreq(IR_56KHZ);
+                        currentGameState = MENU;
+                        drawMenu();
+                    }
                 }
             }
         }
@@ -586,7 +779,7 @@ uint8_t getFreq()
     return OCR0A;
 }
 
-void Update()
+void update()
 {
     player1.xOld = player1.x;
     player1.yOld = player1.y;
@@ -725,7 +918,7 @@ void checkCollision(Rect &bounds)
     }
 }
 
-void DrawPlayers()
+void drawPlayers()
 {
     clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
     drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
@@ -753,6 +946,24 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
                 drawPixel(xOld, yOld, getColor((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
             }
             xOld++;
+        }
+    }
+}
+
+void clearWholeSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
+{
+    for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
+    {
+        if (PixGroup % w == 0 && PixGroup != 0)
+        {
+            x -= w * 2;
+            y++;
+        }
+        for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
+        {
+            uint8_t idx = ((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
+            drawPixel(x, y, getColor((Background[idx] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4)));
+            x++;
         }
     }
 }
@@ -991,7 +1202,7 @@ void level1()
     liq3 = {189, 180, LIQUID_WIDTH, LIQUID_HEIGHT, 2}; // poison
     liq2 = {215, 230, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; // lava
 
-    Platform1 = {{280, 70, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 280, 280, 112, 72};   // main purple platform
+    Platform1 = {{280, 70, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 280, 280, 72, 112};   // main purple platform
     Platform2 = {{10, 111, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 10, 10, 111, 141, 1}; // yellow platform
     Platform3 = {{40, 10, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 40, 70, 10, 10};       // diamonds purple platform
 
@@ -1000,7 +1211,7 @@ void level1()
     button1 = {{146, 108, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}, 0}; // button for purple platform
     button2 = {{181, 48, BUTTON_WIDTH, 2}, false, {&Platform1, &Platform3}, 0};  // button for purple platform
 
-    // Connect buttons to eachother
+    // Connect buttons to each-other
     button1.setConnectedButton(&button2);
     button2.setConnectedButton(&button1);
 
@@ -1010,11 +1221,13 @@ void level1()
     Dia4 = {229, 216, DIA_WIDTH * 2, DIA_HEIGHT, 1}; // red diamond bottom
 
     // draw everything
+    fillRect(SCORE_POS, 0, 40, 18, BACKGROUND_LIGHT);
+    drawScore(score, false);
     drawBackground();
     drawInteractables();
 }
 
-void level2()
+/*void level2()
 {
     walls[0] = {0, 0, 5, 240};
     walls[1] = {5, 0, 310, 5};
@@ -1082,10 +1295,13 @@ void level2()
     player2.x = 187;
     player2.y = 215;
 
+
     // draw everything
+    fillRect(SCORE_POS, 0, 40, 18, BACKGROUND_LIGHT);
+    drawScore(score, false);
     drawBackground();
     drawInteractables();
-}
+}*/
 
 uint16_t getColor(uint8_t Color, uint8_t ver)
 {
@@ -1192,9 +1408,10 @@ uint16_t getColor(uint8_t Color, uint8_t ver)
 void drawPlayerSelectScreen()
 {
     fillScreen(0x0);
-    drawString("Choose your player", 70, 16, 2, PLAYER_RED);
-    drawString("Player1(38KHZ)", 10, 140, 2, PLAYER_RED);
-    drawString("Player2(56KHZ)", 176, 160, 2, PLAYER_RED);
+    drawString("Player1", 80, 60, 4, PLAYER_RED);
+    drawString("Player2", 80, 140, 4, PLAYER_RED);
+    drawBorder(65, 50, 212, 50, 5, PLAYER_ORANGE); // Player1 button
+    drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Player2 button
 }
 
 void drawMenu()
@@ -1222,4 +1439,82 @@ void drawLevelSelectScreen()
     drawString("Level 2", 75, 137, 4, 0xFFFF);
     drawString("Level 3", 75, 77, 4, 0xFFFF);
     drawString("Back to menu", 50, 13, 3, 0xFFFF);
+}
+
+uint8_t getLives()
+{
+    return EEPROM_read(LIVES_ADDR);
+}
+
+void setLives(uint8_t &lives)
+{
+    if (lives > MAX_LIVES)
+    {
+        lives = 5; // Limits the live amount to MAX_LIVES = 5.
+    }
+    if (lives == 0)
+    {
+        lives = 5; // Resets the lives to 5 if the player has no lives left.
+    }
+
+    EEPROM_update(LIVES_ADDR, lives);
+}
+
+void showLives(uint8_t value)
+{                                    // Talks to port expander and tells which pins to toggle.
+    Wire.beginTransmission(IO_ADDR); // Starts transmission with the port expander on port 0x39.
+    Wire.write(~liveCount[value]);   // Sends the reverse of the pattern for the correct letter, reverse because common anode.
+    Wire.endTransmission();          // Ends transmission
+}
+
+void showScore(bool scoreType, uint8_t level)
+{
+    // Checks what scoretype is selected and shows the score accordingly in the level or at the menu screen.
+    if (scoreType == HIGHSCORE)
+    {
+        // Draw score on the menu screen.
+        //  EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + level);
+    } else
+    {
+        // Draw score on the game screen.
+    }
+}
+
+void updateHighscore(uint8_t score, uint8_t level)
+{
+    // Checks if level is in range.
+    if (level > MAX_LEVEL)
+    {
+        level = MAX_LEVEL;
+    }
+    // Checks if the score is higher than the highscore and updates it if it is.
+    if (score > EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + level))
+    {
+        EEPROM_write(HIGHSCORE_START_LEVEL_ADDR + level, score);
+    }
+}
+
+void drawScore(uint8_t highscore, bool clearScore)
+{
+    uint16_t color = PLAYER_BLUE;
+    if (clearScore)
+    {
+        color = BACKGROUND_LIGHT;
+    } else if (highscore < 50)
+    {
+        color = PLAYER_RED;
+    } else if (highscore >= 50 && highscore < 100)
+    {
+        color = PLAYER_YELLOW;
+    }
+
+    unsigned char *pText = new unsigned char[4];
+    pText[0] = highscore / 100 + '0';
+    pText[1] = (highscore % 100) / 10 + '0';
+    pText[2] = highscore % 10 + '0';
+    pText[3] = '\0';
+    drawString((const char *) pText, SCORE_POS, 2, 2, color);
+
+    delete[] pText;
+    pText = nullptr;
 }

@@ -343,6 +343,7 @@ uint8_t score = 100;
 uint8_t level = 1;
 bool levelCompleted = false;
 bool playerDied = false;
+uint8_t player_accel = 0;
 
 // All the gamestates
 enum gameState
@@ -686,15 +687,24 @@ void Update()
     player1.y += player1.yVelocity;
     player1.yVelocity += GRAVITY;
 
-    // Check for movement to right
-    if (state.joy_x_axis > 169)
+    if (player_accel >= PLAYER_MAX_ACCEL)
     {
-        player1.x += MOVEMENT_SPEED;
+        player_accel = PLAYER_MAX_ACCEL;
     }
-    // Check for movement to left
-    else if (state.joy_x_axis < 85)
+    else
     {
-        player1.x -= MOVEMENT_SPEED;
+        player_accel += PLAYER_ACCEL;
+    }
+
+    // Check for movement to right (only move when not against the wall)
+    if (state.joy_x_axis > 140 && player1.x + PLAYER_ACTUAL_WIDTH < SCREEN_WIDTH)
+    {
+        player1.x += player_accel;
+    }
+    // Check for movement to left (only move when not against the wall)
+    else if (state.joy_x_axis < 100 && player1.x > 0)
+    {
+        player1.x -= player_accel;
     }
 
     if(checkPoolCollision() == 1) //Player 1 made collission with pool. #TODO change to make it work for every player.
@@ -714,6 +724,12 @@ void Update()
     {
         player1.jumping = true;
         player1.yVelocity -= INITIAL_Y_VEL;
+    }
+
+    // Check if the player hasn't moved, if so, reset the acceleration.
+    if (player1.xOld == player1.x)
+    {
+        player_accel = 0;
     }
 }
 
@@ -837,16 +853,16 @@ uint8_t checkPoolCollision()
     for (auto &liquid : liquids)
     {
         // Check if the player is colliding with the top of the pool
-        if (player1.x + PLAYER_WIDTH > liquid.x && player1.x < liquid.x + (liquid.w * 3) && player1.y + PLAYER_HEIGHT >= liquid.y)
+        if (player1.x + PLAYER_WIDTH > liquid->bounds.x && player1.x < liquid->bounds.x + (liquid->bounds.width * 3) && player1.y + PLAYER_HEIGHT >= liquid->bounds.y)
         {
             // Check if the player is colliding with the pool from the top.
-            if (player1.yOld + PLAYER_HEIGHT <= liquid.y)
+            if (player1.yOld + PLAYER_HEIGHT <= liquid->bounds.y)
             {
                 player1.yVelocity = 0;
-                player1.y = liquid.y - PLAYER_HEIGHT;
+                player1.y = liquid->bounds.y - PLAYER_HEIGHT;
                 player1.jumping = false;
                 player_accel = 0;
-                return liquid.v;
+                return liquid->Version;
             }
         }
         return -1;

@@ -2,7 +2,8 @@
 
 void EEPROM_write(unsigned short uiAddress, unsigned char ucData)
 {
-    while (EECR & (1 << EEPE));
+    while (EECR & (1 << EEPE))
+        ;
     EEAR = uiAddress;
     EEDR = ucData;
     EECR |= 1 << EEMPE;
@@ -11,7 +12,8 @@ void EEPROM_write(unsigned short uiAddress, unsigned char ucData)
 
 unsigned char EEPROM_read(unsigned int uiAddress)
 {
-    while (EECR & (1 << EEPE));
+    while (EECR & (1 << EEPE))
+        ;
     EEAR = uiAddress;
     EECR |= (1 << EERE);
     return EEDR;

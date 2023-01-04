@@ -546,6 +546,7 @@ void update()
     {
         player1.x += player_accel;
     }
+    
     // Check for movement to left (only move when not against the wall)
     else if (state.joy_x_axis < 100 && player1.x > 0)
     {

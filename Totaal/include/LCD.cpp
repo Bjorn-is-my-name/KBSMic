@@ -1,8 +1,6 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
 #include <SPI.h>
-#include "font.c"
 #include <Defines.c>
+#include "font.c"
 
 // Prototypes
 void setupSPI();
@@ -27,18 +25,18 @@ void SPI_WRITE_COMMAND(uint8_t);
 
 void SEND_COMMAND_WITH_ARGUMENTS(uint8_t, uint8_t *, uint8_t);
 
-void init_LCD();
+void START_UP();
 
-void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color);
-
+void fillRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t);
+void fillScreen(uint16_t);
 void drawRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t);
 void drawLineH(uint16_t x, uint8_t y, uint16_t x2, uint16_t color);
 
 void setupSPI()
 {
     /*
-    SS pins on internal pull-up (DC & CS)
-    SS (DC & CS) & MOSI & SCK pins on output
+    SS pins on internal pull-up (DC & CD)
+    SS (DC & CD) & MOSI & SCK pins on output
     SCK Frequentie -> /2
     Master Mode & Enable SPI
     Data order MSB-first & set to MSB & set to DataMode 0
@@ -52,7 +50,7 @@ void setupSPI()
 
 void drawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
-    if ((x < WIDTH) && (y < HEIGHT))
+    if ((x >= 0) && (x < WIDTH) && (y >= 0) && (y < HEIGHT))
     {
         // Set coords and send color
         SPI_CS_LOW();
@@ -62,6 +60,7 @@ void drawPixel(uint16_t x, uint16_t y, uint16_t color)
     }
 }
 
+// drawRect
 void drawRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color)
 {
     for (uint16_t this_x = 0; this_x < width; ++this_x)
@@ -78,7 +77,6 @@ void drawRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t co
 
 void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t color)
 {
-
     for (uint8_t this_y = 0; this_y < height; ++this_y)
     {
         for (uint16_t this_x = 0; this_x < width; ++this_x)
@@ -93,6 +91,7 @@ void fillScreen(uint16_t color)
     SPI_CS_LOW();
     setAddrWindow(0, 0, WIDTH, HEIGHT);
     SPI_WRITE_COMMAND(MEMORY_WRITE);
+
     for (uint8_t y = HEIGHT; y > 0; y--)
     {
         for (uint16_t x = WIDTH; x > 0; x--)
@@ -210,50 +209,7 @@ void SEND_COMMAND_WITH_ARGUMENTS(uint8_t cmd, uint8_t *args, uint8_t len)
     SPI_CS_HIGH();
 }
 
-void drawChar(uint8_t ascii, uint16_t posX, uint16_t posY, uint16_t size, uint16_t color)
-{
-    for (int i = 0; i < FONT_X; i++)
-    {
-        uint8_t temp = pgm_read_byte(&simpleFont[ascii - 0x20][i]);
-        for (uint8_t f = 0; f < 8; f++)
-        {
-            if ((temp >> f) & 0x01)
-            {
-                fillRect(posX + i * size, posY + f * size, size, size, color);
-            }
-        }
-    }
-}
-
-void drawString(const char *string, uint16_t posX, uint16_t posY, uint16_t size, uint16_t color)
-{
-    while (*string)
-    {
-        drawChar(*string, posX, posY, size, color);
-        *string++;
-        if (posX < WIDTH)
-        {
-            posX += FONT_SPACE * size; /* Move cursor right            */
-        }
-    }
-}
-
-void drawBorder(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint8_t thickness, uint16_t color)
-{
-    // Draw top border
-    fillRect(x, y, width, thickness, color);
-
-    // Draw bottom border
-    fillRect(x, y + height - thickness, width, thickness, color);
-
-    // Draw left border
-    fillRect(x, y, thickness, height, color);
-
-    // Draw right border
-    fillRect(x + width - thickness, y, thickness, height, color);
-}
-
-void init_LCD()
+void START_UP()
 {
     SPI_CS_LOW();
     SPI_WRITE_COMMAND(SOFTWARE_RESET);
@@ -280,10 +236,7 @@ void init_LCD()
         0xf2, 1, 0x00,
         0x26, 1, 0x01,
         0xe0, 15, 0x0F, 0x31, 0x2B, 0x0C, 0x0E, 0x08, 0x4E, 0xF1, 0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00,
-        0xe1, 15, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07, 0x31, 0xC1, 0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F,
-        0x11, 0x80,
-        0x29, 0x80,
-        0x00};
+        0xe1, 15, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07, 0x31, 0xC1, 0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F};
 
     // Send all commands with arguments
     uint8_t cmd, x, numArgs;
@@ -294,43 +247,55 @@ void init_LCD()
         numArgs = x & 0x7F;
         SEND_COMMAND_WITH_ARGUMENTS(cmd, addr, numArgs);
         addr += numArgs;
-        // Wait after the last 2 commands. idk why needed tho, adafruit uses it and won't work without it
-        if (x & 0x80)
+    }
+
+    SPI_CS_LOW();
+    SPI_WRITE_COMMAND(0x11);
+    SPI_CS_HIGH();
+
+    SPI_CS_LOW();
+    SPI_WRITE_COMMAND(0x29);
+    SPI_CS_HIGH();
+}
+
+void drawChar(uint8_t ascii, uint16_t posX, uint16_t posY, uint16_t size, uint16_t color)
+{
+    for (int i = 0; i < FONT_X; i++)
+    {
+        uint8_t temp = pgm_read_byte(&simpleFont[ascii - 0x20][i]);
+        for (uint8_t f = 0; f < 8; f++)
         {
-            _delay_ms(150);
+            if ((temp >> f) & 0x01)
+            {
+                fillRect(posX + i * size, posY + f * size, size, size, color);
+            }
         }
     }
 }
 
-// Touch screen functions
+void drawString(const char *string, uint16_t posX, uint16_t posY, uint16_t size, uint16_t color)
+{
+    while (*string)
+    {
+        drawChar(*string++, posX, posY, size, color);
+        if (posX < WIDTH)
+        {
+            posX += FONT_SPACE * size; /* Move cursor right            */
+        }
+    }
+}
 
-// bool touchBegin()
-//{
-//     writeRegister8(STMPE_SYS_CTRL1, STMPE_SYS_CTRL1_RESET);
-//     _delay_ms(10);
-//
-//     for (uint8_t i = 0; i < 65; i++)
-//     {
-//         readRegister8(i);
-//     }
-//     writeRegister8(STMPE_SYS_CTRL2, 0x0); // turn on clocks!
-//     writeRegister8(STMPE_TSC_CTRL, STMPE_TSC_CTRL_XYZ | STMPE_TSC_CTRL_EN); // XYZ and enable!
-//     Serial.println(readRegister8(STMPE_TSC_CTRL), HEX);
-//     writeRegister8(STMPE_INT_EN, STMPE_INT_EN_TOUCHDET);
-//     writeRegister8(STMPE_ADC_CTRL1, STMPE_ADC_CTRL1_10BIT | (0x6 << 4)); // 96 clocks per conversion
-//     writeRegister8(STMPE_ADC_CTRL2, STMPE_ADC_CTRL2_6_5MHZ);
-//     writeRegister8(STMPE_TSC_CFG, STMPE_TSC_CFG_4SAMPLE | STMPE_TSC_CFG_DELAY_1MS | STMPE_TSC_CFG_SETTLE_5MS);
-//     writeRegister8(STMPE_TSC_FRACTION_Z, 0x6);
-//     writeRegister8(STMPE_FIFO_TH, 1);
-//     writeRegister8(STMPE_FIFO_STA, STMPE_FIFO_STA_RESET);
-//     writeRegister8(STMPE_FIFO_STA, 0); // unreset
-//     writeRegister8(STMPE_TSC_I_DRIVE, STMPE_TSC_I_DRIVE_50MA);
-//     writeRegister8(STMPE_INT_STA, 0xFF); // reset all ints
-//     writeRegister8(STMPE_INT_CTRL, STMPE_INT_CTRL_POL_HIGH | STMPE_INT_CTRL_ENABLE);
-//     return true;
-// }
-//
-// boolean touched()
-//{
-//     return (readRegister8(STMPE_TSC_CTRL) & 0x80);
-// }
+void drawBorder(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint8_t thickness, uint16_t color)
+{
+    // Draw top border
+    fillRect(x, y, width, thickness, color);
+
+    // Draw bottom border
+    fillRect(x, y + height - thickness, width, thickness, color);
+
+    // Draw left border
+    fillRect(x, y, thickness, height, color);
+
+    // Draw right border
+    fillRect(x + width - thickness, y, thickness, height, color);
+}

@@ -1,12 +1,18 @@
-//Nunchuk defines
 #define NUNCHUK_ADDRESS 0x52
 
-
-//IR defines
 #define IR_38KHZ 52
 #define IR_56KHZ 35
+
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+
+#define PLAYER_WIDTH 8
+#define PLAYER_ACTUAL_WIDTH 16
+#define PLAYER_HEIGHT 20
+
 #define SENDINGDATA_LEN 16 // bits - 1
 #define SENDINGBIT_START_VALUE (-2)
+
 #define STARTBIT_VALUE (-1)
 #define STARTBIT_MIN 3
 #define STARTBIT_MAX 6
@@ -14,62 +20,19 @@
 #define ONE_MIN 1
 #define ONE_MAX 4
 
-
-//LCD defines
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
-
-//Player defines
-#define PLAYER_WIDTH 8
-#define PLAYER_ACTUAL_WIDTH 16
-#define PLAYER_HEIGHT 20
 #define INITIAL_Y_VEL 10
+#define FRAME_TIME 32 // (1000 / 30FPS) - 1 = 32
 #define MOVEMENT_SPEED 3
 
-#define GRAVITY 1
-
-//Game loop defines
-#define FRAME_TIME 32 // (1000 / 30FPS) - 1 = 32
-
-//Background defines
 #define BG_SPRITE_AMOUNT 192
 #define BG_SPRITE_WIDTH 10
 #define BG_SPRITE_ACTUAL_WIDTH 20
 #define BG_SPRITE_HEIGHT 10
 
+#define GRAVITY 1
 
-
-/*START OF INTERACTABLE DEFINES*/
-//Button defines
-#define BUTTON_WIDTH 3
-#define BUTTON_HEIGHT 4
-
-//Liquid defines
 #define LIQUID_WIDTH 38
 #define LIQUID_HEIGHT 5
-
-
-//Door defines
-#define DOOR_WIDTH 20
-#define DOOR_HEIGHT 30
-
-
-//Sign defines
-#define SIGN_WIDTH 2
-#define SIGN_HEIGHT 13
-
-//Platform defines
-#define PLATFORM_WIDTH 30
-#define PLATFORM_HEIGHT 8
-
-#define DIA_WIDTH 3
-#define DIA_HEIGHT 9
-#define LEVER_BASE_WIDTH 4
-#define LEVER_BASE_HEIGHT 5
-#define LEVER_TOP_WIDTH 4
-#define LEVER_TOP_HEIGHT 7
-
-/*END OF INTERACTABLE DEFINES*/
 
 /** STMPE610 Address **/
 #define STMPE_ADDR 0x41
@@ -78,7 +41,7 @@
 #define STMPE_SYS_CTRL1 0x03
 #define STMPE_SYS_CTRL1_RESET 0x02
 
-/** Clock Control **/
+/** Clock Contrl **/
 #define STMPE_SYS_CTRL2 0x04
 
 /** Touchscreen controller setup **/
@@ -290,69 +253,6 @@
 #define STMPE_GPIO_ALT_FUNCT 0x17
 // END OF TOUCH
 
-// Colors-------------------------------------------------
-#define BLACK 0x0000 ///<   0,   0,   0
-
-#define PLAYER_DARK_BLUE 0x007f  ///<   0,   3,  31
-#define PLAYER_BLUE 0x033f       ///<   0,  25,  31
-#define PLAYER_LIGHT_BLUE 0x05BF ///<   0,  45,  31
-
-#define PLAYER_RED 0xF803    ///< 255,   0,   0
-#define PLAYER_YELLOW 0xFE03 ///<  31,  48,   3
-#define PLAYER_ORANGE 0xFAC3 ///<  31,  22,   3
-
-#define INTER_BROWN 0x49A2  ///<   9,  13,   2
-#define INTER_GOLD 0xFCE5   ///<  31,  39,   5
-#define INTER_PURPLE 0xD25F ///<  26,  18,  31
-#define INTER_YELLOW 0xC600 ///<  24,  48    0
-
-#define SWAMP_GREEN 0x23C0 ///<   4,  30,   0
-
-#define BACKGROUND_DARK 0x1900  ///<   3,   8,   0
-#define BACKGROUND_LIGHT 0x2961 ///<   5,  11,   1
-
-#define FOREGROUND_LIGHT 0x7346 ///<  14,  26,   6
-#define FOREGROUND_DARK 0x5A85  ///<  11,  20,   5
-//--------------------------------------------------------
-
-// Defines
-#define WIDTH 320
-#define HEIGHT 240
-#define SOFTWARE_RESET 0x01
-#define COLUMN_ADDRESS_SET 0x2A
-#define PAGE_ADDRESS_SET 0x2B
-#define MEMORY_WRITE 0x2C
-
-// Colors-------------------------------------------------
-#define BLACK 0x0000 ///<   0,   0,   0
-#define WHITE 0xFFFF ///< 255, 255, 255
-#define ALPHA 255
-
-#define PLAYER_DARK_BLUE 0x007f  ///<   0,   3,  31
-#define PLAYER_BLUE 0x033f       ///<   0,  25,  31
-#define PLAYER_LIGHT_BLUE 0x05BF ///<   0,  45,  31
-
-#define PLAYER_RED 0xF803    ///< 255,   0,   0
-#define PLAYER_YELLOW 0xFE03 ///<  31,  48,   3
-#define PLAYER_ORANGE 0xFAC3 ///<  31,  22,   3
-
-#define INTER_BROWN 0x49A2  ///<   9,  13,   2
-#define INTER_GOLD 0xFCE5   ///<  31,  39,   5
-#define INTER_PURPLE 0xD25F ///<  26,  18,  31
-#define INTER_YELLOW 0xC600 ///<  24,  48    0
-
-#define SWAMP_GREEN 0x23C0 ///<   4,  30,   0
-
-#define BACKGROUND_DARK 0x1900  ///<   3,   8,   0
-#define BACKGROUND_LIGHT 0x2961 ///<   5,  11,   1
-
-#define FOREGROUND_LIGHT 0x7346 ///<  14,  26,   6
-#define FOREGROUND_DARK 0x5A85  ///<  11,  20,   5
-#define PLATFORM_MIDDLE_COLOR 0b00001010
-#define LIQUID_TOP_COLOR 0b00000110
-#define LIQUID_MIDDLE_COLOR 0b00000101
-#define LIQUID_BOTTOM_COLOR 0b00000100
-
 // nunchuk memory addresses
 #define NCSTATE 0x00 // address of state (6 bytes)
 #define NCCAL 0x20   // address of callibration data (16 bytes)
@@ -422,19 +322,91 @@
 #define BG_SPRITE_ACTUAL_WIDTH 20
 #define BG_SPRITE_HEIGHT 10
 
+#define NUNCHUK_ADDRESS 0x52
+
+#define IR_38KHZ 52
+#define IR_56KHZ 35
+
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+
+#define PLAYER_WIDTH 8
+#define PLAYER_ACTUAL_WIDTH 16
+#define PLAYER_HEIGHT 20
+
+#define SENDINGDATA_LEN 16 // bits - 1
+#define SENDINGBIT_START_VALUE (-2)
+
+#define STARTBIT_VALUE (-1)
+#define STARTBIT_MIN 3
+#define STARTBIT_MAX 6
+#define ZERO_MAX 2
+#define ONE_MIN 1
+#define ONE_MAX 4
+
+#define INITIAL_Y_VEL 10
+#define FRAME_TIME 32 // (1000 / 30FPS) - 1 = 32
+#define MOVEMENT_SPEED 3
+
+#define BG_SPRITE_AMOUNT 192
+#define BG_SPRITE_WIDTH 10
+#define BG_SPRITE_ACTUAL_WIDTH 20
+#define BG_SPRITE_HEIGHT 10
+
+#define GRAVITY 1
+
 #define BUTTON_WIDTH 3
 #define BUTTON_HEIGHT 4
-#define WATER_WIDTH 10
-#define WATER_HEIGHT 5
-#define DOOR_WIDTH 5
-#define DOOR_HEIGHT 10
+#define LIQUID_WIDTH 38
+#define LIQUID_HEIGHT 5
+
+#define DOOR_WIDTH 20
+#define DOOR_HEIGHT 30
+
 #define SIGN_WIDTH 2
 #define SIGN_HEIGHT 13
-#define PLATFORM_WIDTH 5
+#define PLATFORM_WIDTH 30
 #define PLATFORM_HEIGHT 8
 #define DIA_WIDTH 3
 #define DIA_HEIGHT 9
 #define LEVER_BASE_WIDTH 4
-#define LEVER_BASE_HEIGHT 6
+#define LEVER_BASE_HEIGHT 5
 #define LEVER_TOP_WIDTH 4
 #define LEVER_TOP_HEIGHT 7
+
+#define WIDTH 320
+#define HEIGHT 240
+#define SOFTWARE_RESET 0x01
+#define COLUMN_ADDRESS_SET 0x2A
+#define PAGE_ADDRESS_SET 0x2B
+#define MEMORY_WRITE 0x2C
+
+// Colors-------------------------------------------------
+#define BLACK 0x0000 ///<   0,   0,   0
+#define WHITE 0xFFFF ///< 255, 255, 255
+#define ALPHA 255
+
+#define PLAYER_DARK_BLUE 0x007f  ///<   0,   3,  31
+#define PLAYER_BLUE 0x033f       ///<   0,  25,  31
+#define PLAYER_LIGHT_BLUE 0x05BF ///<   0,  45,  31
+
+#define PLAYER_RED 0xF803    ///< 255,   0,   0
+#define PLAYER_YELLOW 0xFE03 ///<  31,  48,   3
+#define PLAYER_ORANGE 0xFAC3 ///<  31,  22,   3
+
+#define INTER_BROWN 0x49A2  ///<   9,  13,   2
+#define INTER_GOLD 0xFCE5   ///<  31,  39,   5
+#define INTER_PURPLE 0xD25F ///<  26,  18,  31
+#define INTER_YELLOW 0xC600 ///<  24,  48    0
+
+#define SWAMP_GREEN 0x23C0 ///<   4,  30,   0
+
+#define BACKGROUND_DARK 0x1900  ///<   3,   8,   0
+#define BACKGROUND_LIGHT 0x2961 ///<   5,  11,   1
+
+#define FOREGROUND_LIGHT 0x7346 ///<  14,  26,   6
+#define FOREGROUND_DARK 0x5A85  ///<  11,  20,   5
+#define PLATFORM_MIDDLE_COLOR 0b00001010
+#define LIQUID_TOP_COLOR 0b00000110
+#define LIQUID_MIDDLE_COLOR 0b00000101
+#define LIQUID_BOTTOM_COLOR 0b00000100

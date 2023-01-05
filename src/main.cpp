@@ -643,24 +643,29 @@ int main(void)
                     normalState = true;
                 }
 
-                if (currentHighlightedButton == 0)
+                switch (currentHighlightedButton)
                 {
-                    drawBorder(45, 191, 229, 42, 5, WHITE); // Level 1 button
-                    drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
-                } else if (currentHighlightedButton == 1)
-                {
-                    drawBorder(45, 131, 229, 42, 5, WHITE); // Level 2 button
-                    drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); // Level 1 button
-                    drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
-                } else if (currentHighlightedButton == 2)
-                {
-                    drawBorder(45, 70, 229, 42, 5, WHITE);  // Level 3 button
-                    drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
-                    drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);   // Exit button
-                } else if (currentHighlightedButton == 3)
-                {
-                    drawBorder(14, 0, 294, 49, 5, WHITE);   // Exit button
-                    drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+                    case 0:
+                        drawBorder(45, 191, 229, 42, 5, WHITE); // Level 1 button
+                        drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+                        break;
+                    case 1:
+                        drawBorder(45, 131, 229, 42, 5, WHITE); // Level 2 button
+                        drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); // Level 1 button
+                        drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+                        break;
+                    case 2:
+                        drawBorder(45, 70, 229, 42, 5, WHITE);  // Level 3 button
+                        drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+                        drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);   // Exit button
+                        break;
+                    case 3:
+                        drawBorder(14, 0, 294, 49, 5, WHITE);   // Exit button
+                        drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+                        break;
+                    default:
+                        // Code to be executed if currentHighlightedButton is not equal to any of the above cases
+                        break;
                 }
                 if (state.c_button && !state.c_button_old) //Checks if button was pressed.
                 {

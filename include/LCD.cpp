@@ -280,7 +280,7 @@ void drawString(const char *string, uint16_t posX, uint16_t posY, uint16_t size,
         drawChar(*string++, posX, posY, size, color);
         if (posX < WIDTH)
         {
-            posX += FONT_SPACE * size; /* Move cursor right            */
+            posX += FONT_SPACE * size; /* Move cursor right */
         }
     }
 }

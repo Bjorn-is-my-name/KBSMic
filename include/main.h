@@ -3,8 +3,7 @@
 #include <avr/interrupt.h>
 
 #include <Wire.h>
-#include <Adafruit_STMPE610.h>
-#include <Adafruit_STMPE610.cpp>
+
 
 #include <EEPROM.c>
 #include <LCD.cpp>
@@ -31,7 +30,7 @@ void drawPlayerSelectScreen();
 void drawLevelSelectScreen();
 void drawBackground();
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
-void DrawPlayers();
+void drawPlayers();
 void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
 void clearWholeSprite(uint16_t, uint8_t, uint8_t, uint8_t);
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
@@ -47,17 +46,17 @@ uint16_t getcolour(uint8_t, uint8_t ver = 0);
 
 // Collision functions
 void checkWallCollision();
-void CheckPlatformCollision();
+void checkPlatformCollision();
 void checkCollision(Rect &);
+void checkPoolCollision();
 bool rectangleCollision(uint16_t, uint8_t, Rect &);
 void checkButtons();
-void checkPoolCollision();
 void checkLevers();
 void checkDias();
 bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t);
 
 // Other functions
-void Update();
+void update();
 void level1();
 void level2();
 uint8_t getLives();

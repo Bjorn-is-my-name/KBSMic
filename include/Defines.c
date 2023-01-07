@@ -10,6 +10,20 @@
 #define PLAYER_ACTUAL_WIDTH 16
 #define PLAYER_HEIGHT 20
 
+//level one
+#define PLAYER_ONE_X_LVL_ONE 13
+#define PLAYER_ONE_Y_LVL_ONE 170
+
+#define PLAYER_TWO_X_LVL_ONE 13
+#define PLAYER_TWO_Y_LVL_ONE 210
+
+//level two
+#define PLAYER_ONE_X_LVL_TWO 207
+#define PLAYER_ONE_Y_LVL_TWO 215
+
+#define PLAYER_TWO_X_LVL_TWO 187
+#define PLAYER_TWO_Y_LVL_TWO 215
+
 #define SENDINGDATA_LEN 16 // bits - 1
 #define SENDINGBIT_START_VALUE (-2)
 
@@ -303,20 +317,6 @@
 #define PLAYER_MAX_ACCEL 6
 #define GRAVITY 1
 
-//level one
-#define PLAYER_ONE_X_LVL_ONE 13
-#define PLAYER_ONE_Y_LVL_ONE 170
-
-#define PLAYER_TWO_X_LVL_ONE 13
-#define PLAYER_TWO_Y_LVL_ONE 210
-
-//level two
-#define PLAYER_ONE_X_LVL_TWO 207
-#define PLAYER_ONE_Y_LVL_TWO 215
-
-#define PLAYER_TWO_X_LVL_TWO 187
-#define PLAYER_TWO_Y_LVL_TWO 215
-
 #define SENDINGDATA_LEN 16 // bits - 1
 #define SENDINGBIT_START_VALUE (-2)
 
@@ -373,7 +373,7 @@
 
 #define BUTTON_WIDTH 3
 #define BUTTON_HEIGHT 4
-#define LIQUID_WIDTH 28
+#define LIQUID_WIDTH 38
 #define LIQUID_HEIGHT 5
 
 #define DOOR_WIDTH 20

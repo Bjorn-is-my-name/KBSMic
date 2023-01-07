@@ -93,7 +93,7 @@
     #define PLATFORM_HEIGHT 8
     #define DIA_WIDTH 3
     #define DIA_HEIGHT 9
-    #define LEVER_BASE_WIDTH 4
+    #define LEVER_BASE_WIDTH 16
     #define LEVER_BASE_HEIGHT 5
     #define LEVER_TOP_WIDTH 4
     #define LEVER_TOP_HEIGHT 7

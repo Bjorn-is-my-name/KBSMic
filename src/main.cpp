@@ -126,7 +126,6 @@ struct Platform
             clearPlat(bounds.x + 3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
             // Move the platform to the maximum X position with a speed of 3
             bounds.x -= 3;
-            // Draw the platform at the new position
             this->draw();
         }
     }
@@ -141,7 +140,6 @@ struct Platform
             clearPlat(bounds.x, bounds.y + 3, bounds.x, bounds.y, bounds.width, bounds.height);
             // Move the platform to the maximum Y position with a speed of 3
             bounds.y += 3;
-            // Draw the platform at the new position
             this->draw();
         }
     }
@@ -156,7 +154,6 @@ struct Platform
             clearPlat(bounds.x + 3, bounds.y, bounds.x, bounds.y, bounds.width, bounds.height);
             // Move the platform to the minimum X position with a speed of 3
             bounds.x -= 3;
-            // Draw the platform at the new position
             this->draw();
         }
     }
@@ -171,7 +168,6 @@ struct Platform
             clearPlat(bounds.x, bounds.y - 3, bounds.x, bounds.y, bounds.width, bounds.height);
             // Move the platform to the minimum Y position with a speed of 3
             bounds.y -= 3;
-            // Draw the platform at the new position
             this->draw();
         }
     }
@@ -181,7 +177,7 @@ struct Platform
     {
         //if x is null (platform not initialized) return (don't continue)
         if (bounds.x == NULL)
-            return;
+            return true;
         // If the platform's bounds are directly at the maximum position or the minimum position
         if ((bounds.x >= maxX && bounds.y >= maxY) || (bounds.x <= minX && bounds.y <= minY))
         {
@@ -239,13 +235,15 @@ struct lever
         {
             // move platform
             plat[0]->MoveMax();
-            plat[1]->MoveMax();
+            if(plat[1] != NULL)
+                plat[1]->MoveMax();
         }
         else
         {
             // move platform back
             plat[0]->MoveMin();
-            plat[1]->MoveMin();
+            if(plat[1] != NULL)
+                plat[1]->MoveMin();
         }
         // If controlled platform is not at the maximum position
         if (!(plat[0]->isMax()))
@@ -262,7 +260,7 @@ struct lever
         if (bounds.x == NULL)
             return;
         // Draw the leverBase
-        drawLever(bounds.x - 7, bounds.y + 1, 1);
+        drawLever(bounds.x - 7, bounds.y + 1);
         // If the lever is on
         if (state)
         {
@@ -462,6 +460,8 @@ bool isDataBit = false;
 uint8_t lives = MAX_LIVES;
 uint8_t score = START_SCORE;
 uint8_t level = 1;
+uint8_t level2Unlocked = 1;
+uint8_t level3Unlocked = 0;
 uint8_t player_accel = 0;
 bool levelCompleted = false;
 bool playerDied = false;
@@ -613,7 +613,7 @@ int main(void)
 
     // Check in the eeprom if the frequency has already been set
     {
-        if (EEPROM_read(20) == IR_38KHZ || EEPROM_read(20) == IR_56KHZ)
+        if (getFreq() == IR_38KHZ || getFreq() == IR_56KHZ)
         {
             setFreq(EEPROM_read(20));
             currentGameState = MENU;
@@ -657,6 +657,21 @@ int main(void)
             break;
         case PLAYER_SELECT_SCREEN:
             drawPlayerSelectScreen();
+            break;
+        case LEVEL_SELECT_SCREEN:
+            currentGameState = MENU;
+            break;
+        case GAME:
+            currentGameState = MENU;
+            break;
+        case SETTINGS:
+            currentGameState = MENU;
+            break;
+        case GAMEOVER:
+            currentGameState = MENU;
+            break;
+        case PAUSE:
+            currentGameState = MENU;
             break;
         }
     }
@@ -779,21 +794,47 @@ int main(void)
                 switch (currentHighlightedButton) {
                     case 0:
                         drawBorder(45, 191, 229, 42, 5, WHITE); // Level 1 button
-                        drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+                        if(level2Unlocked)
+                        {
+                            drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+                        }else
+                        {
+                            drawBorder(45, 131, 229, 42, 5, PLAYER_RED); // Level 2 button
+                        }
                         break;
                     case 1:
                         drawBorder(45, 131, 229, 42, 5, WHITE); // Level 2 button
+                        if(level3Unlocked)
+                        {
+                            drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+                        }else
+                        {
+                            drawBorder(45, 70, 229, 42, 5, PLAYER_RED);  // Level 3 button
+                        }
                         drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); // Level 1 button
-                        drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
                         break;
                     case 2:
-                        drawBorder(45, 70, 229, 42, 5, WHITE);  // Level 3 button
-                        drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+                            drawBorder(45, 70, 229, 42, 5, WHITE);  // Level 3 button
+                        if(level2Unlocked)
+                        {
+                            drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
+                        }else
+                        {
+                            drawBorder(45, 131, 229, 42, 5, PLAYER_RED); // Level 2 button
+                        }
+                        
                         drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);   // Exit button
                         break;
                     case 3:
                         drawBorder(14, 0, 294, 49, 5, WHITE);   // Exit button
-                        drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+                        if(level3Unlocked)
+                        {
+                            drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
+                        }else
+                        {
+                            drawBorder(45, 70, 229, 42, 5, PLAYER_RED);  // Level 3 button
+                        }
+                        
                         break;
                     default:
                         // Code to be executed if currentHighlightedButton is not equal to any of the above cases
@@ -806,17 +847,26 @@ int main(void)
                         case 0:
                             currentHighlightedButton = 0;
                             currentGameState = GAME;
+                            level = 1;
                             level1();
                             break;
                         case 1:
                             currentHighlightedButton = 0;
-                            currentGameState = GAME;
-                            level2();
+                            if(level2Unlocked)
+                            {
+                                currentGameState = GAME;
+                                level = 2;
+                                level2();
+                            }
                             break;
                         case 2:
                             currentHighlightedButton = 0;
-                            //currentGameState = GAME;
-                            //level3();
+                            //if(level3Unlocked)
+                            //{
+                                //currentGameState = GAME;
+                                //level = 3;
+                                //level3();
+                            //}
                             break;
                         case 3: // Exit button
                             currentHighlightedButton = 0;
@@ -897,6 +947,7 @@ void setFreq(uint8_t freq)
 {
     // Set frequency
     OCR0A = freq;
+    EEPROM_write(20, freq);
     // If frequency is 38kHz
     if (freq == IR_38KHZ)
     {
@@ -921,7 +972,7 @@ void setFreq(uint8_t freq)
 // Get frequency of IR receiver
 uint8_t getFreq()
 {
-    return OCR0A;
+    return EEPROM_read(20);
 }
 
 // Main Update function
@@ -960,6 +1011,7 @@ void update()
     checkButtons();
     checkLevers();
     checkDias();
+    checkFinish();
 
     // Jumping and falling mechanics
     if (state.c_button && !player1.jumping)
@@ -981,16 +1033,10 @@ void update()
         // Show lives on 7 segments display.
         showLives(getLives());
         // Reset all player positions and draw the interactables.
-        clearWholeSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT);
-        if(level == 1){
-            player1.x = PLAYER_ONE_X_LVL_ONE;
-            player1.y = PLAYER_ONE_Y_LVL_ONE;
-            player2.x = PLAYER_TWO_X_LVL_ONE;
-            player2.y = PLAYER_TWO_Y_LVL_ONE;
-        }else if (level == 2){
-            player1.x = PLAYER_ONE_X_LVL_TWO;
-            player1.y = PLAYER_ONE_Y_LVL_TWO;
-        }
+        clearWholeSprite(player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT);
+
+        // Reset player positions
+        setPlayerPos(level);
         
         playerDied = false;
 
@@ -1103,11 +1149,41 @@ void checkDias()
 
 // Function to check for collision with finishdoors and to finish the level
 void checkFinish(){
-    if (rectangleCollision(player1.x, player1.y, Door1) && rectangleCollision(player2.x, player2.y, Door2))
+    if(getFreq() == IR_38KHZ)
     {
-        //unlock next level
-        //gamestate = level select
-        //update highscore if score > highscore
+        if (rectangleCollision(player1.x, player1.y, Door1) && rectangleCollision(player2.x, player2.y, Door2))
+        {
+            //unlock next level
+            // if(level == 1){
+                // level2Unlocked = true;
+            // }else if(level == 2){
+                // level3Unlocked = true;
+            // }
+            // Update highscore
+            updateHighscore(score, level);
+            // Set the current game state to the level select screen
+            currentGameState = LEVEL_SELECT_SCREEN;
+            // Draw the level select screen
+            drawLevelSelectScreen();
+        }
+    }
+    else
+    {
+        if (rectangleCollision(player1.x, player1.y, Door2) && rectangleCollision(player2.x, player2.y, Door1))
+        {
+            //unlock next level
+            // if(level == 1){
+                // level2Unlocked = true;
+            // }else if(level == 2){
+                // level3Unlocked = true;
+            // }
+            // Update highscore
+            updateHighscore(score, level);
+            // Set the current game state to the level select screen
+            currentGameState = LEVEL_SELECT_SCREEN;
+            // Draw the level select screen
+            drawLevelSelectScreen();
+        }
     }
 }
 
@@ -1186,21 +1262,102 @@ void checkPoolCollision()
     // For every liquid in the array
     for (auto &liquid : liquids)
     {
-        // If player1 is colliding with the pool
-        if (rectangleCollision(player1.x, player1.y, liquid->bounds))
+        if (getFreq() == IR_38KHZ)
         {
-            // If player1 is not in the right pool
-            if (!(liquid->Version == 0)){
-                // Set playerDied to true
-                playerDied = true;
+            // If player1 is colliding with the pool
+            if (rectangleCollision(player1.x, player1.y, liquid->bounds))
+            {
+                // If player1 is not in the right pool
+                if(player1.y < liquid->bounds.y && !(liquid->Version == 0)){
+                    // Set playerDied to true
+                    playerDied = true;
+                }
+                
+            // Else if player2 is colliding with the pool
+            }else if(rectangleCollision(player2.x, player2.y, liquid->bounds)){
+                // If player2 is not in the right pool
+                if(player2.y < liquid->bounds.y && !(liquid->Version == 1)){
+                    // Set playerDied to true
+                    playerDied = true;
+                }
             }
-        // Else if player2 is colliding with the pool
-        }else if(rectangleCollision(player2.x, player2.y, liquid->bounds)){
-            // If player2 is not in the right pool
-            if (!(liquid->Version == 1)){
-                // Set playerDied to true
-                playerDied = true;
+        }
+        else
+        {
+            // If player1 is colliding with the pool
+            if (rectangleCollision(player1.x, player1.y, liquid->bounds))
+            {
+                // If player1 is not in the right pool
+                if(player1.y < liquid->bounds.y && !(liquid->Version == 1)){
+                    // Set playerDied to true
+                    playerDied = true;
+                }
+                
+            // Else if player2 is colliding with the pool
+            }else if(rectangleCollision(player2.x, player2.y, liquid->bounds)){
+                // If player2 is not in the right pool
+                if(player2.y < liquid->bounds.y && !(liquid->Version == 0)){
+                    // Set playerDied to true
+                    playerDied = true;
+                }
             }
+        }
+    }
+}
+
+// Function to set the player position correctly
+void setPlayerPos(uint8_t Level){
+    if (Level == 1){
+        if (getFreq() == IR_38KHZ)
+        {
+            //player 1
+            player1.x = PLAYER_ONE_X_LVL_ONE;
+            player1.xOld = player1.x;
+            player1.y = PLAYER_ONE_Y_LVL_ONE;
+            player1.yOld = player1.y;
+            //player 2
+            player2.x = PLAYER_TWO_X_LVL_ONE;
+            player2.xOld = player2.x;
+            player2.y = PLAYER_TWO_Y_LVL_ONE;
+            player2.yOld = player2.y;
+        }else{
+            //player 1
+            player1.x = PLAYER_TWO_X_LVL_ONE;
+            player1.xOld = player1.x;
+            player1.y = PLAYER_TWO_Y_LVL_ONE;
+            player1.yOld = player1.y;
+            //player 2
+            player2.x = PLAYER_ONE_X_LVL_ONE;
+            player2.xOld = player2.x;
+            player2.y = PLAYER_ONE_Y_LVL_ONE;
+            player2.yOld = player2.y;
+        }
+    }
+    else if (Level == 2)
+    {
+        if (getFreq() == IR_38KHZ)
+        {
+            //player 1
+            player1.x = PLAYER_ONE_X_LVL_TWO;
+            player1.xOld = player1.x;
+            player1.y = PLAYER_ONE_Y_LVL_TWO;
+            player1.yOld = player1.y;
+            //player 2
+            player2.x = PLAYER_TWO_X_LVL_TWO;
+            player2.xOld = player2.x;
+            player2.y = PLAYER_TWO_Y_LVL_TWO;
+            player2.yOld = player2.y;
+        }else{
+            //player 1
+            player1.x = PLAYER_TWO_X_LVL_TWO;
+            player1.xOld = player1.x;
+            player1.y = PLAYER_TWO_Y_LVL_TWO;
+            player1.yOld = player1.y;
+            //player 2
+            player2.x = PLAYER_ONE_X_LVL_TWO;
+            player2.xOld = player2.x;
+            player2.y = PLAYER_ONE_Y_LVL_TWO;
+            player2.yOld = player2.y;
         }
     }
 }
@@ -1208,12 +1365,21 @@ void checkPoolCollision()
 // Function to cleat and draw Player1 and Player2
 void drawPlayers()
 {
-    // Clear old playersprite and draw new one
-    clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
-    drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
-    // Clear old playersprite and draw new one
-    clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
-    drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+    if(getFreq() == IR_38KHZ){
+        // Clear old playersprite and draw new one
+        clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
+        drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
+        // Clear old playersprite and draw new one
+        clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+        drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+    }else{
+        // Clear old playersprite and draw new one
+        clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+        drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
+        // Clear old playersprite and draw new one
+        clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
+        drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
+    }
 }
 
 // Function to clear a given sprite
@@ -1233,13 +1399,13 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
             // set the colour of the pixel to the colour of the spritepixel
-            uint16_t colour = getcolour(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+            uint16_t colour = getcolour(((pgm_read_byte(&Sprite[PixGroup]) & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
             // If the pixel is not transparent and the pixel is not in the new sprite
             if (colour != 255 && !pointInRect(xOld, yOld, x, y, w * 2, h))
             {
                 // Draw the pixel with the colour of the background
                 uint8_t idx = ((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH;
-                drawPixel(xOld, yOld, getcolour((Background[idx] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
+                drawPixel(xOld, yOld, getcolour((pgm_read_byte(&Background[idx]) & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
             }
             // Increment X
             xOld++;
@@ -1250,6 +1416,8 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
 // Function to clear a give sprite in is entirety
 void clearWholeSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
 {
+    x-=2;
+    w+=4;
     // For every pixelgroup in the sprite (2 pixels per group)
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
@@ -1265,7 +1433,8 @@ void clearWholeSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
         {
             // Get the colour of the pixel of the background
             // Draw the pixel
-            drawPixel(x, y, getcolour((Background[(((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH)] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4)));
+            uint8_t idx = ((pgm_read_byte(&Background[(((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH)]) & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4));
+            drawPixel(x, y, getcolour(idx));
             // Increment the x position
             x++;
         }
@@ -1290,7 +1459,7 @@ void clearPlat(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, ui
         {
             // Get the colour of the pixel from the background sprite
             // Draw the pixel
-            drawPixel(xOld, yOld, getcolour((Background[(((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH)] & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
+            drawPixel(xOld, yOld, getcolour((pgm_read_byte(&Background[(((yOld / BG_SPRITE_HEIGHT % 2) ? (xOld + BG_SPRITE_WIDTH) : xOld) % BG_SPRITE_ACTUAL_WIDTH / 2 + yOld % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH)]) & ((xOld % 2) ? 0x0F : 0xF0)) >> ((xOld % 2) ? 0 : 4)));
             // Move to the next pixel
             xOld++;
         }
@@ -1349,11 +1518,11 @@ void drawDoor(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t ver)
 }
 
 // Function to draw a lever
-void drawLever(uint16_t x, uint8_t y, uint8_t ver)
+void drawLever(uint16_t x, uint8_t y)
 {
-    drawRect(x, y, LEVER_BASE_WIDTH * 4, LEVER_BASE_HEIGHT, BLACK);
-    drawRect(x + 1, y + 1, LEVER_BASE_WIDTH * 4 - 2, LEVER_BASE_HEIGHT - 3, INTER_GOLD);
-    drawLineH(x + 1, y + 3, LEVER_BASE_WIDTH * 4 - 2, INTER_BROWN);
+    drawRect(x, y, LEVER_BASE_WIDTH, LEVER_BASE_HEIGHT, BLACK);
+    drawRect(x + 1, y + 1, LEVER_BASE_WIDTH - 2, LEVER_BASE_HEIGHT - 3, INTER_GOLD);
+    drawLineH(x + 1, y + 3, LEVER_BASE_WIDTH - 2, INTER_BROWN);
 }
 
 // Function to check if a point is in a rectangle
@@ -1387,12 +1556,12 @@ void drawSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Spri
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
             // Set the colour of the pixel to the colour of the pixel in the sprite
-            uint16_t colour = getcolour(((Sprite[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
+            uint16_t colour = getcolour(((pgm_read_byte(&Sprite[PixGroup]) & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
             // If the colour is transparent
             if (colour == 255)
             {
                 // Set the colour of the pixel to the colour of the pixel in the background
-                colour = getcolour((Background[(((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH)] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4), ver);
+                colour = getcolour((pgm_read_byte(&Background[(((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH)]) & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4), ver);
             }
             // Draw the pixel with the current colour
             drawPixel(x, y, colour);
@@ -1420,7 +1589,7 @@ void drawBackground()
 }
 
 // Function to draw a given sprite mirrored
-void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Sprite, uint8_t ver)
+void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *Sprite, uint8_t ver)
 {
     uint8_t yBackup = y;
     // Loop through all the pixelgroups of the sprite (2 pixels per pixelgroup)
@@ -1437,12 +1606,12 @@ void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t *Spri
         for (int8_t Pixel = 1; Pixel >= 0; Pixel--)
         {
             // Set the colour of the pixel to the colour of the pixel of the sprite
-            uint16_t colour = getcolour(((Sprite[w - 1 - PixGroup % w + (y - yBackup) * w] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
+            uint16_t colour = getcolour(((pgm_read_byte(&Sprite[w - 1 - PixGroup % w + (y - yBackup) * w]) & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)), ver);
             // If the colour is transparent
             if (colour == 255)
             {
                 // Set the colour to the colour of the background
-                colour = getcolour((Background[(((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH)] & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4), ver);
+                colour = getcolour((pgm_read_byte(&Background[(((y / BG_SPRITE_HEIGHT % 2) ? (x + BG_SPRITE_WIDTH) : x) % BG_SPRITE_ACTUAL_WIDTH / 2 + y % BG_SPRITE_HEIGHT * BG_SPRITE_WIDTH)]) & ((x % 2) ? 0x0F : 0xF0)) >> ((x % 2) ? 0 : 4), ver);
             }
             // Draw the pixel with the current colour
             drawPixel(x, y, colour);
@@ -1469,7 +1638,7 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
         for (uint8_t Pixel = 0; Pixel <= 1; Pixel++)
         {
             // Get the colour of the pixel for the background
-            uint16_t colour = getcolour(((Background[PixGroup] & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
+            uint16_t colour = getcolour(((pgm_read_byte(&Background[PixGroup]) & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
             //for each initialized wall
             for (auto r : walls)
             {
@@ -1584,16 +1753,7 @@ void level1()
     Dia4 = {229, 216, DIA_WIDTH * 4, DIA_HEIGHT, 1};
 
     // set player positions
-    //player 1
-    player1.x = PLAYER_ONE_X_LVL_ONE;
-    player1.xOld = player1.x;
-    player1.y = PLAYER_ONE_Y_LVL_ONE;
-    player1.yOld = player1.y;
-    //player 2
-    player2.x = PLAYER_TWO_X_LVL_ONE;
-    player2.xOld = player2.x;
-    player2.y = PLAYER_TWO_Y_LVL_ONE;
-    player2.yOld = player2.y;
+    setPlayerPos(1);
 
     // draw everything
     drawBackground();
@@ -1604,16 +1764,7 @@ void level1()
 void level2()
 {
     // set player positions
-    //player 1
-    player1.x = PLAYER_ONE_X_LVL_TWO;
-    player1.xOld = player1.x;
-    player1.y = PLAYER_ONE_Y_LVL_TWO;
-    player1.yOld = player1.y;
-    //player2
-    player2.x = PLAYER_TWO_X_LVL_TWO;
-    player2.xOld = player2.x;
-    player2.y = PLAYER_TWO_Y_LVL_TWO;
-    player2.yOld = player2.y;
+    setPlayerPos(2);
 
     // initialize walls
     walls[0] = {0, 0, 5, 240};
@@ -1643,13 +1794,13 @@ void level2()
     Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT}; 
 
     // water left
-    liq1 = {32, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0}; 
+    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0}; 
     // lava left top
-    liq2 = {32, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; 
+    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; 
     // lava left bottom
-    liq3 = {32, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; 
+    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; 
     // poison middle
-    liq4 = {121, 178, 114, LIQUID_HEIGHT, 2}; 
+    liq4 = {116, 178, 114, LIQUID_HEIGHT, 2}; 
 
     // purple platform
     Platform1 = {{5, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 5, 5, 6, 27, 0};           
@@ -1863,9 +2014,23 @@ void drawLevelSelectScreen()
     // Level 1 button
     drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE);
     // Level 2 button
-    drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE);
+    if(level2Unlocked)
+    {
+        drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE);
+    }
+    else
+    {
+        drawBorder(45, 131, 229, 42, 5, PLAYER_RED);
+    }
     // Level 3 button
-    drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE); 
+    if(level3Unlocked)
+    {
+        drawBorder(45, 71, 229, 42, 5, PLAYER_BLUE);
+    }
+    else
+    {
+        drawBorder(45, 71, 229, 42, 5, PLAYER_RED);
+    }
     // Exit button
     drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);  
     drawString("Level 1", 75, 197, 4, WHITE);
@@ -1893,6 +2058,7 @@ void setLives(uint8_t &lives)
     else if (lives == 0)
     {
         // Reset the amount of lives to the maximum amount of lives (5).
+        // currentGameState = GAMEOVER;
         lives = MAX_LIVES; // Resets the lives to 5 if the player has no lives left.
     }
     //update the amount of lives in the EEPROM.

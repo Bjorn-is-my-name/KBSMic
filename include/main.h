@@ -4,7 +4,6 @@
 
 #include <Wire.h>
 
-
 #include <EEPROM.c>
 #include <LCD.cpp>
 #include <Nunchuk.cpp>
@@ -30,17 +29,18 @@ void drawPlayerSelectScreen();
 void drawLevelSelectScreen();
 void drawBackground();
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
+void setPlayerPos(uint8_t);
 void drawPlayers();
 void clearSprite(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *);
 void clearWholeSprite(uint16_t, uint8_t, uint8_t, uint8_t);
 void drawSprite(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
-void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint8_t ver = 0);
+void drawSpriteMirror(uint16_t, uint8_t, uint8_t, uint8_t, const uint8_t *, uint8_t ver = 0);
 void drawInteractables();
 void clearPlat(uint16_t, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t);
 void drawPlatH(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
 void drawPlatV(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
 void drawLiquid(uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
-void drawLever(uint16_t, uint8_t, uint8_t);
+void drawLever(uint16_t, uint8_t);
 void drawScore(uint8_t, bool);
 uint16_t getcolour(uint8_t, uint8_t ver = 0);
 
@@ -53,6 +53,7 @@ bool rectangleCollision(uint16_t, uint8_t, Rect &);
 void checkButtons();
 void checkLevers();
 void checkDias();
+void checkFinish();
 bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t);
 
 // Other functions
@@ -62,5 +63,4 @@ void level2();
 uint8_t getLives();
 void setLives(uint8_t &);
 void showLives(uint8_t);
-void showScore(bool, uint8_t);
 void updateHighscore(uint8_t, uint8_t);

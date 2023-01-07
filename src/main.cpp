@@ -1585,15 +1585,15 @@ void level1()
 
     // set player positions
     //player 1
-    player1.xOld = PLAYER_ONE_X_LVL_ONE;
     player1.x = PLAYER_ONE_X_LVL_ONE;
-    player1.yOld = PLAYER_ONE_Y_LVL_ONE;
+    player1.xOld = player1.x;
     player1.y = PLAYER_ONE_Y_LVL_ONE;
+    player1.yOld = player1.y;
     //player 2
-    player2.xOld = PLAYER_TWO_X_LVL_ONE;
     player2.x = PLAYER_TWO_X_LVL_ONE;
-    player2.yOld = PLAYER_TWO_Y_LVL_ONE;
+    player2.xOld = player2.x;
     player2.y = PLAYER_TWO_Y_LVL_ONE;
+    player2.yOld = player2.y;
 
     // draw everything
     drawBackground();
@@ -1605,15 +1605,15 @@ void level2()
 {
     // set player positions
     //player 1
-    player1.xOld = PLAYER_ONE_X_LVL_TWO;
     player1.x = PLAYER_ONE_X_LVL_TWO;
-    player1.yOld = PLAYER_ONE_Y_LVL_TWO;
+    player1.xOld = player1.x;
     player1.y = PLAYER_ONE_Y_LVL_TWO;
+    player1.yOld = player1.y;
     //player2
-    player2.xOld = PLAYER_TWO_X_LVL_TWO;
     player2.x = PLAYER_TWO_X_LVL_TWO;
-    player2.yOld = PLAYER_TWO_Y_LVL_TWO;
+    player2.xOld = player2.x;
     player2.y = PLAYER_TWO_Y_LVL_TWO;
+    player2.yOld = player2.y;
 
     // initialize walls
     walls[0] = {0, 0, 5, 240};

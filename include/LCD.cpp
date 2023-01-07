@@ -50,7 +50,7 @@ void setupSPI()
 
 void drawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
-    if ((x >= 0) && (x < WIDTH) && (y >= 0) && (y < HEIGHT))
+    if ((x >= 0) && (x < SCREEN_WIDTH) && (y >= 0) && (y < SCREEN_HEIGHT))
     {
         // Set coords and send color
         SPI_CS_LOW();
@@ -89,12 +89,12 @@ void fillRect(uint16_t x, uint8_t y, uint16_t width, uint8_t height, uint16_t co
 void fillScreen(uint16_t color)
 {
     SPI_CS_LOW();
-    setAddrWindow(0, 0, WIDTH, HEIGHT);
+    setAddrWindow(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     SPI_WRITE_COMMAND(MEMORY_WRITE);
 
-    for (uint8_t y = HEIGHT; y > 0; y--)
+    for (uint8_t y = SCREEN_HEIGHT; y > 0; y--)
     {
-        for (uint16_t x = WIDTH; x > 0; x--)
+        for (uint16_t x = SCREEN_WIDTH; x > 0; x--)
         {
             SPI_WRITE16(color);
         }
@@ -278,7 +278,7 @@ void drawString(const char *string, uint16_t posX, uint16_t posY, uint16_t size,
     while (*string)
     {
         drawChar(*string++, posX, posY, size, color);
-        if (posX < WIDTH)
+        if (posX < SCREEN_WIDTH)
         {
             posX += FONT_SPACE * size; /* Move cursor right */
         }

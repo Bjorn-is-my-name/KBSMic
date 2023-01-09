@@ -8,15 +8,15 @@ char btoa[] = {'0', '1', '2', '3', '4', '5', '6', '7',
 
 struct ncState
 {
-    uint8_t joy_x_axis;
-    uint8_t joy_y_axis;
+    uint8_t joy_x_axis = 128;
+    uint8_t joy_y_axis = 128;
     //    uint16_t accel_x_axis;
     //    uint16_t accel_y_axis;
     // uint16_t accel_z_axis;
-    uint8_t z_button;
-    uint8_t z_button_old;
-    uint8_t c_button;
-    uint8_t c_button_old;
+    uint8_t z_button = 0;
+    uint8_t z_button_old = 0;
+    uint8_t c_button = 0;
+    uint8_t c_button_old = 0;
 } state;
 
 bool startNunchuk(uint8_t);

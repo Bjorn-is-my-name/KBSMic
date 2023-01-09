@@ -472,7 +472,8 @@ enum gameState
     SETTINGS,
     PAUSE,
     GAMEOVER,
-    PLAYER_SELECT_SCREEN
+    PLAYER_SELECT_SCREEN,
+    HIGHSCORE_SCREEN
 } currentGameState;
 
 // IR receiving protocol
@@ -670,9 +671,12 @@ int main(void)
     }
 
     // Draws the score on the screen.
-    uint8_t currentHighlightedButton = 0;
+    uint8_t currentHighlightedButton = 1;
     bool normalState = true;
 
+    EEPROM_write(HIGHSCORE_START_LEVEL_ADDR, 12);
+    EEPROM_write(HIGHSCORE_START_LEVEL_ADDR+1, 134);
+    EEPROM_write(HIGHSCORE_START_LEVEL_ADDR+2, 245);
 
     // Loop forever
     while (true)
@@ -722,24 +726,46 @@ int main(void)
                     score = START_SCORE;
                     level++;
                 }
-            } else if (currentGameState == MENU)
-            {
-                if (state.joy_y_axis > 156) //Checks if the joystick is pushed up
+                if (state.z_button && !state.z_button_old)
                 {
                     currentHighlightedButton = 0;
-                } else if (state.joy_y_axis < 100) // Checks if the joystick is pushed down
-                {
-                    currentHighlightedButton = 1;
+                    currentGameState = LEVEL_SELECT_SCREEN;
+                    drawLevelSelectScreen();
                 }
-
-                if (currentHighlightedButton == 0) // Draw border around the highlighted button
+            } else if (currentGameState == MENU)
+            {
+                if (state.joy_y_axis > 156 && normalState)
                 {
+                    normalState = false;
+                    if (currentHighlightedButton > 0)
+                    {
+                        currentHighlightedButton--;
+                    }
+                } else if (state.joy_y_axis < 100 && normalState)
+                {
+                    normalState = false;
+                    if (currentHighlightedButton < 2)
+                    {
+                        currentHighlightedButton++;
+                    }
+                } else
+                {
+                    normalState = true;
+                }
+                if (currentHighlightedButton == 0)
+                {
+                    drawBorder(265, 5, 50, 50, 5, WHITE); //H button
+                    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); // Play button
+
+                } else if (currentHighlightedButton == 1) // Draw border around the highlighted button
+                {
+                    drawBorder(265, 5, 50, 50, 5, PLAYER_ORANGE); //H button
                     drawBorder(110, 50, 116, 50, 5, WHITE); // Play button
                     drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Settings button
-                } else if (currentHighlightedButton == 1)
+                } else if (currentHighlightedButton == 2)
                 {
                     drawBorder(65, 130, 212, 50, 5, WHITE); // Settings button
-                    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); // Play button b
+                    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); // Play button
                 }
 
 
@@ -748,9 +774,14 @@ int main(void)
                     if (currentHighlightedButton == 0)
                     {
                         currentHighlightedButton = 0;
+                        currentGameState = HIGHSCORE_SCREEN;
+                        drawHighScoreMenu();
+                    } else if (currentHighlightedButton == 1)
+                    {
+                        currentHighlightedButton = 0;
                         currentGameState = LEVEL_SELECT_SCREEN;
                         drawLevelSelectScreen();
-                    } else if (currentHighlightedButton == 1)
+                    } else if (currentHighlightedButton == 2)
                     {
                         currentHighlightedButton = 0;
                         currentGameState = PLAYER_SELECT_SCREEN;
@@ -831,7 +862,7 @@ int main(void)
                 }
                 if (state.z_button && !state.z_button_old)
                 {
-                    currentHighlightedButton = 0;
+                    currentHighlightedButton = 1;
                     currentGameState = MENU;
                     drawMenu();
                 }
@@ -864,12 +895,12 @@ int main(void)
                             //}
                             break;
                         case 3: // Exit button
-                            currentHighlightedButton = 0;
+                            currentHighlightedButton = 1;
                             currentGameState = MENU;
                             drawMenu();
                             break;
                         default:
-                            currentHighlightedButton = 0;
+                            currentHighlightedButton = 1;
                             currentGameState = MENU;
                             drawMenu();
                             break;
@@ -900,7 +931,7 @@ int main(void)
 
                 if (state.z_button && !state.z_button_old)
                 {
-                    currentHighlightedButton = 0;
+                    currentHighlightedButton = 1;
                     currentGameState = MENU;
                     drawMenu();
                 }
@@ -921,6 +952,14 @@ int main(void)
                         currentGameState = MENU;
                         drawMenu();
                     }
+                }
+            } else if (currentGameState == HIGHSCORE_SCREEN)
+            {
+                if ((state.z_button && !state.z_button_old) || (state.c_button && !state.c_button_old))
+                {
+                    currentHighlightedButton = 1;
+                    currentGameState = MENU;
+                    drawMenu();
                 }
             }
         }
@@ -1983,7 +2022,7 @@ uint16_t getcolour(uint8_t colour, uint8_t ver)
 // Function to draw the Player Select Screen
 void drawPlayerSelectScreen()
 {
-    fillScreen(0x0);
+    fillScreen(BLACK);
     drawString("Player1", 80, 60, 4, PLAYER_RED);
     drawString("Player2", 80, 140, 4, PLAYER_RED);
     drawBorder(65, 50, 212, 50, 5, PLAYER_ORANGE); // Player1 button
@@ -1993,23 +2032,23 @@ void drawPlayerSelectScreen()
 // Function to draw the menu screen
 void drawMenu()
 {
-    fillScreen(0x0);
+    fillScreen(BLACK);
     // Play button
     drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE);
     // Settings button
     drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE);
     drawString("Play", 120, 60, 4, PLAYER_RED);
     drawString("Settings", 75, 140, 4, PLAYER_RED);
+    // H button
+    drawBorder(265, 5, 50, 50, 5, PLAYER_ORANGE);
+    drawString("H", 275, 15, 4, PLAYER_RED);
 }
 
 // Function to draw the Level Select screen
 void drawLevelSelectScreen()
 {
     // Draw over the old menu screen
-    drawBorder(110, 50, 116, 50, 5, BLACK);
-    drawBorder(65, 130, 212, 50, 5, BLACK);
-    drawString("Play", 120, 60, 4, BLACK);
-    drawString("Settings", 75, 140, 4, BLACK);
+    fillScreen(BLACK);
     // Draw new screen
     // Level 1 button
     drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE);
@@ -2035,6 +2074,49 @@ void drawLevelSelectScreen()
     drawString("Level 2", 75, 137, 4, WHITE);
     drawString("Level 3", 75, 77, 4, WHITE);
     drawString("Back to menu", 50, 13, 3, WHITE);
+}
+
+void drawHighScoreMenu()
+{
+    fillScreen(BLACK);
+
+    // Highscores heading
+    drawString("Highscores:", 40, 15, 4, PLAYER_RED);
+
+    // Level 1 high score
+    drawString("Level1", 50, 50, 4, PLAYER_ORANGE);
+    // Level 1 high score number
+    auto *pText = new unsigned char[4];
+    pText[0] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR) / 100 + '0';
+    pText[1] = (EEPROM_read(HIGHSCORE_START_LEVEL_ADDR) % 100) / 10 + '0';
+    pText[2] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR) % 10 + '0';
+    pText[3] = '\0';
+    drawString((const char *) pText, 205, 50, 4, PLAYER_YELLOW);
+
+    // Level 2 high score
+    drawString("Level2", 50, 90, 4, PLAYER_ORANGE);
+    // Level 2 high score number
+    pText[0] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + 1) / 100 + '0';
+    pText[1] = (EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + 1) % 100) / 10 + '0';
+    pText[2] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + 1) % 10 + '0';
+    drawString((const char *) pText, 205, 90, 4, PLAYER_YELLOW);
+
+
+
+    // Level 3 high score
+    drawString("Level3", 50, 130, 4, PLAYER_ORANGE);
+    // Level 2 high score number
+    pText[0] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR+2) / 100 + '0';
+    pText[1] = (EEPROM_read(HIGHSCORE_START_LEVEL_ADDR+2) % 100) / 10 + '0';
+    pText[2] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR+2) % 10 + '0';
+    drawString((const char *) pText, 205, 130, 4, PLAYER_YELLOW);
+
+    // Back button
+    drawBorder(120, 180, 116, 50, 5, WHITE);
+    drawString("Back", 130, 190, 4, PLAYER_RED);
+
+    delete[] pText;
+    pText = nullptr;
 }
 
 // Function to return the amount of lives left

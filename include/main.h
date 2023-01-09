@@ -9,6 +9,8 @@
 #include <Nunchuk.cpp>
 #include <Sprites.c>
 #include <Defines.c>
+//#include "Tone.cpp"
+//#include "tone.c"
 
 struct Rect
 {
@@ -27,6 +29,7 @@ uint8_t getFreq();
 void drawMenu();
 void drawPlayerSelectScreen();
 void drawLevelSelectScreen();
+void drawHighScoreMenu();
 void drawBackground();
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
 void setPlayerPos(uint8_t);

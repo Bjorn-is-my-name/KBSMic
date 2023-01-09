@@ -1,4 +1,4 @@
-#include <main.h>   // include the main header file
+#include <main.h> // include the main header file
 
 volatile int frameCounter = 0;
 
@@ -20,7 +20,7 @@ public:
     bool jumping = false;
 } player1;
 
-//Struct for other player
+// Struct for other player
 struct
 {
 public:
@@ -34,7 +34,7 @@ public:
     uint8_t yOld = y;
 } player2;
 
-//Struct for Diamonds
+// Struct for Diamonds
 struct Diamond
 {
     // X position op diamond
@@ -53,19 +53,20 @@ struct Diamond
     // Draw the diamond
     void draw()
     {
-        //if x is null (diamond not initialized) return (don't draw)
-        if (!isInitialized()) 
+        // if x is null (diamond not initialized) return (don't draw)
+        if (!isInitialized())
             return;
-        //draw the diamond_sprite and the mirrored version
+        // draw the diamond_sprite and the mirrored version
         drawSprite(x, y, DIA_WIDTH, DIA_HEIGHT, Diamond_Sprite, version);
         drawSpriteMirror(x + DIA_WIDTH * 2, y, DIA_WIDTH, DIA_HEIGHT, Diamond_Sprite, version);
     }
-    bool isInitialized(){
+    bool isInitialized()
+    {
         return (x != 0);
     }
 };
 
-//Struct for Platforms
+// Struct for Platforms
 struct Platform
 {
     // Bounds op platform in the form of a Rect object
@@ -84,61 +85,62 @@ struct Platform
     // Move the platform to the maximum position
     void MoveMax()
     {
-        //if x is null (platform not initialized) return (don't draw)
+        // if x is null (platform not initialized) return (don't draw)
         if (!isInitialized())
             return;
         // If the platform is horizontal
         if (maxX == minX)
         {
-            if(minY > maxY)
+            if (minY > maxY)
             {
                 MoveMinY();
-            }else
+            }
+            else
             {
                 MoveMaxY();
             }
             // Move the platform to the maximum Y position
-            
         }
         // If the platform is vertical
         else if (maxY == minY)
         {
-            if(minX > maxX)
+            if (minX > maxX)
             {
                 MoveMinX();
-            }else
+            }
+            else
             {
                 // Move the platform to the maximum X position
                 MoveMaxX();
             }
-            
         }
     }
     void MoveMin()
     {
-        //if x is null (platform not initialized) return (don't draw)
+        // if x is null (platform not initialized) return (don't draw)
         if (!isInitialized())
             return;
         // If the platform is horizontal
         if (maxX == minX)
         {
-            if(minY > maxY)
+            if (minY > maxY)
             {
                 MoveMaxY();
-            }else
+            }
+            else
             {
                 // Move the platform to the minimum Y position
                 MoveMinY();
             }
-            
         }
         // If the platform is vertical
         else if (maxY == minY)
         {
-            if(minY > maxY)
+            if (minY > maxY)
             {
                 MoveMaxX();
-            }else
+            }
+            else
             {
                 // Move the platform to the minimum X position
                 MoveMinX();
@@ -159,7 +161,7 @@ struct Platform
             this->draw();
         }
     }
-    
+
     // Move the platform to the maximum Y position
     void MoveMaxY()
     {
@@ -205,7 +207,7 @@ struct Platform
     // Check if the platform is at the maximum position
     bool isMax()
     {
-        //if x is null (platform not initialized) return (don't continue)
+        // if x is null (platform not initialized) return (don't continue)
         if (!isInitialized())
             return true;
         // If the platform's bounds are directly at the maximum position or the minimum position
@@ -222,7 +224,7 @@ struct Platform
     // Draw the platform
     void draw()
     {
-        //if x is null (platform not initialized) return (don't draw)
+        // if x is null (platform not initialized) return (don't draw)
         if (!isInitialized())
             return;
         // If the platform is horizontal
@@ -239,12 +241,13 @@ struct Platform
         }
     }
 
-    bool isInitialized(){
+    bool isInitialized()
+    {
         return (bounds.x != 0);
     }
 };
 
-//Struct for Levers
+// Struct for Levers
 struct lever
 {
     // Bounds of the lever in the form of a Rect object
@@ -261,7 +264,7 @@ struct lever
     // Activate the lever
     void activate()
     {
-        //if x is null (lever not initialized) return (don't draw)
+        // if x is null (lever not initialized) return (don't draw)
         if (!isInitialized())
             return;
         // If the lever is on
@@ -269,14 +272,14 @@ struct lever
         {
             // move platform
             plat[0]->MoveMax();
-            if(plat[1] != NULL)
+            if (plat[1] != NULL)
                 plat[1]->MoveMax();
         }
         else
         {
             // move platform back
             plat[0]->MoveMin();
-            if(plat[1] != NULL)
+            if (plat[1] != NULL)
                 plat[1]->MoveMin();
         }
         // If controlled platform is not at the maximum position
@@ -290,7 +293,7 @@ struct lever
     // Draw the lever
     void draw()
     {
-        //if x is null (lever not initialized) return (don't draw)
+        // if x is null (lever not initialized) return (don't draw)
         if (!isInitialized())
             return;
         // Draw the leverBase
@@ -307,12 +310,13 @@ struct lever
             drawSprite((bounds).x + 1, (bounds).y - 7, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, Version);
         }
     }
-    bool isInitialized(){
+    bool isInitialized()
+    {
         return (bounds.x != 0);
     }
 };
 
-//Struct for Buttons
+// Struct for Buttons
 struct button
 {
     // Bounds of the button in the form of a Rect object
@@ -329,7 +333,7 @@ struct button
     // Activate the button
     void activate()
     {
-        //if x is null (button not initialized) return (don't draw)
+        // if x is null (button not initialized) return (don't draw)
         if (!isInitialized())
             return;
         // If player is standing on the button or player is standing on the connected button
@@ -356,7 +360,7 @@ struct button
     // Draw the button
     void draw()
     {
-        //if x is null (button not initialized) return (don't draw)
+        // if x is null (button not initialized) return (don't draw)
         if (!isInitialized())
             return;
         // Draw the button
@@ -370,12 +374,13 @@ struct button
         this->connectedButton = btn;
     }
 
-    bool isInitialized(){
-       return (bounds.x != 0);
+    bool isInitialized()
+    {
+        return (bounds.x != 0);
     }
 };
 
-//Struct for Liquids
+// Struct for Liquids
 struct Liquid
 {
     // Bounds of the liquid in the form of a Rect object
@@ -386,21 +391,22 @@ struct Liquid
     // Draw the liquid
     void draw()
     {
-        //if x is null (liquid not initialized) return (don't draw)
+        // if x is null (liquid not initialized) return (don't draw)
         if (!isInitialized())
             return;
         // Draw the liquid
-        drawLiquid(bounds.x-5, bounds.y, bounds.width+10, bounds.height, Version);
+        drawLiquid(bounds.x - 5, bounds.y, bounds.width + 10, bounds.height, Version);
     }
-    bool isInitialized(){
+    bool isInitialized()
+    {
         return (bounds.x != 0);
     }
 };
 
 // Level objects
 Platform Platform1, Platform2, Platform3, Platform4, Platform5, Platform6, Platform7, Platform8, Platform9;
-lever Lever1, Lever2, Lever3, Lever4;
-button button1, button2, button3, button4;
+lever Lever1, Lever2, Lever3, Lever4, Lever5;
+button button1, button2, button3;
 Diamond Dia1, Dia2, Dia3, Dia4, Dia5, Dia6;
 Liquid liq1, liq2, liq3, liq4;
 Rect Door1, Door2;
@@ -411,44 +417,44 @@ Rect walls[20];
 // Arrays to store the objects (mainly for looping purposes)
 // Platform array
 Platform *platforms[] =
-{
-    &Platform1,
-    &Platform2,
-    &Platform3,
-    &Platform4,
-    &Platform5,
-    &Platform6,
-    &Platform7,
-    &Platform8,
-    &Platform9};
+    {
+        &Platform1,
+        &Platform2,
+        &Platform3,
+        &Platform4,
+        &Platform5,
+        &Platform6,
+        &Platform7,
+        &Platform8,
+        &Platform9};
 // Lever array
 lever *levers[] =
-{
-    &Lever1,
-    &Lever2,
-    &Lever3,
-    &Lever4};
+    {
+        &Lever1,
+        &Lever2,
+        &Lever3,
+        &Lever4,
+        &Lever5};
 // Button array
 button *buttons[] =
-{
-    &button1,
-    &button2,
-    &button3,
-    &button4};
+    {
+        &button1,
+        &button2,
+        &button3};
 // Diamond array
 Diamond *Dias[] =
-{
-    &Dia1,
-    &Dia2,
-    &Dia3,
-    &Dia4};
+    {
+        &Dia1,
+        &Dia2,
+        &Dia3,
+        &Dia4};
 // Liquid array
 Liquid *liquids[] =
-{
-    &liq1,
-    &liq2,
-    &liq3,
-    &liq4};
+    {
+        &liq1,
+        &liq2,
+        &liq3,
+        &liq4};
 // Lives data array
 const uint8_t liveCount[] = {
     // Patterns for all the numbers and letters.
@@ -462,11 +468,11 @@ const uint8_t liveCount[] = {
 
 // IR sending variables
 // For checking to see if the current bit is done sending
-bool dataIsSend = false;   
-// Data to send over IR                 
-uint32_t sendingData = 0;        
+bool dataIsSend = false;
+// Data to send over IR
+uint32_t sendingData = 0;
 // The data bit to send;
-int8_t sendingBit = SENDINGBIT_START_VALUE; 
+int8_t sendingBit = SENDINGBIT_START_VALUE;
 // Controls the on and off time of the IR LED
 uint16_t onTime = 0;
 
@@ -492,11 +498,11 @@ uint8_t offTime;
 // Used to determin the length of each received bit
 uint32_t startMs = 0;
 // Tracks if the staring bit was received before accepting data
-bool startBitReceived = false; 
+bool startBitReceived = false;
 // All the received bits
-uint32_t receivedData = 0;  
-// Current bit (used for bitshifting 1's in to receivedData)   
-uint8_t bitCounter = 0;        
+uint32_t receivedData = 0;
+// Current bit (used for bitshifting 1's in to receivedData)
+uint8_t bitCounter = 0;
 // Differentiates data from pauses
 bool isDataBit = false;
 
@@ -504,6 +510,8 @@ bool isDataBit = false;
 uint8_t lives = MAX_LIVES;
 uint8_t score = START_SCORE;
 uint8_t level = 1;
+uint8_t currentlyPlayingLevel = 0;
+uint8_t currentlyPlayingLevelReceived = 0;
 uint8_t level2Unlocked = 1;
 uint8_t level3Unlocked = 0;
 uint8_t player_accel = 0;
@@ -526,7 +534,7 @@ enum gameState
 ISR(PCINT2_vect)
 {
     // Check for the pin state (high or low)
-    isDataBit = ((PIND >> PIND2) & 1) != 0; 
+    isDataBit = ((PIND >> PIND2) & 1) != 0;
 
     if (isDataBit)
     {
@@ -542,33 +550,44 @@ ISR(PCINT2_vect)
         }
 
         // If the start bit has been send, check what the data is
-        if (startBitReceived) 
+        if (startBitReceived)
         {
             // Check if its a zero
-            if (difference < ZERO_MAX) 
+            if (difference < ZERO_MAX)
             {
                 receivedData &= ~(1 << bitCounter++);
             }
             // Check if its a one
-            else if (difference > ONE_MIN && difference < ONE_MAX) 
+            else if (difference > ONE_MIN && difference < ONE_MAX)
             {
                 receivedData |= (1 << bitCounter++);
             }
 
             // If all bits are send, save the value in the variable
-            if (bitCounter == SENDINGDATA_LEN) 
+            if (bitCounter == SENDINGDATA_LEN)
             {
-                startBitReceived = false;
+                playerDied |= (receivedData & 1);
+
+                uint8_t receivedLives = ((receivedData & 14) >> 1);
+                if (receivedLives < lives)
+                {
+                    lives = receivedLives;
+                    setLives(lives);
+                    showLives(lives);
+                }
+
+                currentlyPlayingLevelReceived = ((receivedData & 48) >> 4);
+
                 player2.xOld = player2.x;
-                player2.x = receivedData & 0x1FF;
-                receivedData >>= 9;
+                player2.x = ((receivedData & 32704) >> 6);
+
                 player2.yOld = player2.y;
-                player2.y = (receivedData & 0xFF);
+                player2.y = ((receivedData & 8355840) >> 15);
             }
         }
     }
     // Save the time from startup to now
-    startMs = currentMs; 
+    startMs = currentMs;
 }
 
 // IR sending protocol (with timer to keep track of ms)
@@ -588,44 +607,46 @@ ISR(TIMER0_COMPA_vect)
     if (++counter > onTime)
     {
         // If the bit is done sending, wait before sending the next bit
-        if (dataIsSend) 
+        if (dataIsSend)
         {
             // Time after which to continue to the next bit
-            onTime = offTime;     
-            // Disable TC0   
-            TCCR0A |= (1 << COM0A1); 
+            onTime = offTime;
+            // Disable TC0
+            TCCR0A |= (1 << COM0A1);
         }
         // If the waiting time is passed, send the next bit
-        else 
+        else
         {
             if (sendingBit++ < SENDINGDATA_LEN)
             {
                 // Send start bit
-                if (sendingBit == STARTBIT_VALUE) 
+                if (sendingBit == STARTBIT_VALUE)
                 {
                     onTime = startTime;
                 }
                 // Send data
-                else 
+                else
                 {
                     // Set the time corresponding to the bit
-                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime : zeroTime; 
+                    onTime = ((sendingData >> sendingBit) & 1) ? oneTime : zeroTime;
                 }
                 // Enable TC0
-                TCCR0A &= ~(1 << COM0A1); 
+                TCCR0A &= ~(1 << COM0A1);
             }
             else
             {
                 // Once all bits are send, reset for next run
-                sendingBit = SENDINGBIT_START_VALUE; 
-                sendingData = player1.y;
-                sendingData <<= 9;
-                sendingData |= player1.x;
+                sendingBit = SENDINGBIT_START_VALUE;
+                sendingData = playerDied;
+                sendingData |= (getLives() << 1);
+                sendingData |= (currentlyPlayingLevel << 4);
+                sendingData |= (player1.x << 6);
+                sendingData |= ((uint32_t)(player1.y) << 15);
             }
         }
 
         // Flip between sending a bit and waiting
-        dataIsSend = !dataIsSend; 
+        dataIsSend = !dataIsSend;
         counter = 0;
     }
 }
@@ -633,15 +654,21 @@ ISR(TIMER0_COMPA_vect)
 // Main Function
 int main(void)
 {
+    for (uint8_t i = 0; i < 254; i++)
+    {
+        EEPROM_write(i, 0);
+    }
+    EEPROM_write(255, 0);
+
     // Setup IR led
     // Set pin 6 as output
     DDRD |= (1 << DDD6);
-    //initialise timer 0
+    // initialise timer 0
     initTimer0();
 
     // Setup IR recieving
     // pull up
-    PORTD |= (1 << PORTD2); 
+    PORTD |= (1 << PORTD2);
     PCICR |= (1 << PCIE2);
     PCMSK2 |= (1 << PCINT18);
 
@@ -753,7 +780,7 @@ int main(void)
                 if (frameCounter % 30 == 0)
                 {
                     // Draws over the previous score.
-                    drawScore(score, true); 
+                    drawScore(score, true);
                     score--;
                     drawScore(score, false);
                 }
@@ -761,7 +788,6 @@ int main(void)
                 // Game code
                 update();
                 drawPlayers();
-                
 
                 // If level is completed update the highscore and set score to START_SCORE, also add 1 to level.
                 if (levelCompleted)
@@ -774,124 +800,159 @@ int main(void)
             }
             else if (currentGameState == MENU)
             {
-                if (state.joy_y_axis > 156) //Checks if the joystick is pushed up
+                if (state.joy_y_axis > 156) // Checks if the joystick is pushed up
                 {
                     currentHighlightedButton = 0;
-                } else if (state.joy_y_axis < 100) // Checks if the joystick is pushed down
+                }
+                else if (state.joy_y_axis < 100) // Checks if the joystick is pushed down
                 {
                     currentHighlightedButton = 1;
                 }
 
                 if (currentHighlightedButton == 0) // Draw border around the highlighted button
                 {
-                    drawBorder(110, 50, 116, 50, 5, WHITE); // Play button
+                    drawBorder(110, 50, 116, 50, 5, WHITE);         // Play button
                     drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Settings button
-                } else if (currentHighlightedButton == 1)
+                }
+                else if (currentHighlightedButton == 1)
                 {
-                    drawBorder(65, 130, 212, 50, 5, WHITE); // Settings button
+                    drawBorder(65, 130, 212, 50, 5, WHITE);         // Settings button
                     drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); // Play button b
                 }
 
-
-                if (state.c_button && !state.c_button_old) //Checks if button is pressed
+                if (state.c_button && !state.c_button_old) // Checks if button is pressed
                 {
                     if (currentHighlightedButton == 0)
                     {
                         currentHighlightedButton = 0;
                         currentGameState = LEVEL_SELECT_SCREEN;
                         drawLevelSelectScreen();
-                    } else
+                    }
+                    else
                     {
                         currentHighlightedButton = 0;
                         currentGameState = PLAYER_SELECT_SCREEN;
                         drawPlayerSelectScreen();
                     }
                 }
-
-
             }
             else if (currentGameState == LEVEL_SELECT_SCREEN)
             {
-                if (state.joy_y_axis > 156 && normalState)
+                if (currentlyPlayingLevel != currentlyPlayingLevelReceived && getFreq() == IR_38KHZ)
                 {
-                    normalState = false;
-                    if (currentHighlightedButton < 4)
+                    currentGameState = GAME;
+                    currentlyPlayingLevel = currentlyPlayingLevelReceived;
+
+                    switch (currentlyPlayingLevelReceived)
                     {
-                        currentHighlightedButton++;
+                    case 1:
+                        level = 1;
+                        level1();
+                        break;
+                    case 2:
+                        level = 2;
+                        level2();
+                        break;
+                    case 3:
+                        // level = 3;
+                        // Level3();
+                        break;
+                    default:
+                        currentGameState = MENU;
+                        currentlyPlayingLevel = currentlyPlayingLevelReceived;
+                        break;
                     }
-                } else if (state.joy_y_axis < 100 && normalState)
-                {
-                    normalState = false;
-                    if (currentHighlightedButton > 0)
-                    {
-                        currentHighlightedButton--;
-                    }
-                } else
-                {
-                    normalState = true;
                 }
-                switch (currentHighlightedButton) {
+                else
+                {
+                    if (state.joy_y_axis > 156 && normalState)
+                    {
+                        normalState = false;
+                        if (currentHighlightedButton < 4)
+                        {
+                            currentHighlightedButton++;
+                        }
+                    }
+                    else if (state.joy_y_axis < 100 && normalState)
+                    {
+                        normalState = false;
+                        if (currentHighlightedButton > 0)
+                        {
+                            currentHighlightedButton--;
+                        }
+                    }
+                    else
+                    {
+                        normalState = true;
+                    }
+                    switch (currentHighlightedButton)
+                    {
                     case 0:
                         drawBorder(45, 191, 229, 42, 5, WHITE); // Level 1 button
-                        if(level2Unlocked)
+                        if (level2Unlocked)
                         {
                             drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
-                        }else
+                        }
+                        else
                         {
                             drawBorder(45, 131, 229, 42, 5, PLAYER_RED); // Level 2 button
                         }
                         break;
                     case 1:
                         drawBorder(45, 131, 229, 42, 5, WHITE); // Level 2 button
-                        if(level3Unlocked)
+                        if (level3Unlocked)
                         {
-                            drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
-                        }else
+                            drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE); // Level 3 button
+                        }
+                        else
                         {
-                            drawBorder(45, 70, 229, 42, 5, PLAYER_RED);  // Level 3 button
+                            drawBorder(45, 70, 229, 42, 5, PLAYER_RED); // Level 3 button
                         }
                         drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE); // Level 1 button
                         break;
                     case 2:
-                            drawBorder(45, 70, 229, 42, 5, WHITE);  // Level 3 button
-                        if(level2Unlocked)
+                        drawBorder(45, 70, 229, 42, 5, WHITE); // Level 3 button
+                        if (level2Unlocked)
                         {
                             drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE); // Level 2 button
-                        }else
+                        }
+                        else
                         {
                             drawBorder(45, 131, 229, 42, 5, PLAYER_RED); // Level 2 button
                         }
-                        
-                        drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);   // Exit button
+
+                        drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE); // Exit button
                         break;
                     case 3:
-                        drawBorder(14, 0, 294, 49, 5, WHITE);   // Exit button
-                        if(level3Unlocked)
+                        drawBorder(14, 0, 294, 49, 5, WHITE); // Exit button
+                        if (level3Unlocked)
                         {
-                            drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE);  // Level 3 button
-                        }else
-                        {
-                            drawBorder(45, 70, 229, 42, 5, PLAYER_RED);  // Level 3 button
+                            drawBorder(45, 70, 229, 42, 5, PLAYER_BLUE); // Level 3 button
                         }
-                        
+                        else
+                        {
+                            drawBorder(45, 70, 229, 42, 5, PLAYER_RED); // Level 3 button
+                        }
+
                         break;
                     default:
                         // Code to be executed if currentHighlightedButton is not equal to any of the above cases
                         break;
-                }
-                if (state.c_button && !state.c_button_old) //Checks if button was pressed.
-                {
-                    switch (currentHighlightedButton)
+                    }
+                    if (state.c_button && !state.c_button_old) // Checks if button was pressed and you are player 1.
                     {
+                        switch (currentHighlightedButton)
+                        {
                         case 0:
-                            currentHighlightedButton = 0;
-                            currentGameState = GAME;
-                            level = 1;
-                            level1();
+                            if (getFreq() == IR_56KHZ)
+                            {
+                                currentGameState = GAME;
+                                level = 1;
+                                level1();
+                            }
                             break;
                         case 1:
-                            currentHighlightedButton = 0;
-                            if(level2Unlocked)
+                            if (level2Unlocked && getFreq() == IR_56KHZ)
                             {
                                 currentGameState = GAME;
                                 level = 2;
@@ -899,16 +960,14 @@ int main(void)
                             }
                             break;
                         case 2:
-                            currentHighlightedButton = 0;
-                            //if(level3Unlocked)
+                            // if(level3Unlocked && getFreq() == IR_56KHZ)
                             //{
-                                //currentGameState = GAME;
-                                //level = 3;
-                                //level3();
+                            // currentGameState = GAME;
+                            // level = 3;
+                            // level3();
                             //}
                             break;
                         case 3: // Exit button
-                            currentHighlightedButton = 0;
                             currentGameState = MENU;
                             drawMenu();
                             break;
@@ -917,34 +976,34 @@ int main(void)
                             currentGameState = MENU;
                             drawMenu();
                             break;
+                        }
                     }
                 }
-
-
             }
             else if (currentGameState == PLAYER_SELECT_SCREEN)
             {
 
-                if (state.joy_y_axis > 156) //Checks if the joystick is pushed up
+                if (state.joy_y_axis > 156) // Checks if the joystick is pushed up
                 {
                     currentHighlightedButton = 0;
-                } else if (state.joy_y_axis < 100) // Checks if the joystick is pushed down
+                }
+                else if (state.joy_y_axis < 100) // Checks if the joystick is pushed down
                 {
                     currentHighlightedButton = 1;
                 }
 
                 if (currentHighlightedButton == 0) // Draw border around the highlighted button
                 {
-                    drawBorder(65, 50, 212, 50, 5, WHITE); // Player1 button
+                    drawBorder(65, 50, 212, 50, 5, WHITE);          // Player1 button
                     drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Player2 button
-                } else if (currentHighlightedButton == 1)
+                }
+                else if (currentHighlightedButton == 1)
                 {
-                    drawBorder(65, 130, 212, 50, 5, WHITE); // Player2 button
+                    drawBorder(65, 130, 212, 50, 5, WHITE);        // Player2 button
                     drawBorder(65, 50, 212, 50, 5, PLAYER_ORANGE); // Player1 button
                 }
 
-
-                if (state.c_button && !state.c_button_old) //Checks if button is pressed
+                if (state.c_button && !state.c_button_old) // Checks if button is pressed
                 {
                     if (currentHighlightedButton == 0)
                     {
@@ -952,7 +1011,8 @@ int main(void)
                         setFreq(IR_56KHZ);
                         currentGameState = MENU;
                         drawMenu();
-                    } else
+                    }
+                    else
                     {
                         currentHighlightedButton = 0;
                         EEPROM_write(20, IR_38KHZ);
@@ -986,7 +1046,7 @@ void setFreq(uint8_t freq)
 {
     // Set frequency
     OCR0A = freq;
-    EEPROM_write(20, freq);
+
     // If frequency is 38kHz
     if (freq == IR_38KHZ)
     {
@@ -1076,7 +1136,7 @@ void update()
 
         // Reset player positions
         setPlayerPos(level);
-        
+
         playerDied = false;
 
         // Reset score and redraw it.
@@ -1149,7 +1209,7 @@ void checkDias()
     {
         // Make a temporary rectangle to check for collision
         Rect temp = {D->x, D->y, D->w, D->h};
-        if(getFreq() == IR_56KHZ)
+        if (getFreq() == IR_56KHZ)
         {
             // If player 1 collides with the correct diamond
             if (rectangleCollision(player1.x, player1.y, temp) && D->version == 0 && !D->collected)
@@ -1185,7 +1245,9 @@ void checkDias()
                 // Set diamond to collected
                 D->collected = true;
             }
-        }else {
+        }
+        else
+        {
             // If player 1 collides with the correct diamond
             if (rectangleCollision(player1.x, player1.y, temp) && D->version == 1 && !D->collected)
             {
@@ -1225,15 +1287,19 @@ void checkDias()
 }
 
 // Function to check for collision with finishdoors and to finish the level
-void checkFinish(){
-    if(getFreq() == IR_56KHZ)
+void checkFinish()
+{
+    if (getFreq() == IR_56KHZ)
     {
         if (rectangleCollision(player1.x, player1.y, Door1) && rectangleCollision(player2.x, player2.y, Door2))
         {
-            //unlock next level
-            if(level == 1){
+            // unlock next level
+            if (level == 1)
+            {
                 level2Unlocked = true;
-            }else if(level == 2){
+            }
+            else if (level == 2)
+            {
                 level3Unlocked = true;
             }
             // Update highscore
@@ -1248,11 +1314,11 @@ void checkFinish(){
     {
         if (rectangleCollision(player1.x, player1.y, Door2) && rectangleCollision(player2.x, player2.y, Door1))
         {
-            //unlock next level
-            // if(level == 1){
-                // level2Unlocked = true;
+            // unlock next level
+            //  if(level == 1){
+            //  level2Unlocked = true;
             // }else if(level == 2){
-                // level3Unlocked = true;
+            // level3Unlocked = true;
             // }
             // Update highscore
             updateHighscore(score, level);
@@ -1308,24 +1374,24 @@ void checkCollision(Rect &bounds)
     if (rectangleCollision(player1.x, player1.y, bounds))
     {
         if (player1.xOld + PLAYER_ACTUAL_WIDTH <= bounds.x)
-        { 
+        {
             // Check if the player is colliding with the wall from the left
             player1.x = bounds.x - PLAYER_ACTUAL_WIDTH;
         }
         else if (player1.xOld >= bounds.x + bounds.width)
-        { 
+        {
             // Check if the player is colliding with the wall from the right
             player1.x = bounds.x + bounds.width;
         }
         // Check if the player is colliding with the wall from the top
-        else if (player1.yOld + PLAYER_HEIGHT <= bounds.y || player1.y < bounds.y) 
+        else if (player1.yOld + PLAYER_HEIGHT <= bounds.y || player1.y < bounds.y)
         {
             player1.y = bounds.y - PLAYER_HEIGHT;
             player1.yVelocity = 0;
             player1.jumping = false;
         }
         else if (player1.yOld >= bounds.y + bounds.height)
-        { 
+        {
             // Check if the player is colliding with the wall from the bottom
             player1.y = bounds.y + bounds.height;
             player1.yVelocity = 0;
@@ -1345,15 +1411,19 @@ void checkPoolCollision()
             if (rectangleCollision(player1.x, player1.y, liquid->bounds))
             {
                 // If player1 is not in the right pool
-                if(player1.y < liquid->bounds.y && !(liquid->Version == 0)){
+                if (player1.y < liquid->bounds.y && !(liquid->Version == 0))
+                {
                     // Set playerDied to true
                     playerDied = true;
                 }
-                
-            // Else if player2 is colliding with the pool
-            }else if(rectangleCollision(player2.x, player2.y, liquid->bounds)){
+
+                // Else if player2 is colliding with the pool
+            }
+            else if (rectangleCollision(player2.x, player2.y, liquid->bounds))
+            {
                 // If player2 is not in the right pool
-                if(player2.y < liquid->bounds.y && !(liquid->Version == 1)){
+                if (player2.y < liquid->bounds.y && !(liquid->Version == 1))
+                {
                     // Set playerDied to true
                     playerDied = true;
                 }
@@ -1365,15 +1435,19 @@ void checkPoolCollision()
             if (rectangleCollision(player1.x, player1.y, liquid->bounds))
             {
                 // If player1 is not in the right pool
-                if(player1.y < liquid->bounds.y && !(liquid->Version == 1)){
+                if (player1.y < liquid->bounds.y && !(liquid->Version == 1))
+                {
                     // Set playerDied to true
                     playerDied = true;
                 }
-                
-            // Else if player2 is colliding with the pool
-            }else if(rectangleCollision(player2.x, player2.y, liquid->bounds)){
+
+                // Else if player2 is colliding with the pool
+            }
+            else if (rectangleCollision(player2.x, player2.y, liquid->bounds))
+            {
                 // If player2 is not in the right pool
-                if(player2.y < liquid->bounds.y && !(liquid->Version == 0)){
+                if (player2.y < liquid->bounds.y && !(liquid->Version == 0))
+                {
                     // Set playerDied to true
                     playerDied = true;
                 }
@@ -1383,27 +1457,31 @@ void checkPoolCollision()
 }
 
 // Function to set the player position correctly
-void setPlayerPos(uint8_t Level){
-    if (Level == 1){
+void setPlayerPos(uint8_t Level)
+{
+    if (Level == 1)
+    {
         if (getFreq() == IR_56KHZ)
         {
-            //player 1
+            // player 1
             player1.x = PLAYER_ONE_X_LVL_ONE;
             player1.xOld = player1.x;
             player1.y = PLAYER_ONE_Y_LVL_ONE;
             player1.yOld = player1.y;
-            //player 2
+            // player 2
             player2.x = PLAYER_TWO_X_LVL_ONE;
             player2.xOld = player2.x;
             player2.y = PLAYER_TWO_Y_LVL_ONE;
             player2.yOld = player2.y;
-        }else{
-            //player 1
+        }
+        else
+        {
+            // player 1
             player1.x = PLAYER_TWO_X_LVL_ONE;
             player1.xOld = player1.x;
             player1.y = PLAYER_TWO_Y_LVL_ONE;
             player1.yOld = player1.y;
-            //player 2
+            // player 2
             player2.x = PLAYER_ONE_X_LVL_ONE;
             player2.xOld = player2.x;
             player2.y = PLAYER_ONE_Y_LVL_ONE;
@@ -1414,23 +1492,25 @@ void setPlayerPos(uint8_t Level){
     {
         if (getFreq() == IR_56KHZ)
         {
-            //player 1
+            // player 1
             player1.x = PLAYER_ONE_X_LVL_TWO;
             player1.xOld = player1.x;
             player1.y = PLAYER_ONE_Y_LVL_TWO;
             player1.yOld = player1.y;
-            //player 2
+            // player 2
             player2.x = PLAYER_TWO_X_LVL_TWO;
             player2.xOld = player2.x;
             player2.y = PLAYER_TWO_Y_LVL_TWO;
             player2.yOld = player2.y;
-        }else{
-            //player 1
+        }
+        else
+        {
+            // player 1
             player1.x = PLAYER_TWO_X_LVL_TWO;
             player1.xOld = player1.x;
             player1.y = PLAYER_TWO_Y_LVL_TWO;
             player1.yOld = player1.y;
-            //player 2
+            // player 2
             player2.x = PLAYER_ONE_X_LVL_TWO;
             player2.xOld = player2.x;
             player2.y = PLAYER_ONE_Y_LVL_TWO;
@@ -1442,14 +1522,17 @@ void setPlayerPos(uint8_t Level){
 // Function to cleat and draw Player1 and Player2
 void drawPlayers()
 {
-    if(getFreq() == IR_56KHZ){
+    if (getFreq() == IR_56KHZ)
+    {
         // Clear old playersprite and draw new one
         clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
         drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
         // Clear old playersprite and draw new one
         clearSprite(player2.x, player2.y, player2.xOld, player2.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
         drawSprite(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
-    }else{
+    }
+    else
+    {
         // Clear old playersprite and draw new one
         clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
         drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player2);
@@ -1493,8 +1576,8 @@ void clearSprite(uint16_t x, uint8_t y, uint16_t xOld, uint8_t yOld, uint8_t w, 
 // Function to clear a give sprite in is entirety
 void clearWholeSprite(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
 {
-    x-=2;
-    w+=4;
+    x -= 2;
+    w += 4;
     // For every pixelgroup in the sprite (2 pixels per group)
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
@@ -1701,7 +1784,7 @@ void drawSpriteMirror(uint16_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t
 // Function to draw a background tile
 void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
 {
-    //loop through all the pixelgroups in the sprite (2 pixels per pixelgroup)
+    // loop through all the pixelgroups in the sprite (2 pixels per pixelgroup)
     for (uint16_t PixGroup = 0; PixGroup < w * h; PixGroup++)
     {
         // If the current pixelgroup is at the width of the sprite
@@ -1716,7 +1799,7 @@ void drawBackgroundTile(uint16_t x, uint8_t y, uint8_t w, uint8_t h)
         {
             // Get the colour of the pixel for the background
             uint16_t colour = getcolour(((pgm_read_byte(&Background[PixGroup]) & ((Pixel) ? 0x0F : 0xF0)) >> ((Pixel) ? 0 : 4)));
-            //for each initialized wall
+            // for each initialized wall
             for (auto r : walls)
             {
                 // If the current pixel is in the wall
@@ -1763,7 +1846,7 @@ void drawInteractables()
     {
         L->draw();
     }
-    //Draw both doors
+    // Draw both doors
     drawDoor(Door1.x, Door1.y, Door1.width, Door1.height, 0);
     drawDoor(Door2.x, Door2.y, Door2.width, Door2.height, 1);
 }
@@ -1771,6 +1854,8 @@ void drawInteractables()
 // Function to initialize level 1
 void level1()
 {
+    currentlyPlayingLevel = 1;
+
     // Initialize walls
     walls[0] = {0, 0, 10, 240};
     walls[1] = {10, 0, 310, 10};
@@ -1791,9 +1876,9 @@ void level1()
     walls[16] = {138, 0, 48, 22};
 
     // door blue
-    Door1 = {55, 40, DOOR_WIDTH, DOOR_HEIGHT}; 
+    Door1 = {55, 40, DOOR_WIDTH, DOOR_HEIGHT};
     // door red
-    Door2 = {80, 40, DOOR_WIDTH, DOOR_HEIGHT}; 
+    Door2 = {80, 40, DOOR_WIDTH, DOOR_HEIGHT};
 
     // water
     liq1 = {155, 230, LIQUID_WIDTH, LIQUID_HEIGHT, 0};
@@ -1804,7 +1889,7 @@ void level1()
 
     // main purple platform
     Platform1 = {{280, 70, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 280, 280, 72, 112};
-    //yellow platform
+    // yellow platform
     Platform2 = {{10, 111, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 10, 10, 111, 141, 1};
     // purple platform for the diamonds
     Platform3 = {{40, 10, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 40, 70, 10, 10};
@@ -1813,20 +1898,20 @@ void level1()
     Lever1 = {{93, 149, 2, 1}, false, false, {&Platform2}, 1};
 
     // button for purple platform
-    button1 = {{146, 108, BUTTON_WIDTH*2, 2}, false, {&Platform1, &Platform3}, 0};
+    button1 = {{146, 108, BUTTON_WIDTH * 2, 2}, false, {&Platform1, &Platform3}, 0};
     // button for purple platform
-    button2 = {{181, 48, BUTTON_WIDTH*2, 2}, false, {&Platform1, &Platform3}, 0};
+    button2 = {{181, 48, BUTTON_WIDTH * 2, 2}, false, {&Platform1, &Platform3}, 0};
 
     // Connect buttons 1 and 2 to eachother
     button1.setConnectedButton(&button2);
     button2.setConnectedButton(&button1);
 
     // blue diamond upperleft
-    Dia1 = {12, 12, DIA_WIDTH * 4, DIA_HEIGHT, 0}; 
+    Dia1 = {12, 12, DIA_WIDTH * 4, DIA_HEIGHT, 0};
     // blue diamond bottom
     Dia2 = {164, 216, DIA_WIDTH * 4, DIA_HEIGHT, 0};
     // red diamond upperleft
-    Dia3 = {26, 12, DIA_WIDTH * 4, DIA_HEIGHT, 1}; 
+    Dia3 = {26, 12, DIA_WIDTH * 4, DIA_HEIGHT, 1};
     // red diamond bottom
     Dia4 = {229, 216, DIA_WIDTH * 4, DIA_HEIGHT, 1};
 
@@ -1867,74 +1952,72 @@ void level2()
     walls[19] = {280, 178, 35, 17};
 
     // door blue
-    Door1 = {45, 35, DOOR_WIDTH, DOOR_HEIGHT}; 
+    Door1 = {45, 35, DOOR_WIDTH, DOOR_HEIGHT};
     // door red
-    Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT}; 
+    Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT};
 
     // water left
-    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0}; 
+    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0};
     // lava left top
-    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; 
+    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1};
     // lava left bottom
-    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1}; 
+    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1};
     // poison middle
-    liq4 = {116, 178, 114, LIQUID_HEIGHT, 2}; 
+    liq4 = {116, 178, 114, LIQUID_HEIGHT, 2};
 
     // purple platform
-    Platform1 = {{5, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 5, 5, 6, 27, 0};           
+    Platform1 = {{5, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 5, 5, 6, 27, 0};
     // yellow platform
-    Platform2 = {{40, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 40, 40, 6, 27, 1};        
+    Platform2 = {{40, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 40, 40, 6, 27, 1};
     // Red platform left
-    Platform3 = {{127, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 127, 88, 5, 5, 2};        
+    Platform3 = {{127, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 127, 88, 5, 5, 2};
     // Red platform right
-    Platform4 = {{260, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 260, 221, 5, 5, 2};       
+    Platform4 = {{260, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 260, 221, 5, 5, 2};
     // Green platform left
-    Platform5 = {{65, 88, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 65, 104, 88, 88, 3};      
+    Platform5 = {{65, 88, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 65, 104, 88, 88, 3};
     // Blue platform
-    Platform6 = {{73, 118, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 119, 226, 4};    
+    Platform6 = {{73, 118, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 119, 226, 4};
     // Light_blue platform top
-    Platform7 = {{250, 203, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 173, 203, 5}; 
+    Platform7 = {{250, 203, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 173, 203, 5};
     // Light_blue platform bottom
-    Platform8 = {{250, 219, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 189, 219, 5}; 
+    Platform8 = {{250, 219, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 189, 219, 5};
     // White Platform
-    Platform9 = {{285, 150, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 285, 285, 150, 108, 6}; 
+    Platform9 = {{285, 150, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 285, 285, 108, 150, 6};
 
     // Lever light_blue
-    Lever1 = {{280, 34, 2, 1}, true, false, {&Platform7, &Platform8}, 5}; 
+    Lever1 = {{280, 33, 2, 1}, true, false, {&Platform7, &Platform8}, 5};
     // Lever yellow
-    Lever2 = {{310, 34, 2, 1}, true, false, {&Platform2}, 1};             
+    Lever2 = {{310, 33, 2, 1}, true, false, {&Platform2}, 1};
     // Lever green
-    Lever3 = {{299, 177, 2, 1}, false, false, {&Platform5}, 3};           
+    Lever3 = {{299, 176, 2, 1}, false, false, {&Platform5}, 3};
     // Lever purple
-    Lever4 = {{299, 234, 2, 1}, true, false, {&Platform1}, 0};            
+    Lever4 = {{299, 233, 2, 1}, true, false, {&Platform1}, 0};
+    // lever for white platform
+    Lever5 = {{14, 225, 2, 1}, true, false, {&Platform9}, 6};
 
     // button for blue platform
-    button1 = {{127, 233, BUTTON_WIDTH*2, 2}, false, {&Platform6}, 4};            
-    // button for white platform
-    button2 = {{12, 225, BUTTON_WIDTH*2, 2}, false, {&Platform9}, 6};             
+    button1 = {{127, 233, BUTTON_WIDTH * 2, 2}, false, {&Platform6}, 4};
     // button for blue platform
-    button3 = {{12, 176, BUTTON_WIDTH*2, 2}, false, {&Platform6}, 4};             
+    button2 = {{12, 176, BUTTON_WIDTH * 2, 2}, false, {&Platform6}, 4};
     // button for red platform
-    button4 = {{12, 116, BUTTON_WIDTH*2, 2}, false, {&Platform3, &Platform4}, 2}; 
+    button3 = {{12, 116, BUTTON_WIDTH * 2, 2}, false, {&Platform3, &Platform4}, 2};
 
     // Connect buttons 1 and 3 to eachother
-    button1.setConnectedButton(&button3);
-    button3.setConnectedButton(&button1);
-
-    button2.setConnectedButton(&button2);
+    button1.setConnectedButton(&button2);
+    button2.setConnectedButton(&button1);
 
     // blue diamond upperright
-    Dia1 = {286, 10, DIA_WIDTH*4, DIA_HEIGHT, 0}; 
+    Dia1 = {286, 10, DIA_WIDTH * 4, DIA_HEIGHT, 0};
     // red diamond uppermiddle
-    Dia2 = {100, 61, DIA_WIDTH*4, DIA_HEIGHT, 1}; 
+    Dia2 = {100, 61, DIA_WIDTH * 4, DIA_HEIGHT, 1};
     // bue diamond upperleft
-    Dia3 = {39, 101, DIA_WIDTH*4, DIA_HEIGHT, 0}; 
+    Dia3 = {39, 101, DIA_WIDTH * 4, DIA_HEIGHT, 0};
     // red diamond middleleft
-    Dia4 = {39, 163, DIA_WIDTH*4, DIA_HEIGHT, 1};
+    Dia4 = {39, 163, DIA_WIDTH * 4, DIA_HEIGHT, 1};
     // red diamond bottomleft
-    Dia5 = {39, 213, DIA_WIDTH*4, DIA_HEIGHT, 1};
+    Dia5 = {39, 213, DIA_WIDTH * 4, DIA_HEIGHT, 1};
     // blue diamond middleright
-    Dia6 = {252, 137, DIA_WIDTH*4, DIA_HEIGHT, 0};
+    Dia6 = {252, 137, DIA_WIDTH * 4, DIA_HEIGHT, 0};
 
     // draw everything
     drawBackground();
@@ -2004,7 +2087,7 @@ uint16_t getcolour(uint8_t colour, uint8_t ver)
         }
 
     case 7: // 0111
-        //unused
+            // unused
     case 8: // 1000
         return INTER_BROWN;
 
@@ -2043,7 +2126,7 @@ uint16_t getcolour(uint8_t colour, uint8_t ver)
         }
 
     case 11: // 1011
-        // unused
+             // unused
     case 12: // 1100
         return BACKGROUND_LIGHT;
 
@@ -2066,7 +2149,7 @@ void drawPlayerSelectScreen()
     fillScreen(0x0);
     drawString("Player1", 80, 60, 4, PLAYER_RED);
     drawString("Player2", 80, 140, 4, PLAYER_RED);
-    drawBorder(65, 50, 212, 50, 5, PLAYER_ORANGE); // Player1 button
+    drawBorder(65, 50, 212, 50, 5, PLAYER_ORANGE);  // Player1 button
     drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); // Player2 button
 }
 
@@ -2075,9 +2158,9 @@ void drawMenu()
 {
     fillScreen(0x0);
     // Play button
-    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE); 
+    drawBorder(110, 50, 116, 50, 5, PLAYER_ORANGE);
     // Settings button
-    drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE); 
+    drawBorder(65, 130, 212, 50, 5, PLAYER_ORANGE);
     drawString("Play", 120, 60, 4, PLAYER_RED);
     drawString("Settings", 75, 140, 4, PLAYER_RED);
 }
@@ -2094,7 +2177,7 @@ void drawLevelSelectScreen()
     // Level 1 button
     drawBorder(45, 191, 229, 42, 5, PLAYER_BLUE);
     // Level 2 button
-    if(level2Unlocked)
+    if (level2Unlocked)
     {
         drawBorder(45, 131, 229, 42, 5, PLAYER_BLUE);
     }
@@ -2103,7 +2186,7 @@ void drawLevelSelectScreen()
         drawBorder(45, 131, 229, 42, 5, PLAYER_RED);
     }
     // Level 3 button
-    if(level3Unlocked)
+    if (level3Unlocked)
     {
         drawBorder(45, 71, 229, 42, 5, PLAYER_BLUE);
     }
@@ -2112,7 +2195,7 @@ void drawLevelSelectScreen()
         drawBorder(45, 71, 229, 42, 5, PLAYER_RED);
     }
     // Exit button
-    drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);  
+    drawBorder(14, 0, 294, 49, 5, PLAYER_BLUE);
     drawString("Level 1", 75, 197, 4, WHITE);
     drawString("Level 2", 75, 137, 4, WHITE);
     drawString("Level 3", 75, 77, 4, WHITE);
@@ -2131,7 +2214,7 @@ void setLives(uint8_t &lives)
     // If the amount of lives is greater than the maximum amount of lives.
     if (lives > MAX_LIVES)
     {
-        //set the amount of lives to the maximum amount of lives (5).
+        // set the amount of lives to the maximum amount of lives (5).
         lives = MAX_LIVES;
     }
     // If the amount of lives is 0.
@@ -2141,7 +2224,7 @@ void setLives(uint8_t &lives)
         // currentGameState = GAMEOVER;
         lives = MAX_LIVES; // Resets the lives to 5 if the player has no lives left.
     }
-    //update the amount of lives in the EEPROM.
+    // update the amount of lives in the EEPROM.
     EEPROM_update(LIVES_ADDR, lives);
 }
 

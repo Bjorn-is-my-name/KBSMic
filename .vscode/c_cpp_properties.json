@@ -16,8 +16,7 @@
                 "C:/Users/Jan/.platformio/packages/framework-arduino-avr/variants/standard",
                 "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                 "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/HID/src",
-                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                ""
+                "C:/Users/Jan/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,

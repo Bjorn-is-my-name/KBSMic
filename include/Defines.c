@@ -58,7 +58,7 @@
     #define ZERO_MAX 2
     #define ONE_MIN 1
     #define ONE_MAX 4
-    #define SENDINGDATA_LEN 16 // bits - 1
+    #define SENDINGDATA_LEN 32 // bits - 1
     #define SENDINGBIT_START_VALUE (-2)
 
 // sceen dimensions

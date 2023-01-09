@@ -948,15 +948,15 @@ int main(void)
                 {
                     if (currentHighlightedButton == 0)
                     {
-                        EEPROM_write(20, IR_38KHZ);
-                        setFreq(IR_38KHZ);
+                        EEPROM_write(20, IR_56KHZ);
+                        setFreq(IR_56KHZ);
                         currentGameState = MENU;
                         drawMenu();
                     } else
                     {
                         currentHighlightedButton = 0;
-                        EEPROM_write(20, IR_56KHZ);
-                        setFreq(IR_56KHZ);
+                        EEPROM_write(20, IR_38KHZ);
+                        setFreq(IR_38KHZ);
                         currentGameState = MENU;
                         drawMenu();
                     }
@@ -1149,7 +1149,7 @@ void checkDias()
     {
         // Make a temporary rectangle to check for collision
         Rect temp = {D->x, D->y, D->w, D->h};
-        if(getFreq() == IR_38KHZ)
+        if(getFreq() == IR_56KHZ)
         {
             // If player 1 collides with the correct diamond
             if (rectangleCollision(player1.x, player1.y, temp) && D->version == 0 && !D->collected)
@@ -1226,7 +1226,7 @@ void checkDias()
 
 // Function to check for collision with finishdoors and to finish the level
 void checkFinish(){
-    if(getFreq() == IR_38KHZ)
+    if(getFreq() == IR_56KHZ)
     {
         if (rectangleCollision(player1.x, player1.y, Door1) && rectangleCollision(player2.x, player2.y, Door2))
         {
@@ -1339,7 +1339,7 @@ void checkPoolCollision()
     // For every liquid in the array
     for (auto &liquid : liquids)
     {
-        if (getFreq() == IR_38KHZ)
+        if (getFreq() == IR_56KHZ)
         {
             // If player1 is colliding with the pool
             if (rectangleCollision(player1.x, player1.y, liquid->bounds))
@@ -1385,7 +1385,7 @@ void checkPoolCollision()
 // Function to set the player position correctly
 void setPlayerPos(uint8_t Level){
     if (Level == 1){
-        if (getFreq() == IR_38KHZ)
+        if (getFreq() == IR_56KHZ)
         {
             //player 1
             player1.x = PLAYER_ONE_X_LVL_ONE;
@@ -1412,7 +1412,7 @@ void setPlayerPos(uint8_t Level){
     }
     else if (Level == 2)
     {
-        if (getFreq() == IR_38KHZ)
+        if (getFreq() == IR_56KHZ)
         {
             //player 1
             player1.x = PLAYER_ONE_X_LVL_TWO;
@@ -1442,7 +1442,7 @@ void setPlayerPos(uint8_t Level){
 // Function to cleat and draw Player1 and Player2
 void drawPlayers()
 {
-    if(getFreq() == IR_38KHZ){
+    if(getFreq() == IR_56KHZ){
         // Clear old playersprite and draw new one
         clearSprite(player1.x, player1.y, player1.xOld, player1.yOld, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);
         drawSprite(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT, Player1);

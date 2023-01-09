@@ -54,11 +54,14 @@ struct Diamond
     void draw()
     {
         //if x is null (diamond not initialized) return (don't draw)
-        if (x == NULL) 
+        if (!isInitialized()) 
             return;
         //draw the diamond_sprite and the mirrored version
         drawSprite(x, y, DIA_WIDTH, DIA_HEIGHT, Diamond_Sprite, version);
         drawSpriteMirror(x + DIA_WIDTH * 2, y, DIA_WIDTH, DIA_HEIGHT, Diamond_Sprite, version);
+    }
+    bool isInitialized(){
+        return (x != 0);
     }
 };
 
@@ -82,37 +85,64 @@ struct Platform
     void MoveMax()
     {
         //if x is null (platform not initialized) return (don't draw)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return;
         // If the platform is horizontal
         if (maxX == minX)
         {
+            if(minY > maxY)
+            {
+                MoveMinY();
+            }else
+            {
+                MoveMaxY();
+            }
             // Move the platform to the maximum Y position
-            MoveMaxY();
+            
         }
         // If the platform is vertical
         else if (maxY == minY)
         {
-            // Move the platform to the maximum X position
-            MoveMaxX();
+            if(minX > maxX)
+            {
+                MoveMinX();
+            }else
+            {
+                // Move the platform to the maximum X position
+                MoveMaxX();
+            }
+            
         }
     }
     void MoveMin()
     {
         //if x is null (platform not initialized) return (don't draw)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return;
         // If the platform is horizontal
         if (maxX == minX)
         {
-            // Move the platform to the minimum Y position
-            MoveMinY();
+            if(minY > maxY)
+            {
+                MoveMaxY();
+            }else
+            {
+                // Move the platform to the minimum Y position
+                MoveMinY();
+            }
+            
         }
         // If the platform is vertical
         else if (maxY == minY)
         {
-            // Move the platform to the minimum X position
-            MoveMinX();
+            if(minY > maxY)
+            {
+                MoveMaxX();
+            }else
+            {
+                // Move the platform to the minimum X position
+                MoveMinX();
+            }
         }
     }
 
@@ -176,7 +206,7 @@ struct Platform
     bool isMax()
     {
         //if x is null (platform not initialized) return (don't continue)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return true;
         // If the platform's bounds are directly at the maximum position or the minimum position
         if ((bounds.x >= maxX && bounds.y >= maxY) || (bounds.x <= minX && bounds.y <= minY))
@@ -193,7 +223,7 @@ struct Platform
     void draw()
     {
         //if x is null (platform not initialized) return (don't draw)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return;
         // If the platform is horizontal
         if (maxX == minX)
@@ -207,6 +237,10 @@ struct Platform
             // Draw the platform vertically
             drawPlatV(bounds.x, bounds.y, bounds.width, bounds.height, version);
         }
+    }
+
+    bool isInitialized(){
+        return (bounds.x != 0);
     }
 };
 
@@ -228,7 +262,7 @@ struct lever
     void activate()
     {
         //if x is null (lever not initialized) return (don't draw)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return;
         // If the lever is on
         if (state)
@@ -257,7 +291,7 @@ struct lever
     void draw()
     {
         //if x is null (lever not initialized) return (don't draw)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return;
         // Draw the leverBase
         drawLever(bounds.x - 7, bounds.y + 1);
@@ -272,6 +306,9 @@ struct lever
             // Draw the leverTop to the left
             drawSprite((bounds).x + 1, (bounds).y - 7, LEVER_TOP_WIDTH, LEVER_TOP_HEIGHT, LeverTop, Version);
         }
+    }
+    bool isInitialized(){
+        return (bounds.x != 0);
     }
 };
 
@@ -293,7 +330,7 @@ struct button
     void activate()
     {
         //if x is null (button not initialized) return (don't draw)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return;
         // If player is standing on the button or player is standing on the connected button
         if (standingOn || connectedButton->standingOn)
@@ -320,7 +357,7 @@ struct button
     void draw()
     {
         //if x is null (button not initialized) return (don't draw)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return;
         // Draw the button
         drawSprite((bounds).x - 4, (bounds).y - 3, BUTTON_WIDTH, BUTTON_HEIGHT, Button, Version);
@@ -331,6 +368,10 @@ struct button
     void setConnectedButton(button *btn)
     {
         this->connectedButton = btn;
+    }
+
+    bool isInitialized(){
+       return (bounds.x != 0);
     }
 };
 
@@ -346,10 +387,13 @@ struct Liquid
     void draw()
     {
         //if x is null (liquid not initialized) return (don't draw)
-        if (bounds.x == NULL)
+        if (!isInitialized())
             return;
         // Draw the liquid
         drawLiquid(bounds.x-5, bounds.y, bounds.width+10, bounds.height, Version);
+    }
+    bool isInitialized(){
+        return (bounds.x != 0);
     }
 };
 
@@ -679,11 +723,6 @@ int main(void)
     // Draws the score on the screen.
     uint8_t currentHighlightedButton;
     bool normalState = true;
-
-    // Draws the score on the screen.
-    //#TODO make a wall so the player doesn't go through the score.
-    fillRect(SCORE_POS, 0, 40, 18, BACKGROUND_LIGHT);
-    drawScore(score, false);
     // Loop forever
     while (true)
     {
@@ -1110,39 +1149,77 @@ void checkDias()
     {
         // Make a temporary rectangle to check for collision
         Rect temp = {D->x, D->y, D->w, D->h};
-        // If player 1 collides with the correct diamond
-        if (rectangleCollision(player1.x, player1.y, temp) && D->version == 0 && !D->collected)
+        if(getFreq() == IR_38KHZ)
         {
-            // COLLECT DIAMOND
-            // Update score
-            drawScore(score, true);
-            score += DIAMOND_POINTS;
-            drawScore(score, false);
-            // Set diamond to collected
-            D->collected = true;
-        }
-        // If player 2 collides with the wrong diamond
-        else if (rectangleCollision(player2.x, player2.y, temp) && D->version == 0 && !D->collected)
-        {
-            // Draw it again
-            D->draw();
-        }
-        // If player 1 collides with the wrong diamond
-        else if (rectangleCollision(player1.x, player1.y, temp) && D->version == 1 && !D->collected)
-        {
-            // wrong diamond so draw it again
-            D->draw();
-        }
-        // If player 2 collides with the correct diamond
-        else if (rectangleCollision(player2.x, player2.y, temp) && D->version == 1 && !D->collected)
-        {
-            // COLLECT DIAMOND
-            // Update score
-            drawScore(score, true);
-            score += DIAMOND_POINTS;
-            drawScore(score, false);
-            // Set diamond to collected
-            D->collected = true;
+            // If player 1 collides with the correct diamond
+            if (rectangleCollision(player1.x, player1.y, temp) && D->version == 0 && !D->collected)
+            {
+                // COLLECT DIAMOND
+                // Update score
+                drawScore(score, true);
+                score += DIAMOND_POINTS;
+                drawScore(score, false);
+                // Set diamond to collected
+                D->collected = true;
+            }
+            // If player 2 collides with the wrong diamond
+            else if (rectangleCollision(player2.x, player2.y, temp) && D->version == 0 && !D->collected)
+            {
+                // Draw it again
+                D->draw();
+            }
+            // If player 1 collides with the wrong diamond
+            else if (rectangleCollision(player1.x, player1.y, temp) && D->version == 1 && !D->collected)
+            {
+                // wrong diamond so draw it again
+                D->draw();
+            }
+            // If player 2 collides with the correct diamond
+            else if (rectangleCollision(player2.x, player2.y, temp) && D->version == 1 && !D->collected)
+            {
+                // COLLECT DIAMOND
+                // Update score
+                drawScore(score, true);
+                score += DIAMOND_POINTS;
+                drawScore(score, false);
+                // Set diamond to collected
+                D->collected = true;
+            }
+        }else {
+            // If player 1 collides with the correct diamond
+            if (rectangleCollision(player1.x, player1.y, temp) && D->version == 1 && !D->collected)
+            {
+                // COLLECT DIAMOND
+                // Update score
+                drawScore(score, true);
+                score += DIAMOND_POINTS;
+                drawScore(score, false);
+                // Set diamond to collected
+                D->collected = true;
+            }
+            // If player 2 collides with the wrong diamond
+            else if (rectangleCollision(player2.x, player2.y, temp) && D->version == 1 && !D->collected)
+            {
+                // Draw it again
+                D->draw();
+            }
+            // If player 1 collides with the wrong diamond
+            else if (rectangleCollision(player1.x, player1.y, temp) && D->version == 0 && !D->collected)
+            {
+                // wrong diamond so draw it again
+                D->draw();
+            }
+            // If player 2 collides with the correct diamond
+            else if (rectangleCollision(player2.x, player2.y, temp) && D->version == 0 && !D->collected)
+            {
+                // COLLECT DIAMOND
+                // Update score
+                drawScore(score, true);
+                score += DIAMOND_POINTS;
+                drawScore(score, false);
+                // Set diamond to collected
+                D->collected = true;
+            }
         }
     }
 }
@@ -1154,11 +1231,11 @@ void checkFinish(){
         if (rectangleCollision(player1.x, player1.y, Door1) && rectangleCollision(player2.x, player2.y, Door2))
         {
             //unlock next level
-            // if(level == 1){
-                // level2Unlocked = true;
-            // }else if(level == 2){
-                // level3Unlocked = true;
-            // }
+            if(level == 1){
+                level2Unlocked = true;
+            }else if(level == 2){
+                level3Unlocked = true;
+            }
             // Update highscore
             updateHighscore(score, level);
             // Set the current game state to the level select screen
@@ -1711,6 +1788,7 @@ void level1()
     walls[13] = {150, 180, 104, 10};
     walls[14] = {280, 210, 30, 20};
     walls[15] = {10, 190, 80, 10};
+    walls[16] = {138, 0, 48, 22};
 
     // door blue
     Door1 = {55, 40, DOOR_WIDTH, DOOR_HEIGHT}; 
@@ -1767,8 +1845,8 @@ void level2()
     setPlayerPos(2);
 
     // initialize walls
-    walls[0] = {0, 0, 5, 240};
-    walls[1] = {5, 0, 310, 5};
+    walls[0] = {0, 0, 6, 240};
+    walls[1] = {6, 0, 310, 5};
     walls[2] = {315, 0, 5, 240};
     walls[3] = {5, 235, 310, 5};
     walls[4] = {5, 227, 68, 8};
@@ -1842,6 +1920,8 @@ void level2()
     // Connect buttons 1 and 3 to eachother
     button1.setConnectedButton(&button3);
     button3.setConnectedButton(&button1);
+
+    button2.setConnectedButton(&button2);
 
     // blue diamond upperright
     Dia1 = {286, 10, DIA_WIDTH*4, DIA_HEIGHT, 0}; 

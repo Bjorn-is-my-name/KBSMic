@@ -83,7 +83,7 @@
 // interactibles defines
     #define BUTTON_WIDTH 3
     #define BUTTON_HEIGHT 4
-    #define LIQUID_WIDTH 38
+    #define LIQUID_WIDTH 30
     #define LIQUID_HEIGHT 5
     #define DOOR_WIDTH 20
     #define DOOR_HEIGHT 30

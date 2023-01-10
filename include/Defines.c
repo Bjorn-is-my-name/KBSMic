@@ -36,6 +36,13 @@
         #define PLAYER_TWO_X_LVL_TWO 187
         #define PLAYER_TWO_Y_LVL_TWO 215
 
+    //level three
+        #define PLAYER_ONE_X_LVL_THREE 274
+        #define PLAYER_ONE_Y_LVL_THREE 170
+
+        #define PLAYER_TWO_X_LVL_THREE 274
+        #define PLAYER_TWO_Y_LVL_THREE 210
+
 // Nunchuk defines
     #define IO_ADDR (0x39) // The port expander I2C address.
     #define NUNCHUK_ADDRESS 0x52

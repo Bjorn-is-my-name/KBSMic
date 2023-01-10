@@ -513,7 +513,7 @@ uint8_t level = 1;
 uint8_t currentlyPlayingLevel = 0;
 uint8_t currentlyPlayingLevelReceived = 0;
 uint8_t level2Unlocked = 1;
-uint8_t level3Unlocked = 0;
+uint8_t level3Unlocked = 1;
 uint8_t player_accel = 0;
 bool levelCompleted = false;
 bool playerDied = false;
@@ -654,11 +654,10 @@ ISR(TIMER0_COMPA_vect)
 // Main Function
 int main(void)
 {
-    // for (uint8_t i = 0; i < 254; i++)
-    // {
-    //     EEPROM_write(i, 0);
-    // }
-    // EEPROM_write(255, 0);
+    for (uint8_t i = 0; i < 255; i++)
+    {
+        EEPROM_write(i, 0);
+    }
 
     // Setup IR led
     // Set pin 6 as output
@@ -856,9 +855,9 @@ int main(void)
                         level2();
                         break;
                     case 3:
-                        // level = 3;
-                        //currentGameState = GAME;
-                        // Level3();
+                        level = 3;
+                        currentGameState = GAME;
+                        level3();
                         break;
                     default:
                         currentGameState = MENU;
@@ -963,12 +962,12 @@ int main(void)
                             }
                             break;
                         case 2:
-                            // if(level3Unlocked && getFreq() == IR_56KHZ)
-                            //{
-                            // currentGameState = GAME;
-                            // level = 3;
-                            // level3();
-                            //}
+                            if(level3Unlocked && getFreq() == IR_56KHZ)
+                            {
+                                currentGameState = GAME;
+                                level = 3;
+                                level3();
+                            }
                             break;
                         case 3: // Exit button
                             currentGameState = MENU;
@@ -1520,6 +1519,35 @@ void setPlayerPos(uint8_t Level)
             player2.yOld = player2.y;
         }
     }
+    else if (Level == 3)
+    {
+        if (getFreq() == IR_56KHZ)
+        {
+            // player 1
+            player1.x = PLAYER_ONE_X_LVL_THREE;
+            player1.xOld = player1.x;
+            player1.y = PLAYER_ONE_Y_LVL_THREE;
+            player1.yOld = player1.y;
+            // player 2
+            player2.x = PLAYER_TWO_X_LVL_THREE;
+            player2.xOld = player2.x;
+            player2.y = PLAYER_TWO_Y_LVL_THREE;
+            player2.yOld = player2.y;
+        }
+        else
+        {
+            // player 1
+            player1.x = PLAYER_TWO_X_LVL_THREE;
+            player1.xOld = player1.x;
+            player1.y = PLAYER_TWO_Y_LVL_THREE;
+            player1.yOld = player1.y;
+            // player 2
+            player2.x = PLAYER_ONE_X_LVL_THREE;
+            player2.xOld = player2.x;
+            player2.y = PLAYER_ONE_Y_LVL_THREE;
+            player2.yOld = player2.y;
+        }
+    }
 }
 
 // Function to cleat and draw Player1 and Player2
@@ -2049,73 +2077,41 @@ void level3()
     walls[9]  = {175, 69, 25, 41};   //
     walls[10] = {230, 39, 90, 71};   //
 
-    // door blue
-    Door1 = {45, 35, DOOR_WIDTH, DOOR_HEIGHT};
     // door red
-    Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT};
+    Door2 = {290, 160, DOOR_WIDTH, DOOR_HEIGHT};    //
+    // door blue
+    Door1 = {290, 200, DOOR_WIDTH, DOOR_HEIGHT};    //
 
-    // water left
-    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0};
-    // lava left top
-    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1};
-    // lava left bottom
-    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1};
-    // poison middle
-    liq4 = {116, 178, 114, LIQUID_HEIGHT, 2};
+    // Poison
+    liq1 = {69, 190, 200, LIQUID_HEIGHT, 2};    //
 
     // purple platform
-    Platform1 = {{5, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 5, 5, 6, 27, 0};
-    // yellow platform
-    Platform2 = {{40, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 40, 40, 6, 27, 1};
-    // Red platform left
-    Platform3 = {{127, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 127, 88, 5, 5, 2};
-    // Red platform right
-    Platform4 = {{260, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 260, 221, 5, 5, 2};
-    // Green platform left
-    Platform5 = {{65, 88, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 65, 104, 88, 88, 3};
+    Platform1 = {{145, 93, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 145, 145, 93, 143, 0};     //
     // Blue platform
-    Platform6 = {{73, 118, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 119, 226, 4};
-    // Light_blue platform top
-    Platform7 = {{250, 203, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 173, 203, 5};
+    Platform2 = {{89, 69, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 69, 169, 4};        //
     // Light_blue platform bottom
-    Platform8 = {{250, 219, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 189, 219, 5};
+    Platform3 = {{200, 69, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 200, 200, 69, 169, 5};     //
     // White Platform
-    Platform9 = {{285, 150, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 285, 285, 108, 150, 6};
+    Platform4 = {{30, 192, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 30, 30, 110, 192, 6};      //
 
-    // Lever light_blue
-    Lever1 = {{280, 33, 2, 1}, true, false, {&Platform7, &Platform8}, 5};
-    // Lever yellow
-    Lever2 = {{310, 33, 2, 1}, true, false, {&Platform2}, 1};
-    // Lever green
-    Lever3 = {{299, 176, 2, 1}, false, false, {&Platform5}, 3};
-    // Lever purple
-    Lever4 = {{299, 233, 2, 1}, true, false, {&Platform1}, 0};
     // lever for white platform
-    Lever5 = {{14, 225, 2, 1}, true, false, {&Platform9}, 6};
+    Lever5 = {{18, 189, 2, 1}, true, false, {&Platform4}, 6};
 
-    // button for blue platform
-    button1 = {{127, 233, BUTTON_WIDTH * 2, 2}, false, {&Platform6}, 4};
-    // button for blue platform
-    button2 = {{12, 176, BUTTON_WIDTH * 2, 2}, false, {&Platform6}, 4};
+    // button for purple platform
+    button1 = {{100, 228, BUTTON_WIDTH * 2, 2}, false, {&Platform1}, 0};    //
+    // button for Light_blue platform
+    button2 = {{161, 228, BUTTON_WIDTH * 2, 2}, false, {&Platform3}, 5};    //
     // button for red platform
-    button3 = {{12, 116, BUTTON_WIDTH * 2, 2}, false, {&Platform3, &Platform4}, 2};
+    button3 = {{216, 228, BUTTON_WIDTH * 2, 2}, false, {&Platform2}, 4};    //
 
-    // Connect buttons 1 and 3 to eachother
-    button1.setConnectedButton(&button2);
-    button2.setConnectedButton(&button1);
-
-    // blue diamond upperright
-    Dia1 = {286, 10, DIA_WIDTH * 4, DIA_HEIGHT, 0};
-    // red diamond uppermiddle
-    Dia2 = {100, 61, DIA_WIDTH * 4, DIA_HEIGHT, 1};
-    // bue diamond upperleft
-    Dia3 = {39, 101, DIA_WIDTH * 4, DIA_HEIGHT, 0};
+    // red diamond left
+    Dia1 = {97, 149, DIA_WIDTH * 4, DIA_HEIGHT, 1};     //
+    // red diamond upperRight
+    Dia2 = {207, 51, DIA_WIDTH * 4, DIA_HEIGHT, 1};     //
+    // bue diamond upperRight
+    Dia3 = {154, 51, DIA_WIDTH * 4, DIA_HEIGHT, 0};     //
     // red diamond middleleft
-    Dia4 = {39, 163, DIA_WIDTH * 4, DIA_HEIGHT, 1};
-    // red diamond bottomleft
-    Dia5 = {39, 213, DIA_WIDTH * 4, DIA_HEIGHT, 1};
-    // blue diamond middleright
-    Dia6 = {252, 137, DIA_WIDTH * 4, DIA_HEIGHT, 0};
+    Dia4 = {210, 150, DIA_WIDTH * 4, DIA_HEIGHT, 0};    //
 
     // draw everything
     drawBackground();
@@ -2131,23 +2127,35 @@ void ClearLevel(){
     
     Door1 = {};
     Door2 = {};
-
-    for(auto &liq : liquids){
-        liq = {};
-    }
-    for(auto &plat : platforms){
-        plat = {};
-    }
-    for(auto &lever : levers){
-        lever = {};
-    }
-    for(auto &button : buttons){
-        button = {};
-    }
-    for(auto &dia : Dias){
-        dia = {};
-    }
+    Platform1 = {};
+    Platform2 = {};
+    Platform3 = {};
+    Platform4 = {};
+    Platform5 = {};
+    Platform6 = {};
+    Platform7 = {};
+    Platform8 = {};
+    Platform9 = {};
+    Lever1 = {};
+    Lever2 = {};
+    Lever3 = {};
+    Lever4 = {};
+    Lever5 = {};
+    button1 = {};
+    button2 = {};
+    button3 = {};
+    Dia1 = {};
+    Dia2 = {};
+    Dia3 = {};
+    Dia4 = {};
+    Dia5 = {};
+    Dia6 = {};
+    liq1 = {};
+    liq2 = {};
+    liq3 = {};
+    liq4 = {};
 }
+
 // Function to convert a 4 bit colour to a 16 bit colour
 uint16_t getcolour(uint8_t colour, uint8_t ver)
 {

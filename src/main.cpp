@@ -654,11 +654,11 @@ ISR(TIMER0_COMPA_vect)
 // Main Function
 int main(void)
 {
-    for (uint8_t i = 0; i < 254; i++)
-    {
-        EEPROM_write(i, 0);
-    }
-    EEPROM_write(255, 0);
+    // for (uint8_t i = 0; i < 254; i++)
+    // {
+    //     EEPROM_write(i, 0);
+    // }
+    // EEPROM_write(255, 0);
 
     // Setup IR led
     // Set pin 6 as output
@@ -847,14 +847,17 @@ int main(void)
                     {
                     case 1:
                         level = 1;
+                        currentGameState = GAME;
                         level1();
                         break;
                     case 2:
                         level = 2;
+                        currentGameState = GAME;
                         level2();
                         break;
                     case 3:
                         // level = 3;
+                        //currentGameState = GAME;
                         // Level3();
                         break;
                     default:

@@ -1857,6 +1857,7 @@ void drawInteractables()
 // Function to initialize level 1
 void level1()
 {
+    ClearLevel();
     currentlyPlayingLevel = 1;
 
     // Initialize walls
@@ -1929,6 +1930,7 @@ void level1()
 // Function to initialize level 2
 void level2()
 {
+    ClearLevel();
     // set player positions
     setPlayerPos(2);
 
@@ -2027,6 +2029,125 @@ void level2()
     drawInteractables();
 }
 
+// Function to initialize level 3
+void level3()
+{
+    ClearLevel();
+    // set player positions
+    setPlayerPos(3);
+
+    // initialize walls
+    walls[0]  = {0, 0, 320, 39};     //
+    walls[1]  = {0, 39, 145, 30};    //
+    walls[2]  = {0, 69, 89, 41};     //
+    walls[3]  = {119, 69, 26, 41};   //
+    walls[4]  = {0, 110, 10, 130};   //
+    walls[5]  = {10, 190, 20, 10};   //
+    walls[6]  = {10, 230, 310, 10};  //
+    walls[7]  = {60, 190, 250, 10};  //
+    walls[8]  = {310, 110, 10, 120}; //
+    walls[9]  = {175, 69, 25, 41};   //
+    walls[10] = {230, 39, 90, 71};   //
+
+    // door blue
+    Door1 = {45, 35, DOOR_WIDTH, DOOR_HEIGHT};
+    // door red
+    Door2 = {10, 35, DOOR_WIDTH, DOOR_HEIGHT};
+
+    // water left
+    liq1 = {27, 118, LIQUID_WIDTH, LIQUID_HEIGHT, 0};
+    // lava left top
+    liq2 = {27, 178, LIQUID_WIDTH, LIQUID_HEIGHT, 1};
+    // lava left bottom
+    liq3 = {27, 227, LIQUID_WIDTH, LIQUID_HEIGHT, 1};
+    // poison middle
+    liq4 = {116, 178, 114, LIQUID_HEIGHT, 2};
+
+    // purple platform
+    Platform1 = {{5, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 5, 5, 6, 27, 0};
+    // yellow platform
+    Platform2 = {{40, 27, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 40, 40, 6, 27, 1};
+    // Red platform left
+    Platform3 = {{127, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 127, 88, 5, 5, 2};
+    // Red platform right
+    Platform4 = {{260, 5, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 260, 221, 5, 5, 2};
+    // Green platform left
+    Platform5 = {{65, 88, PLATFORM_HEIGHT, PLATFORM_WIDTH}, 65, 104, 88, 88, 3};
+    // Blue platform
+    Platform6 = {{73, 118, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 119, 226, 4};
+    // Light_blue platform top
+    Platform7 = {{250, 203, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 173, 203, 5};
+    // Light_blue platform bottom
+    Platform8 = {{250, 219, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 250, 250, 189, 219, 5};
+    // White Platform
+    Platform9 = {{285, 150, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 285, 285, 108, 150, 6};
+
+    // Lever light_blue
+    Lever1 = {{280, 33, 2, 1}, true, false, {&Platform7, &Platform8}, 5};
+    // Lever yellow
+    Lever2 = {{310, 33, 2, 1}, true, false, {&Platform2}, 1};
+    // Lever green
+    Lever3 = {{299, 176, 2, 1}, false, false, {&Platform5}, 3};
+    // Lever purple
+    Lever4 = {{299, 233, 2, 1}, true, false, {&Platform1}, 0};
+    // lever for white platform
+    Lever5 = {{14, 225, 2, 1}, true, false, {&Platform9}, 6};
+
+    // button for blue platform
+    button1 = {{127, 233, BUTTON_WIDTH * 2, 2}, false, {&Platform6}, 4};
+    // button for blue platform
+    button2 = {{12, 176, BUTTON_WIDTH * 2, 2}, false, {&Platform6}, 4};
+    // button for red platform
+    button3 = {{12, 116, BUTTON_WIDTH * 2, 2}, false, {&Platform3, &Platform4}, 2};
+
+    // Connect buttons 1 and 3 to eachother
+    button1.setConnectedButton(&button2);
+    button2.setConnectedButton(&button1);
+
+    // blue diamond upperright
+    Dia1 = {286, 10, DIA_WIDTH * 4, DIA_HEIGHT, 0};
+    // red diamond uppermiddle
+    Dia2 = {100, 61, DIA_WIDTH * 4, DIA_HEIGHT, 1};
+    // bue diamond upperleft
+    Dia3 = {39, 101, DIA_WIDTH * 4, DIA_HEIGHT, 0};
+    // red diamond middleleft
+    Dia4 = {39, 163, DIA_WIDTH * 4, DIA_HEIGHT, 1};
+    // red diamond bottomleft
+    Dia5 = {39, 213, DIA_WIDTH * 4, DIA_HEIGHT, 1};
+    // blue diamond middleright
+    Dia6 = {252, 137, DIA_WIDTH * 4, DIA_HEIGHT, 0};
+
+    // draw everything
+    drawBackground();
+    drawInteractables();
+}
+
+
+void ClearLevel(){
+    for (uint8_t i = 0; i < 20; i++)
+    {
+        walls[i] = {};
+    }
+    
+    Door1 = {};
+    Door2 = {};
+
+    for(auto &liq : liquids){
+        liq = {};
+    }
+    for(auto &plat : platforms){
+        plat = {};
+    }
+    for(auto &lever : levers){
+        lever = {};
+    }
+    for(auto &button : buttons){
+        button = {};
+    }
+    for(auto &dia : Dias){
+        dia = {};
+    }
+}
 // Function to convert a 4 bit colour to a 16 bit colour
 uint16_t getcolour(uint8_t colour, uint8_t ver)
 {

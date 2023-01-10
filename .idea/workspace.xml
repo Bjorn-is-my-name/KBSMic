@@ -26,9 +26,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="highscore menu en miss tone">
+    <list default="true" id="ae8351d3-5a7e-4e7b-8cc2-625aa035fb60" name="Changes" comment="clear eeprom function">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Defines.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/Defines.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/EEPROM.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/EEPROM.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Nunchuk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/Nunchuk.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/main.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/main.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -220,7 +223,7 @@
       <workItem from="1672836125878" duration="6968000" />
       <workItem from="1672911357479" duration="752000" />
       <workItem from="1673256926911" duration="15674000" />
-      <workItem from="1673344416571" duration="1553000" />
+      <workItem from="1673344416571" duration="6895000" />
     </task>
     <task id="LOCAL-00001" summary="update to most recent version">
       <created>1670243123875</created>
@@ -432,7 +435,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673272368904</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="clear eeprom function">
+      <created>1673346175182</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1673346175182</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -451,7 +461,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="fillscreen toegevoegd" />
     <MESSAGE value="fillRect gedaan want bjorn miept" />
     <MESSAGE value="cruciaal ! vergeten" />
     <MESSAGE value="nunchuk libary geoptimized (973Bytes ram)" />
@@ -476,7 +485,8 @@
     <MESSAGE value="0xFFFF naar WHITE veranderd" />
     <MESSAGE value="optimalisaties en defines en andere zooi #duidelijk" />
     <MESSAGE value="highscore menu en miss tone" />
-    <option name="LAST_COMMIT_MESSAGE" value="highscore menu en miss tone" />
+    <MESSAGE value="clear eeprom function" />
+    <option name="LAST_COMMIT_MESSAGE" value="clear eeprom function" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

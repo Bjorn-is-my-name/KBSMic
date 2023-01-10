@@ -3,7 +3,7 @@
 // Function to write a byte of data to the EEPROM at a specified address
 void EEPROM_write(unsigned short uiAddress, unsigned char ucData)
 {
-    while (EECR & (1 << EEPE)); // Wait for the previous write operation to complete  
+    while (EECR & (1 << EEPE)); // Wait for the previous write operation to complete
     EEAR = uiAddress; // Set the address to write to in the EEAR register
     EEDR = ucData; // Place the data to be written in the EEDR register
     EECR |= 1 << EEMPE; // Set the EEMPE bit to indicate a write operation is coming

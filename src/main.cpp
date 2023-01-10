@@ -269,13 +269,13 @@ struct lever
         {
             // move platform
             plat[0]->MoveMax();
-            if (plat[1] != NULL)
+            if (plat[1] != nullptr)
                 plat[1]->MoveMax();
         } else
         {
             // move platform back
             plat[0]->MoveMin();
-            if (plat[1] != NULL)
+            if (plat[1] != nullptr)
                 plat[1]->MoveMin();
         }
         // If controlled platform is not at the maximum position
@@ -466,7 +466,10 @@ const uint8_t liveCount[] = {
 // For checking to see if the current bit is done sending
 bool dataIsSend = false;
 // Data to send over IR
-uint32_t sendingData = 0;
+uint16_t sendingData = 0;
+// Keeps track of the variable send
+uint8_t sendingPackageNumber = 0;
+uint8_t packageLength = 3;
 // The data bit to send;
 int8_t sendingBit = SENDINGBIT_START_VALUE;
 // Controls the on and off time of the IR LED
@@ -496,12 +499,16 @@ uint32_t startMs = 0;
 // Tracks if the staring bit was received before accepting data
 bool startBitReceived = false;
 // All the received bits
-volatile uint32_t receivedData = 0;
-uint32_t printedData = 0;
+uint16_t receivedData = 0;
+// Header of the incoming data
+uint8_t packageHeader = 0;
+// Lenght of the incoming package
+uint8_t receivingPackageLength = 0;
 // Current bit (used for bitshifting 1's in to receivedData)
 uint8_t bitCounter = 0;
 // Differentiates data from pauses
 bool isDataBit = false;
+
 
 // Other variables
 uint8_t lives = MAX_LIVES;
@@ -529,6 +536,9 @@ enum gameState
     HIGHSCORE_SCREEN
 } currentGameState;
 
+
+
+
 // IR receiving protocol
 ISR(PCINT2_vect)
 {
@@ -543,39 +553,92 @@ ISR(PCINT2_vect)
         // If the start bit has been send, check what the data is
         if (startBitReceived)
         {
-            // Check if its a zero
-            if (difference < ZERO_MAX)
+            if (bitCounter < 3)
             {
-                receivedData &= ~(1 << bitCounter++);
-            }
-                // Else it's a one
-            else
-            {
-                receivedData |= (1 << bitCounter++);
-            }
-
-            // If all bits are send, save the value in the variable
-            if (bitCounter == SENDINGDATA_LEN + 1)
-            {
-                playerDied |= (receivedData & 1);
-
-                uint8_t receivedLives = ((receivedData >> 1) & 7);
-                if (receivedLives < lives)
+                // Check if its a zero
+                if (difference < ZERO_MAX)
                 {
-                    lives = receivedLives;
-//                    setLives(lives);
-//                    showLives(lives);
+                    packageHeader &= ~(1 << bitCounter++);
+                }
+                    // Else its a one
+                else
+                {
+                    packageHeader |= (1 << bitCounter++);
+                }
+            }
+            if (bitCounter == PACKAGE_HEADER_LENGTH)
+            {
+                switch (packageHeader)
+                {
+                    case PACKAGE1_HEADER:
+                        receivingPackageLength = PACKAGE1_LENGTH;
+                        break;
+                    case PACKAGE2_HEADER:
+                        receivingPackageLength = PACKAGE2_LENGTH;
+                        break;
+                    case PACKAGE3_HEADER:
+                        receivingPackageLength = PACKAGE3_LENGTH;
+                        break;
+                    case PACKAGE4_HEADER:
+                        receivingPackageLength = PACKAGE4_LENGTH;
+                        break;
+                    case PACKAGE5_HEADER:
+                        receivingPackageLength = PACKAGE5_LENGTH;
+                        break;
+                    default:
+                        receivingPackageLength = EMPTY_PACKAGE_LENGTH;
+                        break;
+                }
+            }
+
+            if (bitCounter >= 3)
+            {
+                // Check if its a zero
+                if (difference < ZERO_MAX)
+                {
+                    receivedData &= ~(1 << (bitCounter - PACKAGE_HEADER_LENGTH - 1));
+                }
+                    // Else its a one
+                else
+                {
+                    receivedData |= (1 << (bitCounter - PACKAGE_HEADER_LENGTH - 1));
                 }
 
-                currentlyPlayingLevelReceived = ((receivedData >> 4) & 3);
+                // If all bits are send read the data
+                if (bitCounter == receivingPackageLength)
+                {
+                    switch (packageHeader)
+                    {
+                        case PACKAGE1_HEADER:
+                            playerDied |= receivedData;
+                            break;
+                        case PACKAGE2_HEADER:
+                        {
+                            uint8_t receivedLives = receivedData;
 
-                player2.xOld = player2.x;
-                player2.x = ((receivedData >> 6) & 511);
-
-                player2.yOld = player2.y;
-                player2.y = ((receivedData >> 15) & 255);
-
-                startBitReceived = false;
+                            if (receivedLives < lives)
+                            {
+                                lives = receivedLives;
+//                                    setLives(lives);
+//                                    showLives(lives);
+                            }
+                            break;
+                        }
+                        case PACKAGE3_HEADER:
+                            currentlyPlayingLevelReceived = receivedData;
+                            break;
+                        case PACKAGE4_HEADER:
+                            player2.xOld = player2.x;
+                            player2.x = receivedData;
+                            break;
+                        case PACKAGE5_HEADER:
+                            player2.yOld = player2.y;
+                            player2.y = receivedData;
+                            break;
+                    }
+                    startBitReceived = false;
+                }
+                bitCounter++;
             }
         }
 
@@ -584,11 +647,14 @@ ISR(PCINT2_vect)
         {
             startBitReceived = true;
             bitCounter = 0;
+            receivedData = 0;
         }
     }
     // Save the time from startup to now
     startMs = currentMs;
 }
+
+
 
 // IR sending protocol (with timer to keep track of ms)
 ISR(TIMER0_COMPA_vect)
@@ -617,7 +683,7 @@ ISR(TIMER0_COMPA_vect)
             // If the waiting time is passed, send the next bit
         else
         {
-            if (sendingBit++ < SENDINGDATA_LEN)
+            if (++sendingBit < packageLength)
             {
                 // Send start bit
                 if (sendingBit == STARTBIT_VALUE)
@@ -636,11 +702,39 @@ ISR(TIMER0_COMPA_vect)
             {
                 // Once all bits are send, reset for next run
                 sendingBit = SENDINGBIT_START_VALUE;
-                sendingData = playerDied;
-                sendingData |= (getLives() << 1);
-                sendingData |= (currentlyPlayingLevel << 4);
-                sendingData |= (player1.x << 6);
-                sendingData |= ((uint32_t) (player1.y) << 15);
+
+                // If the last package is send, restart at the first one
+                if (++sendingPackageNumber > 5)
+                {
+                    sendingPackageNumber = 1;
+                }
+
+                switch (sendingPackageNumber)
+                {
+                    case 1:
+                        sendingData = (PACKAGE1_HEADER | (playerDied << PACKAGE_HEADER_LENGTH));
+                        packageLength = PACKAGE1_LENGTH;
+                        break;
+                    case 2:
+                        sendingData = (PACKAGE2_HEADER | (getLives() << PACKAGE_HEADER_LENGTH));
+                        packageLength = PACKAGE2_LENGTH;
+                        break;
+                    case 3:
+                        sendingData = (PACKAGE3_HEADER | (currentlyPlayingLevel << PACKAGE_HEADER_LENGTH));
+                        packageLength = PACKAGE3_LENGTH;
+                        break;
+                    case 4:
+                        sendingData = (PACKAGE4_HEADER | (player1.x << PACKAGE_HEADER_LENGTH));
+                        packageLength = PACKAGE4_LENGTH;
+                        break;
+                    case 5:
+                        sendingData = (PACKAGE5_HEADER | (player1.y << PACKAGE_HEADER_LENGTH));
+                        packageLength = PACKAGE5_LENGTH;
+                        break;
+                    default:
+                        sendingData = 0;
+                        packageLength = EMPTY_PACKAGE_LENGTH;
+                }
             }
         }
 
@@ -859,7 +953,7 @@ int main(void)
                 }
             } else if (currentGameState == LEVEL_SELECT_SCREEN)
             {
-                if (currentlyPlayingLevel != currentlyPlayingLevelReceived && getFreq() == IR_38KHZ)
+                if (false)
                 {
                     currentGameState = GAME;
                     currentlyPlayingLevel = currentlyPlayingLevelReceived;
@@ -964,12 +1058,12 @@ int main(void)
                         switch (currentHighlightedButton)
                         {
                             case 0:
-                                if (getFreq() == IR_56KHZ)
-                                {
-                                    currentGameState = GAME;
-                                    level = 1;
-                                    level1();
-                                }
+//                                if (getFreq() == IR_56KHZ)
+//                                {
+                                currentGameState = GAME;
+                                level = 1;
+                                level1();
+//                                }
                                 break;
                             case 1:
                                 if (level2Unlocked && getFreq() == IR_56KHZ)
@@ -1037,6 +1131,7 @@ int main(void)
                 {
                     if (currentHighlightedButton == 0)
                     {
+                        currentHighlightedButton = 1;
                         EEPROM_write(20, IR_56KHZ);
                         setFreq(IR_56KHZ);
                         currentGameState = MENU;

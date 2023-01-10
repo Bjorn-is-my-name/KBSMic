@@ -24,9 +24,16 @@ void EEPROM_update(unsigned short uiAddress, unsigned char ucData)
 {
     unsigned char ucOldData = EEPROM_read(uiAddress); // Read the current data at the specified address
 
-    // If the new data is different than the old data, write the new data
+    // If the new data is different from the old data, write the new data
     if (ucOldData != ucData)
     {
         EEPROM_write(uiAddress, ucData);
+    }
+}
+
+void EEPROM_clear_entire_mem(){
+    for (int i = 0; i < 256; ++i)
+    {
+        EEPROM_write(i, 0);
     }
 }

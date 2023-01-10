@@ -457,6 +457,8 @@ bool isDataBit = false;
 uint8_t lives = MAX_LIVES;
 uint8_t score = START_SCORE;
 uint8_t level = 1;
+uint8_t currentlyPlayingLevel = 0;
+uint8_t currentlyPlayingLevelReceived = 0;
 uint8_t level2Unlocked = 1;
 uint8_t level3Unlocked = 0;
 uint8_t player_accel = 0;
@@ -484,10 +486,10 @@ ISR(PCINT2_vect)
 
     if (isDataBit)
     {
-        // Calculate the length to determin the value
+        // Calculate the length to determine the value
         uint8_t difference = currentMs - startMs;
 
-        // Check if its a start bit
+        // Check if it's a start bit
         if (difference > STARTBIT_MIN && difference < STARTBIT_MAX)
         {
             startBitReceived = true;
@@ -495,15 +497,15 @@ ISR(PCINT2_vect)
             receivedData = 0;
         }
 
-        // If the start bit has been send, check what the data is
+        // If the start bit has been sent, check what the data is
         if (startBitReceived)
         {
-            // Check if its a zero
+            // Check if it's a zero
             if (difference < ZERO_MAX)
             {
                 receivedData &= ~(1 << bitCounter++);
             }
-                // Check if its a one
+                // Check if it's a one
             else if (difference > ONE_MIN && difference < ONE_MAX)
             {
                 receivedData |= (1 << bitCounter++);
@@ -512,12 +514,23 @@ ISR(PCINT2_vect)
             // If all bits are send, save the value in the variable
             if (bitCounter == SENDINGDATA_LEN)
             {
-                startBitReceived = false;
+                playerDied |= (receivedData & 1);
+
+                uint8_t receivedLives = ((receivedData & 14) >> 1);
+                if (receivedLives < lives)
+                {
+                    lives = receivedLives;
+                    setLives(lives);
+                    showLives(lives);
+                }
+
+                currentlyPlayingLevelReceived = ((receivedData & 48) >> 4);
+
                 player2.xOld = player2.x;
-                player2.x = receivedData & 0x1FF;
-                receivedData >>= 9;
+                player2.x = ((receivedData & 32704) >> 6);
+
                 player2.yOld = player2.y;
-                player2.y = (receivedData & 0xFF);
+                player2.y = ((receivedData & 8355840) >> 15);
             }
         }
     }
@@ -571,9 +584,11 @@ ISR(TIMER0_COMPA_vect)
             {
                 // Once all bits are send, reset for next run
                 sendingBit = SENDINGBIT_START_VALUE;
-                sendingData = player1.y;
-                sendingData <<= 9;
-                sendingData |= player1.x;
+                sendingData = playerDied;
+                sendingData |= (getLives() << 1);
+                sendingData |= (currentlyPlayingLevel << 4);
+                sendingData |= (player1.x << 6);
+                sendingData |= ((uint32_t) (player1.y) << 15);
             }
         }
 
@@ -604,7 +619,7 @@ int main(void)
     // Start the SPI communication and send screen startup commands
     setupSPI();
     START_UP();
-
+    EEPROM_clear_entire_mem();
     // Always set a start frequency so the game loop can run (because ms timer is in ISR of IR sending)
     setFreq(IR_38KHZ);
 
@@ -674,9 +689,6 @@ int main(void)
     uint8_t currentHighlightedButton = 1;
     bool normalState = true;
 
-    EEPROM_write(HIGHSCORE_START_LEVEL_ADDR, 12);
-    EEPROM_write(HIGHSCORE_START_LEVEL_ADDR+1, 134);
-    EEPROM_write(HIGHSCORE_START_LEVEL_ADDR+2, 245);
 
     // Loop forever
     while (true)
@@ -2106,9 +2118,9 @@ void drawHighScoreMenu()
     // Level 3 high score
     drawString("Level3", 50, 130, 4, PLAYER_ORANGE);
     // Level 2 high score number
-    pText[0] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR+2) / 100 + '0';
-    pText[1] = (EEPROM_read(HIGHSCORE_START_LEVEL_ADDR+2) % 100) / 10 + '0';
-    pText[2] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR+2) % 10 + '0';
+    pText[0] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + 2) / 100 + '0';
+    pText[1] = (EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + 2) % 100) / 10 + '0';
+    pText[2] = EEPROM_read(HIGHSCORE_START_LEVEL_ADDR + 2) % 10 + '0';
     drawString((const char *) pText, 205, 130, 4, PLAYER_YELLOW);
 
     // Back button

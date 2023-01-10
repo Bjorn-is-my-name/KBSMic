@@ -61,7 +61,7 @@ struct Diamond
         drawSpriteMirror(x + DIA_WIDTH * 2, y, DIA_WIDTH, DIA_HEIGHT, Diamond_Sprite, version);
     }
 
-    bool isInitialized()
+    bool isInitialized() const
     {
         return (x != 0);
     }
@@ -517,7 +517,7 @@ uint8_t level = 1;
 uint8_t currentlyPlayingLevel = 0;
 uint8_t currentlyPlayingLevelReceived = 0;
 uint8_t level2Unlocked = 1;
-uint8_t level3Unlocked = 0;
+uint8_t level3Unlocked = 1;
 uint8_t player_accel = 0;
 bool levelCompleted = false;
 bool playerDied = false;
@@ -535,8 +535,6 @@ enum gameState
     PLAYER_SELECT_SCREEN,
     HIGHSCORE_SCREEN
 } currentGameState;
-
-
 
 
 // IR receiving protocol
@@ -568,26 +566,21 @@ ISR(PCINT2_vect)
             }
             if (bitCounter == PACKAGE_HEADER_LENGTH)
             {
-                switch (packageHeader)
+                if (packageHeader == PACKAGE1_HEADER)
                 {
-                    case PACKAGE1_HEADER:
-                        receivingPackageLength = PACKAGE1_LENGTH;
-                        break;
-                    case PACKAGE2_HEADER:
-                        receivingPackageLength = PACKAGE2_LENGTH;
-                        break;
-                    case PACKAGE3_HEADER:
-                        receivingPackageLength = PACKAGE3_LENGTH;
-                        break;
-                    case PACKAGE4_HEADER:
-                        receivingPackageLength = PACKAGE4_LENGTH;
-                        break;
-                    case PACKAGE5_HEADER:
-                        receivingPackageLength = PACKAGE5_LENGTH;
-                        break;
-                    default:
-                        receivingPackageLength = EMPTY_PACKAGE_LENGTH;
-                        break;
+                    receivingPackageLength = PACKAGE1_LENGTH;
+                } else if (packageHeader == PACKAGE2_HEADER)
+                {
+                    receivingPackageLength = PACKAGE2_LENGTH;
+                } else if (packageHeader == PACKAGE3_HEADER)
+                {
+                    receivingPackageLength = PACKAGE3_LENGTH;
+                } else if (packageHeader == PACKAGE4_HEADER)
+                {
+                    receivingPackageLength = PACKAGE4_LENGTH;
+                } else if (packageHeader == PACKAGE5_HEADER)
+                {
+                    receivingPackageLength = PACKAGE5_LENGTH;
                 }
             }
 
@@ -607,35 +600,31 @@ ISR(PCINT2_vect)
                 // If all bits are send read the data
                 if (bitCounter == receivingPackageLength)
                 {
-                    switch (packageHeader)
+                    if (packageHeader == PACKAGE1_HEADER)
                     {
-                        case PACKAGE1_HEADER:
-                            playerDied |= receivedData;
-                            break;
-                        case PACKAGE2_HEADER:
-                        {
-                            uint8_t receivedLives = receivedData;
+                        playerDied |= receivedData;
+                    } else if (packageHeader == PACKAGE2_HEADER)
+                    {
+                        uint8_t receivedLives = receivedData;
 
-                            if (receivedLives < lives)
-                            {
-                                lives = receivedLives;
-//                                    setLives(lives);
-//                                    showLives(lives);
-                            }
-                            break;
+                        if (receivedLives < lives)
+                        {
+                        lives = receivedLives;
+
                         }
-                        case PACKAGE3_HEADER:
-                            currentlyPlayingLevelReceived = receivedData;
-                            break;
-                        case PACKAGE4_HEADER:
-                            player2.xOld = player2.x;
-                            player2.x = receivedData;
-                            break;
-                        case PACKAGE5_HEADER:
-                            player2.yOld = player2.y;
-                            player2.y = receivedData;
-                            break;
+                    } else if (packageHeader == PACKAGE3_HEADER)
+                    {
+                        currentlyPlayingLevelReceived = receivedData;
+                    } else if (packageHeader == PACKAGE4_HEADER)
+                    {
+                        player2.xOld = player2.x;
+                        player2.x = receivedData;
+                    } else if (packageHeader == PACKAGE5_HEADER)
+                    {
+                        player2.yOld = player2.y;
+                        player2.y = receivedData;
                     }
+
                     startBitReceived = false;
                 }
                 bitCounter++;
@@ -653,8 +642,6 @@ ISR(PCINT2_vect)
     // Save the time from startup to now
     startMs = currentMs;
 }
-
-
 
 // IR sending protocol (with timer to keep track of ms)
 ISR(TIMER0_COMPA_vect)
@@ -709,31 +696,30 @@ ISR(TIMER0_COMPA_vect)
                     sendingPackageNumber = 1;
                 }
 
-                switch (sendingPackageNumber)
+                if (sendingPackageNumber == 1)
                 {
-                    case 1:
-                        sendingData = (PACKAGE1_HEADER | (playerDied << PACKAGE_HEADER_LENGTH));
-                        packageLength = PACKAGE1_LENGTH;
-                        break;
-                    case 2:
-                        sendingData = (PACKAGE2_HEADER | (getLives() << PACKAGE_HEADER_LENGTH));
-                        packageLength = PACKAGE2_LENGTH;
-                        break;
-                    case 3:
-                        sendingData = (PACKAGE3_HEADER | (currentlyPlayingLevel << PACKAGE_HEADER_LENGTH));
-                        packageLength = PACKAGE3_LENGTH;
-                        break;
-                    case 4:
-                        sendingData = (PACKAGE4_HEADER | (player1.x << PACKAGE_HEADER_LENGTH));
-                        packageLength = PACKAGE4_LENGTH;
-                        break;
-                    case 5:
-                        sendingData = (PACKAGE5_HEADER | (player1.y << PACKAGE_HEADER_LENGTH));
-                        packageLength = PACKAGE5_LENGTH;
-                        break;
-                    default:
-                        sendingData = 0;
-                        packageLength = EMPTY_PACKAGE_LENGTH;
+                    sendingData = (PACKAGE1_HEADER | (playerDied << PACKAGE_HEADER_LENGTH));
+                    packageLength = PACKAGE1_LENGTH;
+                } else if (sendingPackageNumber == 2)
+                {
+                    sendingData = (PACKAGE2_HEADER | (getLives() << PACKAGE_HEADER_LENGTH));
+                    packageLength = PACKAGE2_LENGTH;
+                } else if (sendingPackageNumber == 3)
+                {
+                    sendingData = (PACKAGE3_HEADER | (currentlyPlayingLevel << PACKAGE_HEADER_LENGTH));
+                    packageLength = PACKAGE3_LENGTH;
+                } else if (sendingPackageNumber == 4)
+                {
+                    sendingData = (PACKAGE4_HEADER | (player1.x << PACKAGE_HEADER_LENGTH));
+                    packageLength = PACKAGE4_LENGTH;
+                } else if (sendingPackageNumber == 5)
+                {
+                    sendingData = (PACKAGE5_HEADER | (player1.y << PACKAGE_HEADER_LENGTH));
+                    packageLength = PACKAGE5_LENGTH;
+                } else
+                {
+                    sendingData = 0;
+                    packageLength = EMPTY_PACKAGE_LENGTH;
                 }
             }
         }
@@ -772,6 +758,7 @@ int main(void)
     setupSPI();
     START_UP();
     EEPROM_clear_entire_mem();
+    EEPROM_update(LIVES_ADDR, 5);
 
 //     Always set a start frequency so the game loop can run (because ms timer is in ISR of IR sending)
     setFreq(IR_38KHZ);
@@ -876,6 +863,7 @@ int main(void)
                     drawScore(score, true);
                     score--;
                     drawScore(score, false);
+                    showLives(lives);
                 }
 
                 // Game code
@@ -953,7 +941,7 @@ int main(void)
                 }
             } else if (currentGameState == LEVEL_SELECT_SCREEN)
             {
-                if (false)
+                if (currentlyPlayingLevel != currentlyPlayingLevelReceived && getFreq() == IR_38KHZ)
                 {
                     currentGameState = GAME;
                     currentlyPlayingLevel = currentlyPlayingLevelReceived;
@@ -973,12 +961,13 @@ int main(void)
                             currentlyPlayingLevel = currentlyPlayingLevelReceived;
                             break;
                         case 3:
-                            // level = 3;
-                            //currentGameState = GAME;
-                            // Level3();
-//                            currentlyPlayingLevel = currentlyPlayingLevelReceived;
+                            level = 3;
+                            currentGameState = GAME;
+                            level3();
+                            currentlyPlayingLevel = currentlyPlayingLevelReceived;
                             break;
                         default:
+                            currentHighlightedButton = 1;
                             currentGameState = MENU;
                             currentlyPlayingLevel = currentlyPlayingLevelReceived;
                             break;
@@ -1058,12 +1047,12 @@ int main(void)
                         switch (currentHighlightedButton)
                         {
                             case 0:
-//                                if (getFreq() == IR_56KHZ)
-//                                {
-                                currentGameState = GAME;
-                                level = 1;
-                                level1();
-//                                }
+                                if (getFreq() == IR_56KHZ)
+                                {
+                                    currentGameState = GAME;
+                                    level = 1;
+                                    level1();
+                                }
                                 break;
                             case 1:
                                 if (level2Unlocked && getFreq() == IR_56KHZ)
@@ -1074,12 +1063,12 @@ int main(void)
                                 }
                                 break;
                             case 2:
-                                // if(level3Unlocked && getFreq() == IR_56KHZ)
-                                //{
-                                // currentGameState = GAME;
-                                // level = 3;
-                                // level3();
-                                //}
+                                if (level3Unlocked && getFreq() == IR_56KHZ)
+                                {
+                                    currentGameState = GAME;
+                                    level = 3;
+                                    level3();
+                                }
                                 break;
                             case 3: // Exit button
                                 currentGameState = MENU;
@@ -1578,9 +1567,9 @@ void checkPoolCollision()
 }
 
 // Function to set the player position correctly
-void setPlayerPos(uint8_t Level)
+void setPlayerPos(uint8_t currentLevel)
 {
-    if (Level == 1)
+    if (currentLevel == 1)
     {
         if (getFreq() == IR_56KHZ)
         {
@@ -1607,7 +1596,7 @@ void setPlayerPos(uint8_t Level)
             player2.y = PLAYER_ONE_Y_LVL_ONE;
             player2.yOld = player2.y;
         }
-    } else if (Level == 2)
+    } else if (currentLevel == 2)
     {
         if (getFreq() == IR_56KHZ)
         {
@@ -1634,9 +1623,38 @@ void setPlayerPos(uint8_t Level)
             player2.y = PLAYER_ONE_Y_LVL_TWO;
             player2.yOld = player2.y;
         }
+    } else if (currentLevel == 3)
+    {
+        if (getFreq() == IR_56KHZ)
+        {
+            // player 1
+            player1.x = PLAYER_ONE_X_LVL_THREE;
+            player1.xOld = player1.x;
+            player1.y = PLAYER_ONE_Y_LVL_THREE;
+            player1.yOld = player1.y;
+            // player 2
+            player2.x = PLAYER_TWO_X_LVL_THREE;
+            player2.xOld = player2.x;
+            player2.y = PLAYER_TWO_Y_LVL_THREE;
+            player2.yOld = player2.y;
+        } else
+        {
+            // player 1
+            player1.x = PLAYER_TWO_X_LVL_THREE;
+            player1.xOld = player1.x;
+            player1.y = PLAYER_TWO_Y_LVL_THREE;
+            player1.yOld = player1.y;
+            // player 2
+            player2.x = PLAYER_ONE_X_LVL_THREE;
+            player2.xOld = player2.x;
+            player2.y = PLAYER_ONE_Y_LVL_THREE;
+            player2.yOld = player2.y;
+        }
     }
 }
 
+// Function to cleat and draw Player1 and Player2
+// Function to cleat and draw Player1 and Player2
 // Function to cleat and draw Player1 and Player2
 void drawPlayers()
 {
@@ -2145,6 +2163,106 @@ void level2()
     drawInteractables();
 }
 
+// Function to initialize level 3
+void level3()
+{
+    clearLevel();
+    // set player positions
+    setPlayerPos(3);
+
+    // initialize walls
+    walls[0] = {0, 0, 320, 39};     //
+    walls[1] = {0, 39, 145, 30};    //
+    walls[2] = {0, 69, 89, 41};     //
+    walls[3] = {119, 69, 26, 41};   //
+    walls[4] = {0, 110, 10, 130};   //
+    walls[5] = {10, 190, 20, 10};   //
+    walls[6] = {10, 230, 310, 10};  //
+    walls[7] = {60, 190, 250, 10};  //
+    walls[8] = {310, 110, 10, 120}; //
+    walls[9] = {175, 69, 25, 41};   //
+    walls[10] = {230, 39, 90, 71};   //
+
+    // door red
+    Door2 = {290, 160, DOOR_WIDTH, DOOR_HEIGHT};    //
+    // door blue
+    Door1 = {290, 200, DOOR_WIDTH, DOOR_HEIGHT};    //
+
+    // Poison
+    liq1 = {69, 190, 200, LIQUID_HEIGHT, 2};    //
+
+    // purple platform
+    Platform1 = {{145, 93, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 145, 145, 93, 143, 0};     //
+    // Blue platform
+    Platform2 = {{89, 69, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 73, 73, 69, 169, 4};        //
+    // Light_blue platform bottom
+    Platform3 = {{200, 69, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 200, 200, 69, 169, 5};     //
+    // White Platform
+    Platform4 = {{30, 192, PLATFORM_WIDTH, PLATFORM_HEIGHT}, 30, 30, 110, 192, 6};      //
+
+    // lever for white platform
+    Lever5 = {{18, 189, 2, 1}, true, false, {&Platform4}, 6};
+
+    // button for purple platform
+    button1 = {{100, 228, BUTTON_WIDTH * 2, 2}, false, {&Platform1}, 0};    //
+    // button for Light_blue platform
+    button2 = {{161, 228, BUTTON_WIDTH * 2, 2}, false, {&Platform3}, 5};    //
+    // button for red platform
+    button3 = {{216, 228, BUTTON_WIDTH * 2, 2}, false, {&Platform2}, 4};    //
+
+    // red diamond left
+    Dia1 = {97, 149, DIA_WIDTH * 4, DIA_HEIGHT, 1};     //
+    // red diamond upperRight
+    Dia2 = {207, 51, DIA_WIDTH * 4, DIA_HEIGHT, 1};     //
+    // bue diamond upperRight
+    Dia3 = {154, 51, DIA_WIDTH * 4, DIA_HEIGHT, 0};     //
+    // red diamond middleleft
+    Dia4 = {210, 150, DIA_WIDTH * 4, DIA_HEIGHT, 0};    //
+
+    // draw everything
+    drawBackground();
+    drawInteractables();
+}
+
+void clearLevel()
+{
+    for (uint8_t i = 0; i < 20; i++)
+    {
+        walls[i] = {};
+    }
+
+    Door1 = {};
+    Door2 = {};
+    Platform1 = {};
+    Platform2 = {};
+    Platform3 = {};
+    Platform4 = {};
+    Platform5 = {};
+    Platform6 = {};
+    Platform7 = {};
+    Platform8 = {};
+    Platform9 = {};
+    Lever1 = {};
+    Lever2 = {};
+    Lever3 = {};
+    Lever4 = {};
+    Lever5 = {};
+    button1 = {};
+    button2 = {};
+    button3 = {};
+    Dia1 = {};
+    Dia2 = {};
+    Dia3 = {};
+    Dia4 = {};
+    Dia5 = {};
+    Dia6 = {};
+    liq1 = {};
+    liq2 = {};
+    liq3 = {};
+    liq4 = {};
+}
+
+
 // Function to convert a 4 bit colour to a 16 bit colour
 uint16_t getcolour(uint8_t colour, uint8_t ver)
 {
@@ -2418,9 +2536,9 @@ void drawScore(uint8_t highscore, bool clearScore)
     }
 
     unsigned char *pText = new unsigned char[4];
-    pText[0] = player2.y / 100 + '0';
-    pText[1] = (player2.y % 100) / 10 + '0';
-    pText[2] = player2.y % 10 + '0';
+    pText[0] = score / 100 + '0';
+    pText[1] = (score % 100) / 10 + '0';
+    pText[2] = score % 10 + '0';
     pText[3] = '\0';
     drawString((const char *) pText, SCORE_POS, 2, 2, colour);
 

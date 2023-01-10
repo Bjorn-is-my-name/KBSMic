@@ -62,6 +62,8 @@ bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t);
 void update();
 void level1();
 void level2();
+void level3();
+void clearLevel();
 uint8_t getLives();
 void setLives(uint8_t &);
 void showLives(uint8_t);

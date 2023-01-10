@@ -496,7 +496,8 @@ uint32_t startMs = 0;
 // Tracks if the staring bit was received before accepting data
 bool startBitReceived = false;
 // All the received bits
-uint32_t receivedData = 0;
+volatile uint32_t receivedData = 0;
+uint32_t printedData = 0;
 // Current bit (used for bitshifting 1's in to receivedData)
 uint8_t bitCounter = 0;
 // Differentiates data from pauses
@@ -539,14 +540,6 @@ ISR(PCINT2_vect)
         // Calculate the length to determin the value
         uint8_t difference = currentMs - startMs;
 
-        // Check if its a start bit
-        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX)
-        {
-            startBitReceived = true;
-            bitCounter = 0;
-            receivedData = 0;
-        }
-
         // If the start bit has been send, check what the data is
         if (startBitReceived)
         {
@@ -555,14 +548,14 @@ ISR(PCINT2_vect)
             {
                 receivedData &= ~(1 << bitCounter++);
             }
-                // Check if its a one
-            else if (difference > ONE_MIN && difference < ONE_MAX)
+                // Else it's a one
+            else
             {
                 receivedData |= (1 << bitCounter++);
             }
 
             // If all bits are send, save the value in the variable
-            if (bitCounter == SENDINGDATA_LEN)
+            if (bitCounter == SENDINGDATA_LEN + 1)
             {
                 playerDied |= (receivedData & 1);
 
@@ -581,7 +574,16 @@ ISR(PCINT2_vect)
 
                 player2.yOld = player2.y;
                 player2.y = ((receivedData >> 15) & 255);
+
+                startBitReceived = false;
             }
+        }
+
+        // Check if its a start bit
+        if (difference > STARTBIT_MIN && difference < STARTBIT_MAX)
+        {
+            startBitReceived = true;
+            bitCounter = 0;
         }
     }
     // Save the time from startup to now
@@ -676,7 +678,6 @@ int main(void)
     setupSPI();
     START_UP();
     EEPROM_clear_entire_mem();
-    Serial.begin(9600);
 
 //     Always set a start frequency so the game loop can run (because ms timer is in ISR of IR sending)
     setFreq(IR_38KHZ);
@@ -766,9 +767,6 @@ int main(void)
 
             if (currentGameState == GAME)
             {
-                Serial.print("P2Y:");
-                Serial.println(player2.y);
-                Serial.println(receivedData, BIN);
                 // Game code
                 // Checks if the score is 0 or lower. If so, the player loses a life.
                 if (score <= 0)
@@ -872,16 +870,19 @@ int main(void)
                             level = 1;
                             currentGameState = GAME;
                             level1();
+                            currentlyPlayingLevel = currentlyPlayingLevelReceived;
                             break;
                         case 2:
                             level = 2;
                             currentGameState = GAME;
                             level2();
+                            currentlyPlayingLevel = currentlyPlayingLevelReceived;
                             break;
                         case 3:
                             // level = 3;
                             //currentGameState = GAME;
                             // Level3();
+//                            currentlyPlayingLevel = currentlyPlayingLevelReceived;
                             break;
                         default:
                             currentGameState = MENU;
@@ -1003,6 +1004,7 @@ int main(void)
                     currentHighlightedButton = 1;
                     currentGameState = MENU;
                     drawMenu();
+                    currentlyPlayingLevel = 0;
                 }
             } else if (currentGameState == PLAYER_SELECT_SCREEN)
             {
@@ -2321,9 +2323,9 @@ void drawScore(uint8_t highscore, bool clearScore)
     }
 
     unsigned char *pText = new unsigned char[4];
-    pText[0] = highscore / 100 + '0';
-    pText[1] = (highscore % 100) / 10 + '0';
-    pText[2] = highscore % 10 + '0';
+    pText[0] = player2.y / 100 + '0';
+    pText[1] = (player2.y % 100) / 10 + '0';
+    pText[2] = player2.y % 10 + '0';
     pText[3] = '\0';
     drawString((const char *) pText, SCORE_POS, 2, 2, colour);
 

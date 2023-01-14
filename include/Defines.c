@@ -125,6 +125,7 @@
 #define COLUMN_ADDRESS_SET 0x2A
 #define PAGE_ADDRESS_SET 0x2B
 #define MEMORY_WRITE 0x2C
+#define EEPROM_SIZE 21
 
 // colours-------------------------------------------------
 #define BLACK 0x0000 ///<   0,   0,   0

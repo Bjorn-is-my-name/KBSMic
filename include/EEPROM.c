@@ -33,7 +33,7 @@ void EEPROM_update(unsigned short uiAddress, unsigned char ucData)
 
 void EEPROM_clear_entire_mem()
 {
-    for (uint8_t i = 0; i < 21; ++i)
+    for (uint8_t i = 0; i < EEPROM_SIZE; ++i)
     {
         EEPROM_update(i, 0);
     }

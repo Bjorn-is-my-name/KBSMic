@@ -17,7 +17,7 @@ set(CMAKE_TOOLCHAIN_FILE ${ARDUINO_PATH}/etc/toolchain-avr.cmake)
 set(CMAKE_PROJECT_INCLUDE ${ARDUINO_PATH}/etc/extratargets-avr.cmake)
 
 # Project name
-project("Bitches")
+project("KBS")
 
 # Create one target
 # (Linux) `find src -name \*.c\*`
@@ -27,6 +27,7 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     "${ARDUINO_PATH}/include/arduino"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 target_link_directories(${PROJECT_NAME} PRIVATE

@@ -857,7 +857,6 @@ int main(void)
         }
     }
 
-    // Draws the score on the screen.
     uint8_t currentHighlightedButton;
     bool normalState = true;
     // Loop forever

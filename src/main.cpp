@@ -1,4 +1,4 @@
-#include <main.h> //Iinclude the main header file
+#include <main.h> //Include the main header file
 
 volatile int frameCounter = 0;
 
@@ -523,8 +523,8 @@ uint8_t score = START_SCORE;
 uint8_t level = 1;
 uint8_t currentlyPlayingLevel = 0;
 uint8_t currentlyPlayingLevelReceived = 0;
-uint8_t level2Unlocked = 1;
-uint8_t level3Unlocked = 1;
+uint8_t level2Unlocked = 0;
+uint8_t level3Unlocked = 0;
 uint8_t player_accel = 0;
 bool levelCompleted = false;
 bool playerDied = false;
@@ -770,7 +770,7 @@ ISR(TIMER0_COMPA_vect)
 int main(void)
 {
     // If errors are gotten at startup, uncomment this code to clear EEPROM (Mainly for testing purposes)
-    // EEPROM_clear_entire_mem();
+    EEPROM_clear_entire_mem();
 
     // Setup IR led
     // Set pin D6 as output

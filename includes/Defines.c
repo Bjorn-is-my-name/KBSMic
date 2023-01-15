@@ -1,26 +1,19 @@
-// MOETEN NOG GESORTEERD WORDEN
-#define FONT_SPACE 6
-#define FONT_X 8
-#define FONT_Y 8
+// Gameloop defines
 #define FRAME_TIME 32 //(1000/30FPS)-1 = 32
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 // Lives defines
 #define MAX_LIVES 5
 #define LIVES_ADDR 0x00
 
 // Score defines
-#define LEVEL_START_SCORE_ADDR 0x05
 #define START_SCORE 200
-#define CURRENT_SCORE false
 #define DIAMOND_POINTS 30
 // Highscore defines
 #define HIGHSCORE_START_LEVEL_ADDR 0x01
-#define HIGHSCORE true // niet gebruikt? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define SCORE_POS 142  // niet gebruikt? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define SCORE_POS 142
 
 // Level defines
-#define MAX_LEVEL 3 // niet gebruikt? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define MAX_LEVEL 3
 // level one
 #define PLAYER_ONE_X_LVL_ONE 13
 #define PLAYER_ONE_Y_LVL_ONE 170
@@ -42,18 +35,14 @@
 #define PLAYER_TWO_X_LVL_THREE 274
 #define PLAYER_TWO_Y_LVL_THREE 210
 
-
-
 // Nunchuk defines
 #define IO_ADDR (0x39) // The port expander I2C address.
 #define NUNCHUK_ADDRESS 0x52
 // nunchuk memory addresses
 #define NCSTATE 0x00 // address of state (6 bytes)
-#define NCCAL 0x20   // address of callibration data (16 bytes)  niet gebruikt? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define NCID 0xFA    // address of id (4 bytes)
 #define CHUNKLEN 32
 #define STATELEN 6
-#define CALLEN 16     // niet gebruikt? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define IDLEN 4       // bytes
 #define WAITFORREAD 1 // ms
 
@@ -64,9 +53,6 @@
 #define STARTBIT_MIN 3
 #define STARTBIT_MAX 6
 #define ZERO_MAX 2
-#define ONE_MIN 1
-#define ONE_MAX 4
-#define SENDINGDATA_LEN 22
 #define SENDINGBIT_START_VALUE (-2)
 
 #define PACKAGE1_HEADER 0b001
@@ -82,8 +68,7 @@
 #define PACKAGE4_LENGTH 12
 #define PACKAGE5_LENGTH 11
 
-
-// sceen dimensions
+// Sceen dimensions
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
@@ -95,14 +80,13 @@
 #define PLAYER_MAX_ACCEL 6
 #define GRAVITY 1
 #define INITIAL_Y_VEL 10
-#define MOVEMENT_SPEED 3
 
 // Background defines
 #define BG_SPRITE_WIDTH 10
 #define BG_SPRITE_ACTUAL_WIDTH 20
 #define BG_SPRITE_HEIGHT 10
 
-// interactibles defines
+// Interactibles defines
 #define BUTTON_WIDTH 3
 #define BUTTON_HEIGHT 4
 #define LIQUID_WIDTH 38
@@ -127,7 +111,7 @@
 #define MEMORY_WRITE 0x2C
 #define EEPROM_SIZE 21
 
-// colours-------------------------------------------------
+// Colours-------------------------------------------------
 #define BLACK 0x0000 ///<   0,   0,   0
 #define WHITE 0xFFFF ///< 255, 255, 255
 #define ALPHA 255
@@ -152,8 +136,13 @@
 
 #define FOREGROUND_LIGHT 0x7346 ///<  14,  26,   6
 #define FOREGROUND_DARK 0x5A85  ///<  11,  20,   5
+
 // Getcolor values
 #define PLATFORM_MIDDLE_COLOUR 0b00001010
 #define LIQUID_TOP_COLOUR 0b00000110
 #define LIQUID_MIDDLE_COLOUR 0b00000101
 #define LIQUID_BOTTOM_COLOUR 0b00000100
+
+// Font defines
+#define FONT_SPACE 6
+#define FONT_X 8

@@ -4,11 +4,11 @@
 
 #include <Wire.h>
 
+#include <Defines.c>
 #include <EEPROM.c>
 #include <LCD.cpp>
 #include <Nunchuk.cpp>
 #include <Sprites.c>
-#include <Defines.c>
 
 struct Rect
 {
@@ -27,6 +27,8 @@ uint8_t getFreq();
 void drawMenu();
 void drawPlayerSelectScreen();
 void drawLevelSelectScreen();
+void drawHighScoreMenu();
+
 void drawBackground();
 void drawBackgroundTile(uint16_t, uint8_t, uint8_t, uint8_t);
 void setPlayerPos(uint8_t);
@@ -60,6 +62,8 @@ bool pointInRect(uint16_t, uint8_t, uint16_t, uint8_t, uint16_t, uint8_t);
 void update();
 void level1();
 void level2();
+void level3();
+void clearLevel();
 uint8_t getLives();
 void setLives(uint8_t &);
 void showLives(uint8_t);
